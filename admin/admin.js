@@ -1,5 +1,5 @@
 // admin/admin.js - COMPLETE REWRITE FOR SECURITY (with booking reference)
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 console.log('🚀 Admin JS loaded');
 console.log('🔗 API URL:', API_URL);
 

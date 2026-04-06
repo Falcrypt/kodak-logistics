@@ -1,5 +1,5 @@
 // script.js - COMPLETELY FIXED VERSION with Booking Reference
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 
 // Hide loader immediately when page loads
 window.addEventListener('load', function() {
