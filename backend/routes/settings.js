@@ -4,7 +4,7 @@
 const express = require('express');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 // ========== PUBLIC ENDPOINT (no login required) ==========
