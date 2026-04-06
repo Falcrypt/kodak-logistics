@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KODAK LOGISTICS | Student Storage & Pickup – KNUST</title>
+  <meta name="description" content="Affordable, secure luggage, fridge & student item storage with hostel pickup for KNUST students during vacation."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9922A;
+      --gold-light: #F5C96A;
+      --gold-pale: #FDF6E7;
+      --dark: #0F0E0C;
+      --dark-2: #1A1916;
+      --dark-3: #252320;
+      --mid: #4A4740;
+      --muted: #8A867E;
+      --cream: #F9F5EF;
+      --white: #FFFFFF;
+      --border: rgba(201,146,42,0.18);
+      --radius: 16px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed; inset: 0; background: var(--dark);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-inner {
+      text-align: center;
+    }
+    .loader-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px; font-weight: 800;
+      color: var(--gold); letter-spacing: 4px;
+      animation: pulse 1.2s ease infinite;
+    }
+    .loader-bar {
+      width: 160px; height: 2px;
+      background: var(--dark-3); border-radius: 2px;
+      margin: 16px auto 0; overflow: hidden;
+    }
+    .loader-fill {
+      height: 100%; background: var(--gold);
+      animation: load 1.6s ease forwards;
+    }
+    @keyframes load { from { width: 0; } to { width: 100%; } }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+    /* ── WHATSAPP FLOAT ── */
+    .wa-float {
+      position: fixed; bottom: 28px; right: 24px; z-index: 999;
+      display: flex; align-items: center; gap: 10px;
+      background: #25D366; color: #fff;
+      padding: 12px 20px; border-radius: 50px;
+      font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px;
+      text-decoration: none; box-shadow: 0 8px 24px rgba(37,211,102,0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .wa-float:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(37,211,102,0.5); }
+    .wa-float i { font-size: 18px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 72px;
+      background: rgba(15,14,12,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.3s ease;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+    }
+    .nav-brand-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .nav-brand-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 17px;
+      color: var(--white); letter-spacing: 1px;
+    }
+    .nav-brand-name span { color: var(--gold); }
+    .nav-links {
+      display: flex; align-items: center; gap: 6px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px; font-weight: 400;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none; padding: 8px 14px; border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.07); }
+    .nav-cta {
+      background: var(--gold) !important;
+      color: var(--dark) !important;
+      font-weight: 500 !important;
+      padding: 9px 20px !important;
+    }
+    .nav-cta:hover { background: var(--gold-light) !important; }
+
+    .hamburger {
+      display: none; background: none; border: none; cursor: pointer;
+      padding: 6px; color: var(--white); font-size: 22px;
+    }
+    .mobile-menu {
+      display: none; position: fixed; top: 72px; left: 0; right: 0;
+      background: var(--dark-2); border-bottom: 1px solid var(--border);
+      padding: 16px 5%; z-index: 800;
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a {
+      display: block; padding: 12px 0;
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--gold); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: var(--dark);
+      display: flex; align-items: center;
+      padding: 120px 5% 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -200px; right: -200px;
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,146,42,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -100px; left: -100px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,146,42,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1200px; margin: 0 auto; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(201,146,42,0.12); border: 1px solid rgba(201,146,42,0.3);
+      color: var(--gold-light); font-size: 13px; font-weight: 500;
+      padding: 7px 16px; border-radius: 50px; margin-bottom: 28px;
+    }
+    .hero-badge i { font-size: 12px; }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(38px, 5vw, 62px);
+      font-weight: 800; line-height: 1.08;
+      color: var(--white); margin-bottom: 24px;
+    }
+    .hero h1 em {
+      font-style: normal; color: var(--gold);
+    }
+    .hero p {
+      font-size: 17px; line-height: 1.7;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 40px; max-width: 460px;
+    }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gold); color: var(--dark);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px;
+      padding: 14px 28px; border-radius: var(--radius-sm);
+      text-decoration: none; border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent; color: rgba(255,255,255,0.8);
+      font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 15px;
+      padding: 14px 28px; border-radius: var(--radius-sm);
+      text-decoration: none; border: 1px solid rgba(255,255,255,0.18);
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 44px; padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+      color: var(--gold);
+    }
+    .stat-lbl { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+    .hero-visual {
+      position: relative;
+    }
+    .hero-card {
+      background: var(--dark-2); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+    }
+    .hero-card-img {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover;
+      display: block; background: var(--dark-3);
+    }
+    .hero-card-body {
+      padding: 20px 22px;
+    }
+    .hero-card-body h3 {
+      font-family: 'Syne', sans-serif; font-size: 18px;
+      font-weight: 700; color: var(--white);
+    }
+    .hero-card-body p { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+    .floating-pill {
+      position: absolute; top: -18px; right: -18px;
+      background: var(--gold); color: var(--dark);
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 12px; letter-spacing: 1px;
+      padding: 8px 16px; border-radius: 50px;
+      box-shadow: 0 6px 20px rgba(201,146,42,0.4);
+    }
+    .floating-badge {
+      position: absolute; bottom: -14px; left: 28px;
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .floating-badge-icon {
+      width: 36px; height: 36px; background: rgba(201,146,42,0.15);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .floating-badge-text { font-size: 13px; }
+    .floating-badge-text strong { display: block; color: var(--white); font-size: 15px; }
+    .floating-badge-text span { color: rgba(255,255,255,0.4); font-size: 12px; }
+
+    /* ── SECTION WRAPPER ── */
+    .section {
+      padding: 100px 5%;
+    }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px; font-weight: 600; letter-spacing: 2.5px;
+      color: var(--gold); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif; font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800; color: var(--dark); line-height: 1.15;
+    }
+    .section-title.light { color: var(--white); }
+    .section-sub {
+      font-size: 16px; color: var(--muted); margin-top: 12px; max-width: 520px;
+    }
+    .section-sub.light { color: rgba(255,255,255,0.45); }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      background: var(--dark);
+      padding: 100px 5%;
+    }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 2px;
+      margin-top: 60px;
+    }
+    .step {
+      background: var(--dark-2); padding: 36px 28px;
+      border: 1px solid rgba(255,255,255,0.04);
+      position: relative; transition: background 0.2s;
+    }
+    .step:first-child { border-radius: 20px 0 0 20px; }
+    .step:last-child { border-radius: 0 20px 20px 0; }
+    .step:hover { background: var(--dark-3); }
+    .step-num {
+      font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800;
+      color: rgba(201,146,42,0.15); line-height: 1; margin-bottom: 20px;
+    }
+    .step-icon {
+      width: 48px; height: 48px; background: rgba(201,146,42,0.12);
+      border: 1px solid rgba(201,146,42,0.25); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+    }
+    .step h3 {
+      font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700;
+      color: var(--white); margin-bottom: 10px;
+    }
+    .step p { font-size: 14px; color: rgba(255,255,255,0.4); line-height: 1.7; }
+
+    /* ── GALLERY ── */
+    .gallery-section { background: var(--cream); }
+    .gallery-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 40px; margin-bottom: 36px;
+    }
+    .tab-btn {
+      background: transparent; border: 1px solid #D8D3CB;
+      color: var(--mid); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 500;
+      padding: 9px 20px; border-radius: 50px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--gold); border-color: var(--gold);
+      color: var(--dark);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .gallery-card {
+      background: var(--white); border-radius: var(--radius);
+      overflow: hidden; border: 1px solid #EAE4DB;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+    .gallery-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.1);
+    }
+    .gallery-card-img {
+      width: 100%; aspect-ratio: 4/3;
+      object-fit: cover; display: block;
+      background: #F0EBE2;
+    }
+    .gallery-card-body { padding: 18px 20px; }
+    .gallery-card-body h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px; font-weight: 700; color: var(--dark);
+    }
+    .gallery-card-body p { font-size: 13px; color: var(--muted); margin: 5px 0 12px; line-height: 1.5; }
+    .gallery-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 12px; border-top: 1px solid #F0EBE2;
+    }
+    .price-tag {
+      font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800;
+      color: var(--gold);
+    }
+    .price-tag span { font-size: 13px; font-weight: 400; color: var(--muted); }
+
+    /* ── PRICING ── */
+    .pricing-section { background: var(--dark); padding: 100px 5%; }
+    .price-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;
+      margin-top: 56px;
+    }
+    .price-card {
+      background: var(--dark-2); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius); padding: 32px 24px;
+      text-align: center; transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+    }
+    .price-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+    .price-card.featured {
+      background: linear-gradient(145deg, rgba(201,146,42,0.15), rgba(201,146,42,0.05));
+      border-color: rgba(201,146,42,0.45);
+    }
+    .price-card-icon { font-size: 32px; margin-bottom: 16px; }
+    .price-card h3 {
+      font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+      color: rgba(255,255,255,0.7); letter-spacing: 0.5px; margin-bottom: 16px;
+    }
+    .price-amount {
+      font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800;
+      color: var(--white); line-height: 1;
+    }
+    .price-amount .currency {
+      font-size: 18px; color: var(--gold); vertical-align: top; margin-top: 6px;
+      display: inline-block;
+    }
+    .price-period {
+      font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 6px;
+    }
+    .price-card p {
+      font-size: 13px; color: rgba(255,255,255,0.35);
+      margin-top: 16px; line-height: 1.6;
+    }
+    .free-badge {
+      background: rgba(39,174,96,0.15); color: #6CE09E;
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      padding: 5px 12px; border-radius: 50px;
+      display: inline-block; margin-top: 8px;
+    }
+    .featured-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--gold); color: var(--dark);
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      padding: 5px 14px; border-radius: 50px; white-space: nowrap;
+    }
+
+    /* ── BOOKING ── */
+    .booking-section { background: var(--cream); padding: 100px 5%; }
+    .booking-wrapper {
+      display: grid; grid-template-columns: 1fr 1.5fr; gap: 64px; align-items: start;
+      margin-top: 56px;
+    }
+    .booking-info h3 {
+      font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .info-item {
+      display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px;
+    }
+    .info-icon {
+      width: 44px; height: 44px; flex-shrink: 0;
+      background: var(--gold-pale); border: 1px solid rgba(201,146,42,0.2);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .info-item h4 { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+    .info-item p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    .booking-form-card {
+      background: var(--white); border: 1px solid #EAE4DB;
+      border-radius: 24px; padding: 40px;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-full { grid-column: 1/-1; }
+    .form-group { display: flex; flex-direction: column; gap: 7px; }
+    .form-group label {
+      font-size: 13px; font-weight: 500; color: var(--mid); letter-spacing: 0.3px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      font-family: 'DM Sans', sans-serif; font-size: 15px;
+      background: var(--cream); border: 1.5px solid #E0D9CF;
+      border-radius: var(--radius-sm); padding: 13px 16px;
+      color: var(--dark); outline: none; width: 100%;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+      background: #FEFCF7;
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+
+    .items-wrapper { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+    .item-row {
+      display: grid; grid-template-columns: 1fr 90px 36px; gap: 10px;
+      align-items: center;
+    }
+    .remove-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #FEF2F2; border: 1px solid #FECACA;
+      color: #EF4444; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .remove-btn:hover { background: #FEE2E2; }
+    .add-item-btn {
+      background: transparent; border: 1.5px dashed #C9C0B4;
+      color: var(--mid); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 500;
+      padding: 12px; border-radius: var(--radius-sm);
+      cursor: pointer; width: 100%; margin-top: 4px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .add-item-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    .total-box {
+      background: var(--dark); border-radius: var(--radius-sm);
+      padding: 20px 24px; margin-top: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .total-box p { font-size: 14px; color: rgba(255,255,255,0.5); }
+    .total-amount {
+      font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+      color: var(--gold);
+    }
+    .total-note { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+
+    .submit-btn {
+      width: 100%; background: var(--gold); color: var(--dark);
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px;
+      letter-spacing: 0.5px;
+      padding: 18px; border-radius: var(--radius-sm);
+      border: none; cursor: pointer; margin-top: 20px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .submit-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    .form-message {
+      text-align: center; font-size: 14px; margin-top: 14px;
+      padding: 12px; border-radius: var(--radius-sm); display: none;
+    }
+    .form-message.success {
+      background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; display: block;
+    }
+    .form-message.error {
+      background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; display: block;
+    }
+
+    /* ── FAQ ── */
+    .faq-section { background: var(--dark); padding: 100px 5%; }
+    .faq-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 56px;
+    }
+    .faq-item {
+      background: var(--dark-2); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: var(--radius); overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .faq-item:hover { border-color: rgba(201,146,42,0.3); }
+    .faq-q {
+      width: 100%; text-align: left; background: none; border: none;
+      padding: 22px 26px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500;
+      color: var(--white);
+    }
+    .faq-q .icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,255,255,0.05); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: rgba(255,255,255,0.4);
+      transition: background 0.2s, transform 0.3s;
+    }
+    .faq-item.open .faq-q .icon { background: var(--gold); color: var(--dark); transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
+    }
+    .faq-item.open .faq-a { max-height: 200px; }
+    .faq-a-inner {
+      padding: 0 26px 22px;
+      font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.7;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #080807; padding: 60px 5% 32px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px;
+      padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-brand-name {
+      font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+      color: var(--white); margin-bottom: 12px;
+    }
+    .footer-brand-name span { color: var(--gold); }
+    .footer-desc { font-size: 14px; color: rgba(255,255,255,0.35); line-height: 1.7; max-width: 280px; }
+    .footer-contact-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: rgba(255,255,255,0.5);
+      text-decoration: none; margin-top: 12px;
+      transition: color 0.2s;
+    }
+    .footer-contact-item:hover { color: var(--gold); }
+    .footer-col h4 {
+      font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+      color: rgba(255,255,255,0.7); letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .footer-col a {
+      display: block; font-size: 14px; color: rgba(255,255,255,0.4);
+      text-decoration: none; padding: 5px 0; transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--gold); }
+    .footer-bottom {
+      max-width: 1200px; margin: 28px auto 0;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: rgba(255,255,255,0.25);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .price-grid { grid-template-columns: repeat(3,1fr); }
+    }
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hero-visual { display: none; }
+      .steps-grid { grid-template-columns: 1fr 1fr; }
+      .step:first-child { border-radius: 20px 0 0 0; }
+      .step:nth-child(2) { border-radius: 0 20px 0 0; }
+      .step:nth-child(3) { border-radius: 0 0 0 20px; }
+      .step:last-child { border-radius: 0 0 20px 0; }
+      .booking-wrapper { grid-template-columns: 1fr; gap: 40px; }
+      .faq-grid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media (max-width: 640px) {
+      nav { padding: 0 4%; }
+      .nav-links { display: none; }
+      .hamburger { display: block; }
+      .section { padding: 72px 4%; }
+      .price-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .item-row { grid-template-columns: 1fr 70px 36px; }
+      .booking-form-card { padding: 24px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .step { border-radius: 0 !important; }
+      .step:first-child { border-radius: 20px 20px 0 0 !important; }
+      .step:last-child { border-radius: 0 0 20px 20px !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-logo">KODAK</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+
+<!-- WHATSAPP -->
+<a href="https://wa.me/233545025296?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage..."
+   class="wa-float" target="_blank" rel="noopener">
+  <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+</a>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#home" class="nav-brand">
+    <div class="nav-brand-icon">📦</div>
+    <span class="nav-brand-name">KODAK <span>LOGISTICS</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#how">How it Works</a></li>
+    <li><a href="#gallery">Storage Items</a></li>
+    <li><a href="#prices">Prices</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#book" class="nav-cta">Book Now</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
+    <i class="fas fa-bars"></i>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#home">Home</a>
+  <a href="#how">How it Works</a>
+  <a href="#gallery">Storage Items</a>
+  <a href="#prices">Prices</a>
+  <a href="#faq">FAQ</a>
+  <a href="#book" style="color:var(--gold);font-weight:600;">Book Now →</a>
+</div>
+
+<main>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-badge"><i class="fas fa-map-marker-alt"></i> KNUST Campus, Kumasi</div>
+      <h1>Secure Student<br>Storage — <em>Done Right.</em></h1>
+      <p>Store your fridge, luggage, and essentials during vacation. Free hostel pickup. No stress, no damage, no hidden fees.</p>
+      <div class="hero-btns">
+        <a href="#book" class="btn-primary">Book Storage Now</a>
+        <a href="#gallery" class="btn-outline">View What We Store</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-num">500+</div>
+          <div class="stat-lbl">Students served</div>
+        </div>
+        <div>
+          <div class="stat-num">₵40</div>
+          <div class="stat-lbl">Starting price</div>
+        </div>
+        <div>
+          <div class="stat-num">24/7</div>
+          <div class="stat-lbl">Secure monitoring</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div style="position:relative;">
+        <div class="hero-card">
+          <img src="https://i.pinimg.com/1200x/2a/3f/28/2a3f281be65a174cd98936b0087f1cfa.jpg"
+               alt="Storage items" class="hero-card-img">
+          <div class="hero-card-body">
+            <h3>Safe, clean storage facility</h3>
+            <p>Monitored 24/7 with CCTV and on-site security</p>
+          </div>
+        </div>
+        <div class="floating-pill">FREE PICKUP</div>
+        <div class="floating-badge">
+          <div class="floating-badge-icon">🔐</div>
+          <div class="floating-badge-text">
+            <strong>Fully Secured</strong>
+            <span>Cameras + guards</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-inner">
+    <div class="section-label">Simple process</div>
+    <h2 class="section-title light">How It Works</h2>
+    <p class="section-sub light">Get your storage sorted in four easy steps</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon">📋</div>
+        <h3>Book Online</h3>
+        <p>Fill the booking form with your items, hostel, and preferred pickup date and time.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon">🚚</div>
+        <h3>We Pick Up</h3>
+        <p>Our team comes to your hostel room at the scheduled time — no carrying required.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon">🔐</div>
+        <h3>Secure Storage</h3>
+        <p>Your items are stored in our monitored facility with cameras and on-site guards.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-icon">✅</div>
+        <h3>Return Ready</h3>
+        <p>When break ends, we deliver your items back — fresh semester, zero hassle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="section gallery-section" id="gallery">
+  <div class="section-inner">
+    <div class="section-label">What we store</div>
+    <h2 class="section-title">Storage Catalogue</h2>
+    <p class="section-sub">All items are handled with care. See what students store with us every semester.</p>
+
+    <div class="gallery-tabs">
+      <button class="tab-btn active" data-cat="all">All Items</button>
+      <button class="tab-btn" data-cat="fridge">Fridges</button>
+      <button class="tab-btn" data-cat="bag">Bags & Luggage</button>
+      <button class="tab-btn" data-cat="gas">Gas Cylinders</button>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Fridges -->
+      <div class="gallery-card" data-cat="fridge">
+        <img src="https://i.pinimg.com/1200x/2a/3f/28/2a3f281be65a174cd98936b0087f1cfa.jpg"
+             alt="Large Fridge" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Large Fridge</h3>
+          <p>Full-size fridges and freezers, stored flat or upright.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵70 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-card" data-cat="fridge">
+        <img src="https://i.pinimg.com/736x/c4/a9/13/c4a91378bcd2c855b186654182c215da.jpg"
+             alt="Medium Fridge" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Medium Fridge</h3>
+          <p>Mid-size hostel fridge, ideal for student rooms.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵70 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-card" data-cat="fridge">
+        <img src="https://i.pinimg.com/1200x/1d/dd/a1/1ddda18ab58de891ae9b886fd495ebb9.jpg"
+             alt="Mini Fridge" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Mini / Small Fridge</h3>
+          <p>Compact coolers and personal mini-fridges.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵70 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gas -->
+      <div class="gallery-card" data-cat="gas">
+        <img src="https://i.pinimg.com/736x/53/75/14/5375146956d91b6c351b5ba88316834b.jpg"
+             alt="Gas Cylinder" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Gas Cylinder (Small)</h3>
+          <p>Small cooking gas cylinders, stored safely away from heat.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵60 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-card" data-cat="gas">
+        <img src="https://i.pinimg.com/736x/eb/1b/cb/eb1bcbb4e6545d043bbfc025759d45a6.jpg"
+             alt="Gas + Stove" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Gas Cylinder + Stove</h3>
+          <p>We store your cylinder and cooker together as a set.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵60 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bags -->
+      <div class="gallery-card" data-cat="bag">
+        <img src="https://i.pinimg.com/736x/9a/a9/dc/9aa9dcde3c05b876119695e4b224050b.jpg"
+             alt="Large Ghana Must Go" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Large Ghana Must Go</h3>
+          <p>The iconic woven bag — maximum capacity storage.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵60 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-card" data-cat="bag">
+        <img src="https://i.pinimg.com/736x/f9/1c/3a/f91c3adf63c0044c5daa5898275f104f.jpg"
+             alt="Medium Ghana Must Go" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Medium Ghana Must Go</h3>
+          <p>Versatile mid-size woven bag for clothes and books.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵50 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-card" data-cat="bag">
+        <img src="https://i.pinimg.com/1200x/17/eb/e6/17ebe6fcd472f9685a99706e9d13caee.jpg"
+             alt="Small Ghana Must Go" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Small Ghana Must Go</h3>
+          <p>Perfect for books, documents, and smaller items.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵40 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-card" data-cat="bag">
+        <img src="https://i.pinimg.com/1200x/ec/53/26/ec53268450a11844a833b97160907582.jpg"
+             alt="Large Suitcase" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Large Suitcase</h3>
+          <p>Hard and soft-shell suitcases, all sizes welcome.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵60 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-card" data-cat="bag">
+        <img src="https://i.pinimg.com/1200x/7c/50/6c/7c506ca14c97a675285c0cc27c05ad9b.jpg"
+             alt="Medium Suitcase" class="gallery-card-img" loading="lazy">
+        <div class="gallery-card-body">
+          <h3>Medium Suitcase</h3>
+          <p>Carry-on and weekend bag sizes stored securely.</p>
+          <div class="gallery-card-footer">
+            <span class="price-tag">₵50 <span>/ semester</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="prices">
+  <div class="section-inner">
+    <div class="section-label">Transparent pricing</div>
+    <h2 class="section-title light">Simple, Fair Rates</h2>
+    <p class="section-sub light">Per item, per semester. No hidden charges — ever.</p>
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="price-card-icon">👜</div>
+        <h3>Small Bag</h3>
+        <div class="price-amount"><span class="currency">₵</span>40</div>
+        <div class="price-period">per semester</div>
+        <p>Clothes, books, shoes, personal items</p>
+      </div>
+      <div class="price-card">
+        <div class="price-card-icon">🧳</div>
+        <h3>Medium Bag</h3>
+        <div class="price-amount"><span class="currency">₵</span>50</div>
+        <div class="price-period">per semester</div>
+        <p>Medium suitcases, large backpacks</p>
+      </div>
+      <div class="price-card">
+        <div class="price-card-icon">📦</div>
+        <h3>Big Bag / Gas</h3>
+        <div class="price-amount"><span class="currency">₵</span>60</div>
+        <div class="price-period">per semester</div>
+        <p>Large suitcases, Ghana Must Go, gas cylinders</p>
+      </div>
+      <div class="price-card featured">
+        <div class="featured-badge">MOST STORED</div>
+        <div class="price-card-icon">🧊</div>
+        <h3>Fridge</h3>
+        <div class="price-amount"><span class="currency">₵</span>70</div>
+        <div class="price-period">per semester</div>
+        <p>All fridge sizes — mini to full-size</p>
+      </div>
+      <div class="price-card">
+        <div class="price-card-icon">🪣</div>
+        <h3>Buckets</h3>
+        <div class="price-amount" style="font-size:28px;">FREE</div>
+        <div class="price-period">&nbsp;</div>
+        <div class="free-badge">COMPLIMENTARY</div>
+        <p>Free with any paid storage item</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section class="section booking-section" id="book">
+  <div class="section-inner">
+    <div class="section-label">Get started</div>
+    <h2 class="section-title">Book Your Storage</h2>
+    <p class="section-sub">We'll confirm within a few hours and arrange pickup at your convenience.</p>
+
+    <div class="booking-wrapper">
+      <div class="booking-info">
+        <h3>Why students choose us</h3>
+        <div class="info-item">
+          <div class="info-icon">🚚</div>
+          <div>
+            <h4>Free Hostel Pickup</h4>
+            <p>We come to your room — no need to transport heavy items yourself.</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">🔐</div>
+          <div>
+            <h4>24/7 Monitored Facility</h4>
+            <p>CCTV cameras and on-site security guards protect your belongings round the clock.</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">💸</div>
+          <div>
+            <h4>Pay on Pickup Day</h4>
+            <p>MoMo, Vodafone Cash, or cash. No deposit required to book.</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">📅</div>
+          <div>
+            <h4>All Break Periods</h4>
+            <p>Christmas, Easter, and mid-semester breaks all covered.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-form-card">
+        <form id="bookingForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input type="text" id="name" name="name" required placeholder="Your full name">
+            </div>
+            <div class="form-group">
+              <label for="phone">WhatsApp Number *</label>
+              <input type="tel" id="phone" name="phone" required placeholder="0545025296">
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" placeholder="optional@email.com">
+            </div>
+            <div class="form-group">
+              <label for="hostel">Hostel / Location *</label>
+              <input type="text" id="hostel" name="hostel" required placeholder="e.g. Unity Hall, Q-block">
+            </div>
+            <div class="form-group">
+              <label for="date">Pickup Date *</label>
+              <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+              <label for="time">Pickup Time *</label>
+              <input type="time" id="time" name="time" required>
+            </div>
+
+            <div class="form-group form-full">
+              <label>Items to Store *</label>
+              <div class="items-wrapper" id="itemsContainer">
+                <div class="item-row">
+                  <select class="itemSelect" required>
+                    <option value="">Select item type</option>
+                    <option value="40">Small Bag – ₵40</option>
+                    <option value="50">Medium Bag – ₵50</option>
+                    <option value="60">Big Bag / Gas – ₵60</option>
+                    <option value="70">Fridge – ₵70</option>
+                    <option value="0">Buckets / Small Items – Free</option>
+                  </select>
+                  <input type="number" class="itemQty" min="1" value="1" required>
+                  <button type="button" class="remove-btn" style="display:none;" title="Remove">✕</button>
+                </div>
+              </div>
+              <button type="button" class="add-item-btn" id="addItemBtn">+ Add Another Item</button>
+            </div>
+
+            <div class="form-group form-full">
+              <label for="notes">Special Instructions (optional)</label>
+              <textarea id="notes" name="notes" placeholder="Fragile items, specific instructions, room number..."></textarea>
+            </div>
+          </div>
+
+          <div class="total-box">
+            <div>
+              <p>Estimated Total</p>
+              <div class="total-note">Confirmed at pickup</div>
+            </div>
+            <div class="total-amount">₵<span id="totalAmt">0</span></div>
+          </div>
+
+          <button type="submit" class="submit-btn">Confirm Booking →</button>
+          <div class="form-message" id="formMsg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="section-inner">
+    <div class="section-label">Questions</div>
+    <h2 class="section-title light">Frequently Asked</h2>
+    <p class="section-sub light">Everything you need to know before booking</p>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <button class="faq-q">When do I pay? <span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Payment is made on pickup day. We accept MTN MoMo, Vodafone Cash, and cash. No upfront deposit is required to make a booking.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Is my stuff actually safe? <span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Yes! Our facility is monitored 24/7 with CCTV cameras and on-site security guards. Every item is logged when collected and returned.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can I get my items back early? <span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Absolutely. Just contact us at least 24 hours in advance and we'll arrange for early return or collection from our facility at no extra charge.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Which break periods do you cover? <span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">We operate during all major KNUST breaks — Christmas/New Year, Easter, and mid-semester breaks. Book in advance to guarantee your slot.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What areas on campus do you serve? <span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">We cover all KNUST hostels including Unity Hall, Q-block, Katanga, Independence, and all off-campus accommodations nearby.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What if my item gets damaged? <span class="icon">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">We handle all items with care and document their condition at pickup. Contact us immediately via WhatsApp if you have any concerns — we take responsibility seriously.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">KODAK <span>LOGISTICS</span></div>
+      <p class="footer-desc">Your trusted student storage partner at KNUST, Kumasi. Serving students since 2022.</p>
+      <a href="https://wa.me/233545025296" class="footer-contact-item" target="_blank">
+        <i class="fab fa-whatsapp"></i> +233 545 025 296
+      </a>
+      <a href="mailto:Philiptesimbo@gmail.com" class="footer-contact-item">
+        <i class="far fa-envelope"></i> Philiptesimbo@gmail.com
+      </a>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <a href="#home">Home</a>
+      <a href="#how">How it Works</a>
+      <a href="#gallery">Storage Items</a>
+      <a href="#prices">Pricing</a>
+      <a href="#book">Book Now</a>
+    </div>
+    <div class="footer-col">
+      <h4>We Store</h4>
+      <a href="#gallery">Fridges</a>
+      <a href="#gallery">Ghana Must Go Bags</a>
+      <a href="#gallery">Suitcases & Luggage</a>
+      <a href="#gallery">Gas Cylinders</a>
+      <a href="#gallery">Buckets (Free)</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Kodak Logistics – Proudly serving KNUST students</span>
+    <span>Made with ❤️ in Kumasi, Ghana</span>
+  </div>
+</footer>
+
+<script>
+  // Loader
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1600);
+  });
+
+  // Hamburger
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  });
+
+  // Gallery filter
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      document.querySelectorAll('.gallery-card').forEach(card => {
+        card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+      });
+    });
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Booking: add item row
+  const prices = { '40': 40, '50': 50, '60': 60, '70': 70, '0': 0 };
+
+  function calcTotal() {
+    let t = 0;
+    document.querySelectorAll('.item-row').forEach(row => {
+      const sel = row.querySelector('.itemSelect');
+      const qty = parseInt(row.querySelector('.itemQty').value) || 0;
+      if (sel.value) t += (prices[sel.value] || 0) * qty;
+    });
+    document.getElementById('totalAmt').textContent = t;
+  }
+
+  function addItemRow(container) {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <select class="itemSelect" required>
+        <option value="">Select item type</option>
+        <option value="40">Small Bag – ₵40</option>
+        <option value="50">Medium Bag – ₵50</option>
+        <option value="60">Big Bag / Gas – ₵60</option>
+        <option value="70">Fridge – ₵70</option>
+        <option value="0">Buckets / Small Items – Free</option>
+      </select>
+      <input type="number" class="itemQty" min="1" value="1" required>
+      <button type="button" class="remove-btn" title="Remove">✕</button>
+    `;
+    row.querySelector('.remove-btn').addEventListener('click', () => {
+      row.remove();
+      calcTotal();
+    });
+    row.querySelector('.itemSelect').addEventListener('change', calcTotal);
+    row.querySelector('.itemQty').addEventListener('input', calcTotal);
+    container.appendChild(row);
+  }
+
+  // Wire up first row
+  const container = document.getElementById('itemsContainer');
+  container.querySelector('.itemSelect').addEventListener('change', calcTotal);
+  container.querySelector('.itemQty').addEventListener('input', calcTotal);
+
+  document.getElementById('addItemBtn').addEventListener('click', () => {
+    addItemRow(container);
+  });
+
+  // Form submit
+  document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const hostel = document.getElementById('hostel').value.trim();
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const total = document.getElementById('totalAmt').textContent;
+    const notes = document.getElementById('notes').value.trim();
+
+    let items = [];
+    document.querySelectorAll('.item-row').forEach(row => {
+      const sel = row.querySelector('.itemSelect');
+      const qty = row.querySelector('.itemQty').value;
+      if (sel.value && sel.options[sel.selectedIndex]) {
+        items.push(`${qty}x ${sel.options[sel.selectedIndex].text}`);
+      }
+    });
+
+    const msg = `Hi Kodak Logistics! I'd like to book storage.%0A%0A*Name:* ${encodeURIComponent(name)}%0A*Phone:* ${encodeURIComponent(phone)}%0A*Hostel:* ${encodeURIComponent(hostel)}%0A*Pickup:* ${date} at ${time}%0A*Items:* ${encodeURIComponent(items.join(', '))}%0A*Total:* ₵${total}%0A*Notes:* ${encodeURIComponent(notes || 'None')}`;
+
+    const msgEl = document.getElementById('formMsg');
+    msgEl.className = 'form-message success';
+    msgEl.textContent = '✓ Booking sent! Redirecting to WhatsApp to confirm...';
+
+    setTimeout(() => {
+      window.open(`https://wa.me/233545025296?text=${msg}`, '_blank');
+    }, 1000);
+  });
+</script>
+</body>
+</html>

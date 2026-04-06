@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KODAK LOGISTICS | Student Storage & Pickup – KNUST</title>
+  <meta name="description" content="Affordable, secure luggage, fridge & student item storage with hostel pickup for KNUST students during vacation."/>
+  <meta name="keywords" content="KNUST storage, student luggage Kumasi, fridge storage KNUST, vacation storage Ghana, hostel pickup"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* Force Ghana Cedi symbol */
+    .price-tag::before,
+    .price::before,
+    .total-section p::before {
+      content: "₵";
+      margin-right: 2px;
+    }
+    /* Ensure images display nicely */
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+    }
+    /* Make all sections visible */
+    section {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    /* Hero background image - STORAGE FACILITY */
+    .hero {
+      background: linear-gradient(135deg, rgba(139,0,0,0.85), rgba(107,15,26,0.9)),
+                  url('https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat fixed;
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+    }
+    /* Gallery focus message */
+    .gallery-intro {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 2rem auto;
+      background: rgba(255,179,71,0.15);
+      padding: 1rem 2rem;
+      border-radius: 60px;
+      backdrop-filter: blur(5px);
+    }
+    .gallery-intro i {
+      color: #ffb347;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader -->
+  <div id="loading">
+    <div class="loader">
+      <div class="pulse-ring">📦</div>
+      <div class="loading-text">KODAK LOGISTICS<span class="loading-dots">...</span></div>
+      </div>
+  </div>
+
+  <!-- WhatsApp Floating Button -->
+  <a href="https://wa.me/233545025296?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage..." 
+     class="whatsapp-btn" target="_blank" rel="noopener noreferrer">
+    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+  </a>
+
+  <!-- Header / Navigation -->
+  <header>
+    <nav class="navbar">
+      <div class="logo-wrapper">
+        <div class="logo">
+          <span class="logo-icons">
+            <span class="icon-box">📦</span>
+            <span class="icon-box">🔐</span>
+            <span class="icon-box">🚚</span>
+          </span>
+          <span class="brand-name">KODAK LOGISTICS</span>
+        </div>
+        <span class="tagline">📍 KNUST – Premium Student Storage</span>
+      </div>
+
+      <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#gallery">What We Store</a></li>
+        <li><a href="#prices">Prices</a></li>
+        <li><a href="#book">Book Now</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <h1>Secure & Affordable<br>Student Storage</h1>
+        <p>Store your bags, fridges, gas cylinders, and essentials safely during vacation — with <strong>free pickup</strong> from your KNUST hostel.</p>
+        <div class="hero-buttons">
+          <a href="#book" class="btn-primary">📦 Book Storage Now</a>
+          <a href="#gallery" class="btn-secondary">📸 See How It Works</a>
+        </div>
+        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+          <span style="background: rgba(255,255,255,0.15); padding: 0.5rem 1rem; border-radius: 50px;">✅ 500+ Students Served</span>
+          <span style="background: rgba(255,255,255,0.15); padding: 0.5rem 1rem; border-radius: 50px;">🔒 24/7 Security</span>
+          <span style="background: rgba(255,255,255,0.15); padding: 0.5rem 1rem; border-radius: 50px;">🚚 Free Pickup</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Image Gallery Section - Focused on STORAGE SERVICE -->
+    <section class="image-gallery-section" id="gallery">
+      <div class="section-header">
+        <h2>📦 What We Store For You</h2>
+        <p>We safely store these items while you're away – pick up when you return</p>
+      </div>
+      
+      <!-- Clarifying message -->
+      <div class="gallery-intro">
+        <i class="fas fa-info-circle"></i> These are examples of items students store with us. We pick them up from your hostel, keep them safe, and return them when you need them.
+      </div>
+      
+      <div class="image-gallery">
+        <!-- Large Fridge -->
+        <div class="gallery-item">
+          <img src="https://i.pinimg.com/1200x/2a/3f/28/2a3f281be65a174cd98936b0087f1cfa.jpg" alt="Large Fridge" loading="lazy">
+          <h3>❄️ Large Fridges</h3>
+          <p>We store your fridge/freezer safely in our facility.</p>
+          <span class="price-tag">70/semester</span>
+        </div>
+
+        <!-- Medium Fridge -->
+        <div class="gallery-item">
+          <img src="https://i.pinimg.com/736x/c4/a9/13/c4a91378bcd2c855b186654182c215da.jpg" alt="Medium Fridge" loading="lazy">
+          <h3>🧊 Medium Fridges</h3>
+          <p>Perfect size for student rooms – stored securely.</p>
+          <span class="price-tag">70/semester</span>
+        </div>
+
+        <!-- Small Fridge -->
+        <div class="gallery-item">
+          <img src="https://i.pinimg.com/1200x/1d/dd/a1/1ddda18ab58de891ae9b886fd495ebb9.jpg" alt="Small Fridge" loading="lazy">
+          <h3>🧊 Mini Fridges</h3>
+          <p>Compact coolers stored with care.</p>
+          <span class="price-tag">70/semester</span>
+        </div>
+
+        <!-- Gas Cylinder -->
+        <div class="gallery-item">
+          <img src="https://i.pinimg.com/736x/53/75/14/5375146956d91b6c351b5ba88316834b.jpg" alt="Gas Cylinder" loading="lazy">
+          <h3>🔥 Gas Cylinders</h3>
+          <p>Safe storage for your cooking gas.</p>
+          <span class="price-tag">60/semester</span>
+        </div>
+
+        <!-- Ghana Must Go Bags -->
+        <div class="gallery-item">
+          <img src="https://i.pinimg.com/736x/9a/a9/dc/9aa9dcde3c05b876119695e4b224050b.jpg" alt="Ghana Must Go" loading="lazy">
+          <h3>👜 Ghana Must Go Bags</h3>
+          <p>Durable woven bags – perfect for clothes & books.</p>
+          <span class="price-tag">40-60/semester</span>
+        </div>
+
+        <!-- Suitcases -->
+        <div class="gallery-item">
+          <img src="https://i.pinimg.com/1200x/ec/53/26/ec53268450a11844a833b97160907582.jpg" alt="Suitcase" loading="lazy">
+          <h3>🧳 Suitcases & Luggage</h3>
+          <p>All sizes of travel bags stored securely.</p>
+          <span class="price-tag">40-60/semester</span>
+        </div>
+
+        <!-- Ankara / African Print Bags -->
+        <div class="gallery-item">
+          <img src="https://i.pinimg.com/1200x/11/b7/d4/11b7d4e3b132dc15f9e706fb2e4e1cdc.jpg" alt="Ankara Bag" loading="lazy">
+          <h3>🎨 Ankara Travel Bags</h3>
+          <p>Beautiful African print bags – stored safely.</p>
+          <span class="price-tag">50/semester</span>
+        </div>
+
+        <!-- Small Items / Buckets -->
+        <div class="gallery-item">
+          <img src="https://i.pinimg.com/1200x/f8/ae/91/f8ae91357c119f73993c667fc6082d77.jpg" alt="Small Items" loading="lazy">
+          <h3>📦 Small Items & Buckets</h3>
+          <p>Free storage when stored with paid items.</p>
+          <span class="price-tag">FREE</span>
+        </div>
+      </div>
+      
+      <!-- Storage process explanation -->
+      <div style="text-align: center; margin-top: 2rem; padding: 1rem; background: rgba(255,179,71,0.1); border-radius: 20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+        <p><i class="fas fa-truck" style="color: #ffb347;"></i> <strong>How it works:</strong> We pick up from your hostel → store safely → return when you need it. Simple and secure!</p>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="prices">
+      <div class="section-header">
+        <h2>💰 Simple Storage Pricing</h2>
+        <p>Pay only for what you store – no hidden fees</p>
+      </div>
+
+      <!-- Price Cards -->
+      <div class="price-cards">
+        <div class="card">
+          <h3>Small Bag</h3>
+          <p class="price" id="priceSmallDisplay">40</p>
+          <p>Clothes, books, shoes</p>
+        </div>
+        <div class="card">
+          <h3>Medium Bag</h3>
+          <p class="price" id="priceMediumDisplay">50</p>
+          <p>Larger loads</p>
+        </div>
+        <div class="card">
+          <h3>Big Bag</h3>
+          <p class="price" id="priceBigDisplay">60</p>
+          <p>Maximum capacity</p>
+        </div>
+        <div class="card highlight">
+          <h3>Fridge</h3>
+          <p class="price" id="priceFridgeDisplay">70</p>
+          <p>Temperature controlled</p>
+        </div>
+        <div class="card">
+          <h3>Gas Cylinder</h3>
+          <p class="price" id="priceGasDisplay">60</p>
+          <p>Any size cooking gas cylinder</p>
+        </div>
+        <div class="card free">
+          <h3>Buckets</h3>
+          <p class="price">0</p>
+          <p>Free with any paid item</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section (NEW) -->
+    <section style="background: rgba(0,0,0,0.2); padding: 3rem 5%; text-align: center;">
+      <div class="section-header">
+        <h2>⚡ How It Works</h2>
+        <p>Three simple steps to stress‑free storage</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto;">
+        <div style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 2rem;">
+          <div style="font-size: 3rem;">📝</div>
+          <h3 style="color: #ffb347;">1. Book Online</h3>
+          <p>Fill the booking form with your details and items.</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 2rem;">
+          <div style="font-size: 3rem;">🚚</div>
+          <h3 style="color: #ffb347;">2. Free Pickup</h3>
+          <p>We pick up your items from your hostel on the scheduled date.</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 2rem;">
+          <div style="font-size: 3rem;">🔒</div>
+          <h3 style="color: #ffb347;">3. Safe Storage</h3>
+          <p>Your items are stored securely and returned when you need them.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking Section (FULL FORM) -->
+    <section class="booking" id="book">
+      <div class="section-header">
+        <h2>📋 Book Your Storage</h2>
+        <p>Fill the form — we'll confirm within hours & give you a unique reference ID</p>
+      </div>
+
+      <form class="booking-form" id="bookingForm">
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" name="name" required placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" required placeholder="your@email.com">
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone (WhatsApp) *</label>
+          <input type="tel" id="phone" name="phone" required placeholder="0545025296">
+        </div>
+
+        <div class="form-group">
+          <label for="hostel">Hostel / Location *</label>
+          <input type="text" id="hostel" name="hostel" required placeholder="e.g., Unity Hall, Q-block">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Pickup Date *</label>
+            <input type="date" id="date" name="date" required>
+          </div>
+
+          <div class="form-group">
+            <label for="time">Pickup Time *</label>
+            <input type="time" id="time" name="time" required>
+          </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="form-group items-section">
+          <label>Items to Store *</label>
+          <div id="itemsContainer">
+            <div class="item-row">
+              <select class="itemSelect" required>
+                <option value="">Select item type</option>
+                <option value="small">Small Bag – ₵40</option>
+                <option value="medium">Medium Bag – ₵50</option>
+                <option value="big">Big Bag – ₵60</option>
+                <option value="fridge">Fridge – ₵70</option>
+                <option value="gas">Gas Cylinder - ₵60</option>
+                <option value="free">Buckets / Small Items – Free</option>
+              </select>
+              <input type="number" class="quantity" min="1" value="1" required>
+              <button type="button" class="remove-btn" style="display: none;">✕</button>
+            </div>
+          </div>
+          <button type="button" id="addItem" class="add-btn">+ Add Another Item</button>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Special Instructions (optional)</label>
+          <textarea id="description" name="description" rows="4" placeholder="e.g., fragile items, specific pickup instructions..."></textarea>
+        </div>
+
+        <div class="total-section">
+          <p>Total: ₵<span id="totalPrice">0.00</span></p>
+          <small>Final amount confirmed at pickup</small>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-primary">✅ Confirm Booking</button>
+        <div id="formMessage" class="form-message"></div>
+      </form>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+      <div class="section-header">
+        <h2>❓ Frequently Asked Questions</h2>
+        <p>Everything you need to know about our storage service</p>
+      </div>
+      
+      <div class="faq-content">
+        <details>
+          <summary>When do I pay?</summary>
+          <p>Payment is made on pickup day. We accept MTN MoMo, Vodafone Cash, and cash.</p>
+        </details>
+        
+        <details>
+          <summary>Is my stuff safe?</summary>
+          <p>Yes! 24/7 monitored facility with security cameras and guards. Your items are insured.</p>
+        </details>
+        
+        <details>
+          <summary>Can I get items back early?</summary>
+          <p>Yes, just contact us 24 hours in advance. Early retrieval fee may apply.</p>
+        </details>
+        
+        <details>
+          <summary>Do you store during all breaks?</summary>
+          <p>Yes! Christmas, Easter, and mid-semester breaks. We're here year-round.</p>
+        </details>
+
+        <details>
+          <summary>What is the reference ID?</summary>
+          <p>After booking, you'll receive a unique ID (e.g., KDL-000123). Keep it – you'll use it to quickly retrieve your items.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-logo">KODAK LOGISTICS</div>
+      <p class="footer-tag">Your Trusted KNUST Storage Partner</p>
+      
+      <div class="footer-contact">
+        <p><strong>Contact Us</strong></p>
+        <a href="https://wa.me/233545025296" class="footer-whatsapp" target="_blank">
+          <i class="fab fa-whatsapp"></i> +233 545 025 296
+        </a>
+        <p class="footer-email">Email: <a href="mailto:Philiptesimbo@gmail.com">Philiptesimbo@gmail.com</a></p>
+      </div>
+
+      <p class="footer-copyright">
+        © 2026 Kodak Logistics – Proudly serving KNUST students
+      </p>
+    </div>
+  </footer>
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Scripts -->
+  <script src="script.js"></script>
+</body>
+</html>

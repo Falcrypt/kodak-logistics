@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Kodak Logistics Admin</title>
+  <link rel="stylesheet" href="admin-style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' http://localhost:3000; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:3000;">
+</head>
+<body>
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>KODAK<span>Admin</span></h2>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="active" data-section="dashboard">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="#bookings" data-section="bookings">
+          <i class="fas fa-calendar-check"></i> Bookings
+        </a>
+        <a href="#customers" data-section="customers">
+          <i class="fas fa-users"></i> Customers
+        </a>
+        <a href="#pricing" data-section="pricing">
+          <i class="fas fa-tag"></i> Pricing
+        </a>
+        <a href="#settings" data-section="settings">
+          <i class="fas fa-cog"></i> Settings
+        </a>
+        <a href="#" id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="admin-user">
+          <span>Welcome, <span id="adminName"></span></span>
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </header>
+      
+      <!-- Dashboard Section -->
+      <section id="dashboard-section" class="content-section active-section">
+        <div class="stats-grid" id="statsGrid">
+          <!-- Stats loaded by JS -->
+        </div>
+        
+        <div class="chart-container">
+          <h3>Recent Bookings</h3>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="recentBookingsBody">
+                <tr><td colspan="6">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="quick-actions">
+          <h3>Today's Pickups</h3>
+          <div id="todayPickups" class="pickup-list"></div>
+        </div>
+      </section>
+      
+      <!-- Bookings Section -->
+      <section id="bookings-section" class="content-section">
+        <div class="section-header">
+          <h2>All Bookings</h2>
+          <div class="filters">
+            <input type="text" id="searchBooking" placeholder="Search customer, phone...">
+            <select id="statusFilter">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+            </select>
+            <button id="exportBtn" class="btn-export">
+              <i class="fas fa-download"></i> Export
+            </button>
+          </div>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Hostel</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="allBookingsBody">
+              <tr><td colspan="9">Loading...</td></tr>
+            </tbody>
+          </table>
+          <div id="pagination" class="pagination"></div>
+        </div>
+      </section>
+      
+      <!-- Customers Section -->
+      <section id="customers-section" class="content-section">
+        <h2>Customer Database</h2>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Bookings</th>
+                <th>Last Booking</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="customersBody">
+              <tr><td colspan="6">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      
+      <!-- Pricing Section -->
+      <section id="pricing-section" class="content-section">
+        <h2>Manage Pricing</h2>
+        <div class="pricing-editor">
+          <div class="form-group">
+            <label>Small Bag (₵)</label>
+            <input type="number" id="priceSmall" min="0" step="0.5" value="40">
+          </div>
+          <div class="form-group">
+            <label>Medium Bag (₵)</label>
+            <input type="number" id="priceMedium" min="0" step="0.5" value="50">
+          </div>
+          <div class="form-group">
+            <label>Big Bag (₵)</label>
+            <input type="number" id="priceBig" min="0" step="0.5" value="60">
+          </div>
+          <div class="form-group">
+            <label>Fridge (₵)</label>
+            <input type="number" id="priceFridge" min="0" step="0.5" value="70">
+          </div>
+          <button onclick="savePricing()" class="btn-save">Save Pricing</button>
+          <div id="pricingMessage" class="form-message"></div>
+        </div>
+      </section>
+      
+      <!-- Settings Section -->
+      <section id="settings-section" class="content-section">
+        <h2>Business Settings</h2>
+        <div class="settings-form">
+          <div class="form-group">
+            <label>WhatsApp Number</label>
+            <input type="text" id="whatsappNumber" maxlength="20">
+          </div>
+          <div class="form-group">
+            <label>Business Email</label>
+            <input type="email" id="businessEmail" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="currentPassword" placeholder="Enter current password">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="newPassword" placeholder="Leave blank to keep current">
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm new password">
+          </div>
+          <button onclick="saveSettings()" class="btn-save">Save Settings</button>
+          <div id="settingsMessage" class="form-message"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <!-- Session warning -->
+  <div id="sessionWarning" class="session-warning" style="display: none;">
+    Session expiring soon. <button onclick="extendSession()">Stay Logged In</button>
+  </div>
+  
+  <script src="admin.js"></script>
+</body>
+</html>
