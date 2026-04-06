@@ -2,7 +2,7 @@
 // This file handles login and authentication
 
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
