@@ -1,30 +1,18 @@
-// backend/database/db.js
-// This file connects to MySQL database
+// backend/database/db.js - PostgreSQL Version (COMPLETE)
+const { Pool } = require('pg');
 
-const mysql = require('mysql2');
-
-// Create a connection pool
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'Kodak@123',
-    database: process.env.DB_NAME || 'kodak_logistics',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 0
+// Create a connection pool for PostgreSQL
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/kodak_logistics',
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
-
-// Convert to promises
-const promisePool = pool.promise();
 
 // Test the connection
 async function testConnection() {
     try {
-        const connection = await promisePool.getConnection();
+        const client = await pool.connect();
         console.log('✅ Database connected successfully!');
-        connection.release();
+        client.release();
         return true;
     } catch (error) {
         console.error('❌ Database connection failed:', error.message);
@@ -43,8 +31,8 @@ async function query(sql, params = []) {
         console.log('🔍 Executing query:', sql);
         console.log('📦 With params:', params);
         
-        const [rows] = await promisePool.execute(sql, params);
-        return rows;
+        const result = await pool.query(sql, params);
+        return result.rows;
     } catch (error) {
         console.error('❌ Database query error:');
         console.error('   SQL:', sql);
@@ -75,9 +63,10 @@ async function insert(sql, params = []) {
         console.log('🔍 Insert query:', sql);
         console.log('📦 Insert params:', params);
         
-        const [result] = await promisePool.execute(sql, params);
-        console.log('✅ Insert result:', result);
-        return result.insertId;
+        // PostgreSQL needs RETURNING id to get the inserted ID
+        const result = await pool.query(sql + ' RETURNING id', params);
+        console.log('✅ Insert result:', result.rows[0]);
+        return result.rows[0].id;
     } catch (error) {
         console.error('❌ insert error:', error.message);
         console.error('   SQL:', sql);
@@ -93,29 +82,30 @@ async function update(sql, params = []) {
             params = [params];
         }
         
-        const [result] = await promisePool.execute(sql, params);
-        return result.affectedRows;
+        const result = await pool.query(sql, params);
+        return result.rowCount;
     } catch (error) {
         console.error('❌ update error:', error.message);
         throw error;
     }
 }
 
-// Helper to check if a table exists
+// Helper to check if a table exists (PostgreSQL version)
 async function tableExists(tableName) {
     try {
         const result = await query(
-            "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = ? AND table_name = ?",
-            [process.env.DB_NAME || 'kodak_logistics', tableName]
+            `SELECT COUNT(*) as count FROM information_schema.tables 
+             WHERE table_schema = 'public' AND table_name = $1`,
+            [tableName]
         );
-        return result[0].count > 0;
+        return parseInt(result[0].count) > 0;
     } catch (error) {
         console.error('❌ tableExists error:', error.message);
         return false;
     }
 }
 
-// ✅✅✅ CRITICAL: EXPORT ALL FUNCTIONS ✅✅✅
+// ✅✅✅ EXPORT ALL FUNCTIONS ✅✅✅
 module.exports = {
     testConnection: testConnection,
     query: query,

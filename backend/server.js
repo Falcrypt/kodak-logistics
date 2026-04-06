@@ -71,23 +71,24 @@ async function setupDatabase() {
     try {
         console.log('📦 Setting up database tables...');
         
-        // 6.1 Create admin_users table
+        // 6.1 Create admin_users table (PostgreSQL syntax)
         await db.query(`
             CREATE TABLE IF NOT EXISTS admin_users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 username VARCHAR(50) UNIQUE NOT NULL,
                 password_hash VARCHAR(255) NOT NULL,
                 email VARCHAR(100),
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
         console.log('✅ admin_users table ready');
         
-        // 6.2 Create bookings table
+        // 6.2 Create bookings table (PostgreSQL syntax)
         await db.query(`
             CREATE TABLE IF NOT EXISTS bookings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
+                booking_ref VARCHAR(20) UNIQUE,
                 customer_name VARCHAR(100) NOT NULL,
                 customer_email VARCHAR(100) NOT NULL,
                 customer_phone VARCHAR(20) NOT NULL,
@@ -97,45 +98,26 @@ async function setupDatabase() {
                 items TEXT,
                 items_summary VARCHAR(500),
                 total_amount DECIMAL(10,2),
-                status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
+                status VARCHAR(20) DEFAULT 'pending',
                 description TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
-                INDEX (booking_date),
-                INDEX (status),
-                INDEX (customer_phone)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
         console.log('✅ bookings table ready');
         
-        // 6.3 Create settings table
+        // 6.3 Create settings table (PostgreSQL syntax)
         await db.query(`
             CREATE TABLE IF NOT EXISTS settings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 setting_key VARCHAR(50) UNIQUE NOT NULL,
                 setting_value TEXT,
-                updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
         console.log('✅ settings table ready');
         
-        // 6.4 Create customers table (optional, for better performance)
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS customers (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                phone VARCHAR(20) UNIQUE NOT NULL,
-                name VARCHAR(100),
-                email VARCHAR(100),
-                total_bookings INT DEFAULT 0,
-                last_booking_date DATETIME,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
-                INDEX (phone)
-            )
-        `);
-        console.log('✅ customers table ready');
-        
-        // 6.5 Insert default settings if they don't exist
+        // 6.4 Insert default settings if they don't exist
         const defaultSettings = [
             ['whatsapp_number', '233545025296'],
             ['business_email', 'Philiptesimbo@gmail.com'],
@@ -147,7 +129,7 @@ async function setupDatabase() {
         
         for (const [key, value] of defaultSettings) {
             await db.query(
-                'INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)',
+                'INSERT INTO settings (setting_key, setting_value) VALUES ($1, $2) ON CONFLICT (setting_key) DO NOTHING',
                 [key, value]
             );
         }
