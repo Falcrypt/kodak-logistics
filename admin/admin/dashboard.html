@@ -6,7 +6,8 @@
   <title>Dashboard - Kodak Logistics Admin</title>
   <link rel="stylesheet" href="admin-style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' http://localhost:3000; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:3000;">
+  <!-- Content Security Policy - Allows connections to production backend -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://kodak-logistics-api.onrender.com; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
 </head>
 <body>
   <div class="admin-wrapper">
@@ -70,7 +71,7 @@
                 </tr>
               </thead>
               <tbody id="recentBookingsBody">
-                <tr><td colspan="6">Loading...</td></tr>
+                <tr><td colspan="6">Loading...<\/td><\/tr>
               </tbody>
             </table>
           </div>
@@ -104,6 +105,7 @@
           <table class="data-table">
             <thead>
               <tr>
+                <th>Reference</th>
                 <th>ID</th>
                 <th>Date</th>
                 <th>Customer</th>
@@ -116,7 +118,7 @@
               </tr>
             </thead>
             <tbody id="allBookingsBody">
-              <tr><td colspan="9">Loading...</td></tr>
+              <tr><td colspan="10">Loading...<\/td><\/tr>
             </tbody>
           </table>
           <div id="pagination" class="pagination"></div>
@@ -139,7 +141,7 @@
               </tr>
             </thead>
             <tbody id="customersBody">
-              <tr><td colspan="6">Loading...</td></tr>
+              <tr><td colspan="6">Loading...<\/td><\/tr>
             </tbody>
           </table>
         </div>
