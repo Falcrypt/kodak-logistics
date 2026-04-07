@@ -15,29 +15,26 @@ router.post('/login', async (req, res) => {
         
         const { username, password } = req.body;
         
-        // Check if username and password were provided
         if (!username || !password) {
             console.log("❌ Missing username or password");
             return res.status(400).json({ error: 'Username and password required' });
         }
         
-        // Find admin in database
-        let admin = await db.getOne('SELECT * FROM admin_users WHERE username = ?', [username]);
+        // PostgreSQL uses $1 instead of ?
+        let admin = await db.getOne('SELECT * FROM admin_users WHERE username = $1', [username]);
         
-        // If no admin exists, create default admin (first time only)
         if (!admin) {
             console.log('👤 Creating default admin user...');
             const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'Admin@123', 10);
             const adminId = await db.insert(
-                'INSERT INTO admin_users (username, password_hash, email) VALUES (?, ?, ?)',
+                'INSERT INTO admin_users (username, password_hash, email) VALUES ($1, $2, $3)',
                 [username, hashedPassword, 'admin@kodak.com']
             );
             
-            admin = await db.getOne('SELECT * FROM admin_users WHERE id = ?', [adminId]);
+            admin = await db.getOne('SELECT * FROM admin_users WHERE id = $1', [adminId]);
             console.log("✅ Default admin created with ID:", adminId);
         }
         
-        // Check password
         console.log("🔐 Verifying password...");
         const validPassword = await bcrypt.compare(password, admin.password_hash);
         
@@ -46,19 +43,14 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid password' });
         }
         
-        // Create JWT token
         const token = jwt.sign(
-            { 
-                id: admin.id, 
-                username: admin.username 
-            },
+            { id: admin.id, username: admin.username },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
         
         console.log("✅ Login successful for:", username);
         
-        // Send success response
         res.json({
             success: true,
             token: token,

@@ -15,24 +15,21 @@ router.post('/', async (req, res) => {
         }
         const itemsSummary = items.map(item => `${item.quantity}x ${item.type}`).join(', ');
         
-        // Insert without booking_ref first
+        // PostgreSQL uses $1, $2, etc.
         const sql = `INSERT INTO bookings 
             (customer_name, customer_email, customer_phone, hostel_name, 
              booking_date, booking_time, items, items_summary, total_amount, status, description) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
         const params = [ name, email, phone, hostel, date, time,
             JSON.stringify(items), itemsSummary, total, 'pending', description || '' ];
         
         const result = await db.insert(sql, params);
         const insertId = result;
 
-        // Generate booking reference: KDL- + 6‑digit padded ID
         const bookingRef = 'KDL-' + String(insertId).padStart(6, '0');
         
-        // Update the record with the reference
-        await db.update('UPDATE bookings SET booking_ref = ? WHERE id = ?', [bookingRef, insertId]);
+        await db.update('UPDATE bookings SET booking_ref = $1 WHERE id = $2', [bookingRef, insertId]);
 
-        // Prepare data for emails
         const newBooking = {
             booking_ref: bookingRef,
             customer_name: name,
@@ -46,11 +43,9 @@ router.post('/', async (req, res) => {
             status: 'pending'
         };
 
-        // Send emails in background
         sendAdminNotification(newBooking).catch(console.error);
         sendCustomerConfirmation(newBooking).catch(console.error);
 
-        // Return the reference to the frontend
         res.status(201).json({ 
             success: true, 
             bookingId: insertId,
@@ -79,16 +74,18 @@ router.get('/', authenticateToken, async (req, res) => {
         
         let whereConditions = [];
         let params = [];
+        let paramCounter = 1;
         
         if (search) {
-            // Also search by booking_ref
-            whereConditions.push('(customer_name LIKE ? OR customer_phone LIKE ? OR hostel_name LIKE ? OR booking_ref LIKE ?)');
+            whereConditions.push(`(customer_name LIKE $${paramCounter} OR customer_phone LIKE $${paramCounter+1} OR hostel_name LIKE $${paramCounter+2} OR booking_ref LIKE $${paramCounter+3})`);
             const searchTerm = `%${search}%`;
             params.push(searchTerm, searchTerm, searchTerm, searchTerm);
+            paramCounter += 4;
         }
         if (status !== 'all') {
-            whereConditions.push('status = ?');
+            whereConditions.push(`status = $${paramCounter}`);
             params.push(status);
+            paramCounter++;
         }
         
         const whereClause = whereConditions.length > 0
@@ -121,7 +118,7 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/stats', authenticateToken, async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
-        const todayResult = await db.getOne('SELECT COUNT(*) as count FROM bookings WHERE DATE(booking_date) = ?', [today]);
+        const todayResult = await db.getOne('SELECT COUNT(*) as count FROM bookings WHERE DATE(booking_date) = $1', [today]);
         const pendingResult = await db.getOne("SELECT COUNT(*) as count FROM bookings WHERE status = 'pending'");
         const confirmedResult = await db.getOne("SELECT COUNT(*) as count FROM bookings WHERE status = 'confirmed'");
         const revenueResult = await db.getOne("SELECT SUM(total_amount) as total FROM bookings WHERE status IN ('confirmed', 'completed')");
@@ -154,7 +151,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
         if (!status) return res.status(400).json({ error: 'Status required' });
-        await db.update('UPDATE bookings SET status = ? WHERE id = ?', [status, id]);
+        await db.update('UPDATE bookings SET status = $1 WHERE id = $2', [status, id]);
         res.json({ success: true });
     } catch (error) {
         console.error('❌ Update booking error:', error);

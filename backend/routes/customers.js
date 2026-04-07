@@ -7,7 +7,6 @@ const router = express.Router();
 // GET /api/customers - Get all customers
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        // Get unique customers from bookings
         const customers = await db.query(`
             SELECT 
                 customer_name as name,

@@ -10,23 +10,20 @@ const router = express.Router();
 // ========== PUBLIC ENDPOINT (no login required) ==========
 
 // GET /api/settings/public - Get public settings (prices only)
-// This is used by the public website to show current prices
 router.get('/public', async (req, res) => {
     try {
-        // Get all settings that start with 'price_' from database
+        // PostgreSQL uses LIKE with $1 placeholder
         const settings = await db.query(
-            "SELECT setting_key, setting_value FROM settings WHERE setting_key LIKE 'price_%'"
+            "SELECT setting_key, setting_value FROM settings WHERE setting_key LIKE $1",
+            ['price_%']
         );
         
-        // Convert to object format: { small: 40, medium: 50, ... }
         const prices = {};
         settings.forEach(s => {
-            // Remove 'price_' from the key name
             const key = s.setting_key.replace('price_', '');
             prices[key] = parseFloat(s.setting_value);
         });
         
-        // Send prices back to the website
         res.json(prices);
         
     } catch (error) {
@@ -37,19 +34,16 @@ router.get('/public', async (req, res) => {
 
 // ========== ADMIN ENDPOINTS (login required) ==========
 
-// GET /api/settings - Get all settings (for admin panel)
+// GET /api/settings - Get all settings
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        // Get ALL settings from database
         const settings = await db.query('SELECT setting_key, setting_value FROM settings');
         
-        // Convert to object
         const settingsObj = {};
         settings.forEach(s => {
             settingsObj[s.setting_key] = s.setting_value;
         });
         
-        // Send all settings to admin panel
         res.json(settingsObj);
         
     } catch (error) {
@@ -58,36 +52,31 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
-// PUT /api/settings - Update settings (for admin panel)
+// PUT /api/settings - Update settings
 router.put('/', authenticateToken, async (req, res) => {
     try {
-        const updates = req.body;  // Data sent from admin panel
-        const userId = req.user.id; // ID of admin who is logged in
+        const updates = req.body;
+        const userId = req.user.id;
         
         // ===== HANDLE PASSWORD CHANGE =====
-        // If admin is trying to change password
         if (updates.current_password && updates.new_password) {
-            // Get current admin from database
-            const admin = await db.getOne('SELECT * FROM admin_users WHERE id = ?', [userId]);
+            // PostgreSQL uses $1
+            const admin = await db.getOne('SELECT * FROM admin_users WHERE id = $1', [userId]);
             
-            // Check if current password is correct
             const validPassword = await bcrypt.compare(updates.current_password, admin.password_hash);
             if (!validPassword) {
                 return res.status(401).json({ error: 'Current password is incorrect' });
             }
             
-            // Hash the new password (encrypt it)
             const newHash = await bcrypt.hash(updates.new_password, 10);
             
-            // Save new password to database
             await db.update(
-                'UPDATE admin_users SET password_hash = ? WHERE id = ?',
+                'UPDATE admin_users SET password_hash = $1 WHERE id = $2',
                 [newHash, userId]
             );
         }
         
         // ===== HANDLE SETTINGS UPDATE =====
-        // List of all possible settings
         const settingKeys = [
             'whatsapp_number', 
             'business_email', 
@@ -97,17 +86,15 @@ router.put('/', authenticateToken, async (req, res) => {
             'price_fridge'
         ];
         
-        // Update each setting if it was sent
         for (const key of settingKeys) {
             if (updates[key] !== undefined) {
                 await db.update(
-                    'UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?',
+                    'UPDATE settings SET setting_value = $1, updated_at = CURRENT_TIMESTAMP WHERE setting_key = $2',
                     [updates[key].toString(), key]
                 );
             }
         }
         
-        // Send success message back
         res.json({ success: true, message: 'Settings updated successfully' });
         
     } catch (error) {
