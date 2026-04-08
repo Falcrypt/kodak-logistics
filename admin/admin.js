@@ -1,5 +1,5 @@
-// admin/admin.js - COMPLETE REWRITE FOR SECURITY (with booking reference)
-const API_URL = 'https://kodak-logistics-api.onrender.com/api';
+// admin/admin.js - COMPLETE REWRITE FOR SECURITY
+const API_URL = 'http://localhost:3000/api';
 console.log('🚀 Admin JS loaded');
 console.log('🔗 API URL:', API_URL);
 
@@ -19,7 +19,9 @@ async function checkAuth() {
   
   try {
     const response = await fetch(`${API_URL}/auth/verify`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
     
     if (response.ok) {
@@ -41,6 +43,7 @@ async function checkAuth() {
 
 // ========== LOGIN FORM ==========
 document.addEventListener('DOMContentLoaded', function() {
+  // Handle login page
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
     loginForm.addEventListener('submit', async function(e) {
@@ -84,19 +87,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  // Handle dashboard
   if (window.location.pathname.includes('dashboard.html')) {
     checkAuth().then(isAuthed => {
       if (isAuthed) {
+        // Load all sections
         loadDashboardData();
         loadAllBookings();
         loadCustomers();
         loadSettings();
         setupEventListeners();
+        
+        // Set up navigation clicks
         setupNavigation();
       }
     });
   }
   
+  // Logout
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', function(e) {
@@ -133,9 +141,15 @@ function startSessionMonitor() {
         const expiry = payload.exp * 1000;
         const timeLeft = expiry - Date.now();
         
-        if (timeLeft < 5 * 60 * 1000) showSessionWarning();
-        if (timeLeft <= 0) logout('Session expired');
-      } catch (e) {}
+        if (timeLeft < 5 * 60 * 1000) {
+          showSessionWarning();
+        }
+        if (timeLeft <= 0) {
+          logout('Session expired');
+        }
+      } catch (e) {
+        // If can't decode, assume valid
+      }
     }
   }, 60000);
 }
@@ -231,21 +245,31 @@ async function loadDashboardData() {
       `;
     }
     
+    // Load recent bookings
     await loadRecentBookings();
     
   } catch (error) {
     console.error('❌ Dashboard load failed:', error);
-    loadRecentBookings().catch(e => console.error(e));
   }
 }
 
 async function loadRecentBookings() {
   try {
     console.log("📚 Fetching recent bookings...");
-    const data = await apiCall('/bookings?limit=5');
-    let bookings = data && data.bookings ? data.bookings : (Array.isArray(data) ? data : []);
-    console.log("📚 Recent bookings received:", bookings);
-    displayRecentBookings(bookings);
+    const response = await fetch(`${API_URL}/bookings/recent?limit=5`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+      }
+    });
+    
+    if (response.ok) {
+      const bookings = await response.json();
+      console.log("📚 Recent bookings received:", bookings);
+      displayRecentBookings(bookings || []);
+    } else {
+      console.error("❌ Failed to fetch recent bookings:", response.status);
+      displayRecentBookings([]);
+    }
   } catch (error) {
     console.error('❌ Failed to load recent bookings:', error);
     displayRecentBookings([]);
@@ -265,6 +289,7 @@ function displayRecentBookings(bookings) {
   }
   
   tbody.innerHTML = bookings.map(booking => {
+    // Handle different possible field names
     const date = booking.booking_date || booking.date || '';
     const name = booking.customer_name || booking.name || '';
     const items = booking.items_summary || booking.items || '';
@@ -288,30 +313,33 @@ function displayRecentBookings(bookings) {
 }
 
 // ========== BOOKINGS ==========
-let currentPage = 1;
-let totalPages = 1;
-let currentFilters = { search: '', status: 'all' };
-
-async function loadAllBookings(page = 1, filters = {}) {
+async function loadAllBookings() {
   try {
-    currentPage = page;
-    currentFilters = { ...currentFilters, ...filters };
-    
-    const queryParams = new URLSearchParams({
-      page: currentPage,
-      limit: 20,
-      search: currentFilters.search,
-      status: currentFilters.status
+    console.log("📚 Loading all bookings...");
+    const response = await fetch(`${API_URL}/bookings`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+      }
     });
     
-    const data = await apiCall(`/bookings?${queryParams}`);
-    if (!data) return;
-    
-    displayAllBookings(data.bookings || []);
-    totalPages = data.pages || 1;
-    updatePagination();
+    if (response.ok) {
+      const data = await response.json();
+      console.log("📚 All bookings data:", data);
+      
+      // Handle both response formats
+      if (data && data.bookings) {
+        displayAllBookings(data.bookings);
+      } else if (Array.isArray(data)) {
+        displayAllBookings(data);
+      } else {
+        displayAllBookings([]);
+      }
+    } else {
+      console.error("❌ Failed to fetch bookings:", response.status);
+      displayAllBookings([]);
+    }
   } catch (error) {
-    console.error('Failed to load bookings:', error);
+    console.error('❌ Failed to load bookings:', error);
     displayAllBookings([]);
   }
 }
@@ -324,12 +352,12 @@ function displayAllBookings(bookings) {
   }
   
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9">No bookings found</td></tr>';
     return;
   }
   
   tbody.innerHTML = bookings.map(booking => {
-    const ref = booking.booking_ref || '';
+    // Handle different possible field names
     const id = booking.id || '';
     const date = booking.booking_date || booking.date || '';
     const name = booking.customer_name || booking.name || '';
@@ -340,7 +368,6 @@ function displayAllBookings(bookings) {
     const status = booking.status || 'pending';
     
     return `<tr>
-      <td>${escapeHtml(ref)}</td>
       <td>#${escapeHtml(id)}</td>
       <td>${escapeHtml(date)}</td>
       <td>${escapeHtml(name)}</td>
@@ -364,31 +391,6 @@ function displayAllBookings(bookings) {
   }).join('');
 }
 
-function updatePagination() {
-  const pagination = document.getElementById('pagination');
-  if (!pagination) return;
-  
-  let html = '';
-  if (currentPage > 1) {
-    html += `<button onclick="loadAllBookings(${currentPage - 1})">Previous</button>`;
-  }
-  
-  for (let i = 1; i <= totalPages; i++) {
-    if (i === currentPage) {
-      html += `<button class="active">${i}</button>`;
-    } else if (Math.abs(i - currentPage) < 3 || i === 1 || i === totalPages) {
-      html += `<button onclick="loadAllBookings(${i})">${i}</button>`;
-    } else if (Math.abs(i - currentPage) === 3) {
-      html += `<button disabled>...</button>`;
-    }
-  }
-  
-  if (currentPage < totalPages) {
-    html += `<button onclick="loadAllBookings(${currentPage + 1})">Next</button>`;
-  }
-  pagination.innerHTML = html;
-}
-
 async function updateBookingStatus(bookingId, status) {
   if (!confirm('Update booking status?')) return;
   
@@ -399,8 +401,9 @@ async function updateBookingStatus(bookingId, status) {
     });
     
     showNotification('Status updated', 'success');
-    await loadAllBookings(currentPage, currentFilters);
+    await loadAllBookings();
     await loadDashboardData();
+    
   } catch (error) {
     showNotification('Update failed', 'error');
   }
@@ -573,10 +576,12 @@ function contactCustomer(phone) {
 function showSection(sectionId) {
   console.log("🔄 Switching to section:", sectionId);
   
+  // Hide all sections
   document.querySelectorAll('.content-section').forEach(s => {
     s.classList.remove('active-section');
   });
   
+  // Show selected section
   const targetSection = document.getElementById(sectionId + '-section');
   if (targetSection) {
     targetSection.classList.add('active-section');
@@ -585,48 +590,60 @@ function showSection(sectionId) {
     return;
   }
   
+  // Update active nav link
   document.querySelectorAll('.sidebar-nav a').forEach(a => {
     a.classList.remove('active');
   });
   
   const activeLink = document.querySelector(`.sidebar-nav a[data-section="${sectionId}"]`);
-  if (activeLink) activeLink.classList.add('active');
+  if (activeLink) {
+    activeLink.classList.add('active');
+  }
   
+  // Update page title
   const pageTitle = document.getElementById('pageTitle');
-  if (pageTitle) pageTitle.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  if (pageTitle) {
+    pageTitle.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  }
   
-  if (sectionId === 'bookings') loadAllBookings();
-  if (sectionId === 'customers') loadCustomers();
-  if (sectionId === 'settings') loadSettings();
-  if (sectionId === 'pricing') loadSettings();
+  // Load section data
+  if (sectionId === 'bookings') {
+    loadAllBookings();
+  }
+  if (sectionId === 'customers') {
+    loadCustomers();
+  }
+  if (sectionId === 'settings') {
+    loadSettings();
+  }
+  if (sectionId === 'pricing') {
+    loadSettings(); // Pricing uses same settings data
+  }
 }
 
 function setupEventListeners() {
+  // Search with debounce
   let searchTimeout;
   const searchInput = document.getElementById('searchBooking');
-  const statusFilter = document.getElementById('statusFilter');
-  
   if (searchInput) {
     searchInput.addEventListener('input', function() {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
-        loadAllBookings(1, { 
-          search: this.value, 
-          status: statusFilter ? statusFilter.value : 'all' 
-        });
+        // Implement search if needed
+        console.log('Search:', this.value);
       }, 300);
     });
   }
   
+  // Status filter
+  const statusFilter = document.getElementById('statusFilter');
   if (statusFilter) {
     statusFilter.addEventListener('change', function() {
-      loadAllBookings(1, { 
-        search: searchInput ? searchInput.value : '', 
-        status: this.value 
-      });
+      console.log('Status filter:', this.value);
     });
   }
   
+  // Export button
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) {
     exportBtn.addEventListener('click', exportBookings);
@@ -638,9 +655,8 @@ async function exportBookings() {
     const data = await apiCall('/bookings/export');
     if (!data) return;
     
-    const headers = ['Reference', 'Date', 'Name', 'Phone', 'Hostel', 'Items', 'Total', 'Status'];
+    const headers = ['Date', 'Name', 'Phone', 'Hostel', 'Items', 'Total', 'Status'];
     const rows = data.map(b => [
-      b.booking_ref || '',
       b.booking_date || b.date || '',
       b.customer_name || b.name || '',
       b.customer_phone || b.phone || '',

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login - Kodak Logistics</title>
   <link rel="stylesheet" href="admin-style.css">
+  <!-- Content Security Policy - Allows connections to backend API -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://kodak-logistics-api.onrender.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
 </head>
 <body class="login-body">
   <div class="login-container">
@@ -25,9 +27,15 @@
         
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" required 
-                 placeholder="Enter password"
-                 autocomplete="off">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="password" id="password" name="password" required 
+                   placeholder="Enter password"
+                   autocomplete="off"
+                   style="flex: 1;">
+            <button type="button" id="togglePassword" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 10px 15px; cursor: pointer; color: white; font-weight: bold;">
+              👁️ Show
+            </button>
+          </div>
         </div>
         
         <button type="submit" class="login-btn" id="loginBtn">Login to Dashboard</button>
@@ -41,6 +49,19 @@
     </div>
   </div>
   
+  <script>
+    // Password visibility toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    if (togglePassword && passwordInput) {
+      togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.textContent = type === 'password' ? '👁️ Show' : '🙈 Hide';
+      });
+    }
+  </script>
   <script src="admin.js"></script>
 </body>
 </html>
