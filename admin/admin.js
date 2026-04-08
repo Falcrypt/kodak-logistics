@@ -1,5 +1,5 @@
 // admin/admin.js - COMPLETE REWRITE FOR SECURITY
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 console.log('🚀 Admin JS loaded');
 console.log('🔗 API URL:', API_URL);
 
@@ -289,7 +289,6 @@ function displayRecentBookings(bookings) {
   }
   
   tbody.innerHTML = bookings.map(booking => {
-    // Handle different possible field names
     const date = booking.booking_date || booking.date || '';
     const name = booking.customer_name || booking.name || '';
     const items = booking.items_summary || booking.items || '';
@@ -326,7 +325,6 @@ async function loadAllBookings() {
       const data = await response.json();
       console.log("📚 All bookings data:", data);
       
-      // Handle both response formats
       if (data && data.bookings) {
         displayAllBookings(data.bookings);
       } else if (Array.isArray(data)) {
@@ -352,12 +350,12 @@ function displayAllBookings(bookings) {
   }
   
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9">No bookings found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
     return;
   }
   
   tbody.innerHTML = bookings.map(booking => {
-    // Handle different possible field names
+    const ref = booking.booking_ref || '';
     const id = booking.id || '';
     const date = booking.booking_date || booking.date || '';
     const name = booking.customer_name || booking.name || '';
@@ -368,6 +366,7 @@ function displayAllBookings(bookings) {
     const status = booking.status || 'pending';
     
     return `<tr>
+      <td>${escapeHtml(ref)}</td>
       <td>#${escapeHtml(id)}</td>
       <td>${escapeHtml(date)}</td>
       <td>${escapeHtml(name)}</td>
@@ -459,6 +458,7 @@ async function loadSettings() {
     const priceMedium = document.getElementById('priceMedium');
     const priceBig = document.getElementById('priceBig');
     const priceFridge = document.getElementById('priceFridge');
+    const priceGas = document.getElementById('priceGas');
     
     if (whatsappInput) whatsappInput.value = settings.whatsapp_number || '';
     if (emailInput) emailInput.value = settings.business_email || '';
@@ -466,6 +466,7 @@ async function loadSettings() {
     if (priceMedium) priceMedium.value = settings.price_medium || 50;
     if (priceBig) priceBig.value = settings.price_big || 60;
     if (priceFridge) priceFridge.value = settings.price_fridge || 70;
+    if (priceGas) priceGas.value = settings.price_gas || 60;
     
   } catch (error) {
     console.error('Failed to load settings:', error);
@@ -477,7 +478,8 @@ async function savePricing() {
     price_small: document.getElementById('priceSmall')?.value || 40,
     price_medium: document.getElementById('priceMedium')?.value || 50,
     price_big: document.getElementById('priceBig')?.value || 60,
-    price_fridge: document.getElementById('priceFridge')?.value || 70
+    price_fridge: document.getElementById('priceFridge')?.value || 70,
+    price_gas: document.getElementById('priceGas')?.value || 60
   };
   
   try {
@@ -576,12 +578,10 @@ function contactCustomer(phone) {
 function showSection(sectionId) {
   console.log("🔄 Switching to section:", sectionId);
   
-  // Hide all sections
   document.querySelectorAll('.content-section').forEach(s => {
     s.classList.remove('active-section');
   });
   
-  // Show selected section
   const targetSection = document.getElementById(sectionId + '-section');
   if (targetSection) {
     targetSection.classList.add('active-section');
@@ -590,7 +590,6 @@ function showSection(sectionId) {
     return;
   }
   
-  // Update active nav link
   document.querySelectorAll('.sidebar-nav a').forEach(a => {
     a.classList.remove('active');
   });
@@ -600,13 +599,11 @@ function showSection(sectionId) {
     activeLink.classList.add('active');
   }
   
-  // Update page title
   const pageTitle = document.getElementById('pageTitle');
   if (pageTitle) {
     pageTitle.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
   }
   
-  // Load section data
   if (sectionId === 'bookings') {
     loadAllBookings();
   }
@@ -617,25 +614,22 @@ function showSection(sectionId) {
     loadSettings();
   }
   if (sectionId === 'pricing') {
-    loadSettings(); // Pricing uses same settings data
+    loadSettings();
   }
 }
 
 function setupEventListeners() {
-  // Search with debounce
   let searchTimeout;
   const searchInput = document.getElementById('searchBooking');
   if (searchInput) {
     searchInput.addEventListener('input', function() {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
-        // Implement search if needed
         console.log('Search:', this.value);
       }, 300);
     });
   }
   
-  // Status filter
   const statusFilter = document.getElementById('statusFilter');
   if (statusFilter) {
     statusFilter.addEventListener('change', function() {
@@ -643,7 +637,6 @@ function setupEventListeners() {
     });
   }
   
-  // Export button
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) {
     exportBtn.addEventListener('click', exportBookings);
@@ -655,8 +648,9 @@ async function exportBookings() {
     const data = await apiCall('/bookings/export');
     if (!data) return;
     
-    const headers = ['Date', 'Name', 'Phone', 'Hostel', 'Items', 'Total', 'Status'];
+    const headers = ['Reference', 'Date', 'Name', 'Phone', 'Hostel', 'Items', 'Total', 'Status'];
     const rows = data.map(b => [
+      b.booking_ref || '',
       b.booking_date || b.date || '',
       b.customer_name || b.name || '',
       b.customer_phone || b.phone || '',
