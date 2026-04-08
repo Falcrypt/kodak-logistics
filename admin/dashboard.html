@@ -118,7 +118,7 @@
               </tr>
             </thead>
             <tbody id="allBookingsBody">
-              <tr><td colspan="10">Loading...<\/td><\/tr>
+              <td><td colspan="10">Loading...<\/td><\/tr>
             </tbody>
           </table>
           <div id="pagination" class="pagination"></div>
@@ -166,6 +166,10 @@
           <div class="form-group">
             <label>Fridge (₵)</label>
             <input type="number" id="priceFridge" min="0" step="0.5" value="70">
+          </div>
+          <div class="form-group">
+            <label>Gas Cylinder (₵)</label>
+            <input type="number" id="priceGas" min="0" step="0.5" value="60">
           </div>
           <button onclick="savePricing()" class="btn-save">Save Pricing</button>
           <div id="pricingMessage" class="form-message"></div>
