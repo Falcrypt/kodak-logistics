@@ -1046,13 +1046,6 @@ select option:checked {
     color: var(--primary-red);
 }
 
-/* ========== CURRENCY SYMBOL FIX ========== */
-.price-tag::before,
-.price::before,
-.total-section p::before {
-    content: none;
-}
-
 /* ========== IMAGE FALLBACK ========== */
 img {
     max-width: 100%;
