@@ -1,4 +1,4 @@
-// script.js - COMPLETELY FIXED VERSION with Booking Reference
+// script.js - COMPLETELY FIXED VERSION with Booking Reference & Gas Cylinder
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 
 // Hide loader immediately when page loads
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const menuToggle = document.querySelector('.menu-toggle');
   const navLinks = document.querySelector('.nav-links');
   
-  // Prices
+  // Prices (default values)
   let prices = {
     small: 40,
     medium: 50,
@@ -41,6 +41,64 @@ document.addEventListener("DOMContentLoaded", function() {
     gas: 60,
     free: 0
   };
+
+  // ===== LOAD PRICES FROM SERVER (WITH CACHE BUSTING) =====
+  async function loadPrices() {
+    try {
+      // Add timestamp to prevent caching
+      const timestamp = Date.now();
+      const response = await fetch(`${API_URL}/settings/public?t=${timestamp}`);
+      if (response.ok) {
+        const serverPrices = await response.json();
+        prices = { ...prices, ...serverPrices };
+        console.log('💰 Prices loaded from server:', prices);
+      } else {
+        console.log('⚠️ Using default prices');
+      }
+    } catch (error) {
+      console.log('⚠️ Network error, using default prices');
+    }
+    updatePriceDisplay();
+  }
+
+  // ===== UPDATE PRICE DISPLAYS =====
+  function updatePriceDisplay() {
+    // Update price cards
+    const smallDisplay = document.getElementById('priceSmallDisplay');
+    const mediumDisplay = document.getElementById('priceMediumDisplay');
+    const bigDisplay = document.getElementById('priceBigDisplay');
+    const fridgeDisplay = document.getElementById('priceFridgeDisplay');
+    const gasDisplay = document.getElementById('priceGasDisplay');
+    
+    if (smallDisplay) smallDisplay.textContent = `₵${prices.small}`;
+    if (mediumDisplay) mediumDisplay.textContent = `₵${prices.medium}`;
+    if (bigDisplay) bigDisplay.textContent = `₵${prices.big}`;
+    if (fridgeDisplay) fridgeDisplay.textContent = `₵${prices.fridge}`;
+    if (gasDisplay) gasDisplay.textContent = `₵${prices.gas}`;
+    
+    // Update select dropdowns
+    updateSelectOptions();
+  }
+
+  // ===== UPDATE SELECT DROPDOWN OPTIONS =====
+  function updateSelectOptions() {
+    const selects = document.querySelectorAll('.itemSelect');
+    const optionsHtml = `
+      <option value="">Select item</option>
+      <option value="small">Small Bag – ₵${prices.small}</option>
+      <option value="medium">Medium Bag – ₵${prices.medium}</option>
+      <option value="big">Big Bag – ₵${prices.big}</option>
+      <option value="fridge">Fridge – ₵${prices.fridge}</option>
+      <option value="gas">Gas Cylinder – ₵${prices.gas}</option>
+      <option value="free">Buckets / Free – ₵0</option>
+    `;
+    
+    selects.forEach(select => {
+      const currentValue = select.value;
+      select.innerHTML = optionsHtml;
+      if (currentValue) select.value = currentValue;
+    });
+  }
 
   // ===== CALCULATE TOTAL =====
   function calculateTotal() {
@@ -69,10 +127,11 @@ document.addEventListener("DOMContentLoaded", function() {
       newRow.innerHTML = `
         <select class="itemSelect" required>
           <option value="">Select item</option>
-          <option value="small">Small Bag – ₵40</option>
-          <option value="medium">Medium Bag – ₵50</option>
-          <option value="big">Big Bag – ₵60</option>
-          <option value="fridge">Fridge – ₵70</option>
+          <option value="small">Small Bag – ₵${prices.small}</option>
+          <option value="medium">Medium Bag – ₵${prices.medium}</option>
+          <option value="big">Big Bag – ₵${prices.big}</option>
+          <option value="fridge">Fridge – ₵${prices.fridge}</option>
+          <option value="gas">Gas Cylinder – ₵${prices.gas}</option>
           <option value="free">Buckets – Free</option>
         </select>
         <input type="number" class="quantity" min="1" value="1" required>
@@ -81,7 +140,6 @@ document.addEventListener("DOMContentLoaded", function() {
       
       itemsContainer.appendChild(newRow);
       
-      // Add remove button functionality
       newRow.querySelector(".remove-btn").addEventListener("click", function() {
         if (document.querySelectorAll(".item-row").length > 1) {
           newRow.remove();
@@ -89,7 +147,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       });
       
-      // Add input listeners for calculation
       newRow.querySelectorAll(".itemSelect, .quantity").forEach(input => {
         input.addEventListener("input", calculateTotal);
       });
@@ -173,7 +230,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const result = await response.json();
 
         if (response.ok) {
-          // Show success message with booking reference
           alert(`✅ Booking sent successfully!\n\nYour booking reference is: ${result.bookingRef}\nPlease keep this reference for pickup.\nWe'll contact you soon.`);
           
           form.reset();
@@ -192,7 +248,6 @@ document.addEventListener("DOMContentLoaded", function() {
           
           calculateTotal();
 
-          // Optional: Open WhatsApp with reference
           if (confirm("Open WhatsApp to chat with us directly?")) {
             const message = encodeURIComponent(
               `Hi Kodak Logistics!\n\nBooking confirmed online.\nReference: ${result.bookingRef}\nName: ${formData.name}\nDate: ${formData.date}\nTotal: ₵${formData.total}\n\nPlease confirm.`
@@ -226,8 +281,10 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // ===== INITIALIZE =====
-  attachExistingRowListeners();
-  calculateTotal();
-  
-  console.log("✅ Script initialized");
+  // Load prices from server first, then setup
+  loadPrices().then(() => {
+    attachExistingRowListeners();
+    calculateTotal();
+    console.log("✅ Script initialized with fresh prices");
+  });
 });
