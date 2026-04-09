@@ -133,7 +133,8 @@ async function setupDatabase() {
             ['price_small', '40'],
             ['price_medium', '50'],
             ['price_big', '60'],
-            ['price_fridge', '70']
+            ['price_fridge', '70'],
+            ['price_gas', '60']
         ];
         
         for (const [key, value] of defaultSettings) {
