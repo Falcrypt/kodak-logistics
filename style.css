@@ -687,6 +687,11 @@ section.visible {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.price::before {
+  content: "₵";
+  margin-right: 2px;
+}
+
 /* ========== BOOKING FORM ========== */
 .booking-form {
     max-width: 800px;

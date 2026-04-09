@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // ===== LOAD PRICES FROM SERVER (WITH CACHE BUSTING) =====
   async function loadPrices() {
     try {
-      // Add timestamp to prevent caching
       const timestamp = Date.now();
       const response = await fetch(`${API_URL}/settings/public?t=${timestamp}`);
       if (response.ok) {
@@ -63,20 +62,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // ===== UPDATE PRICE DISPLAYS =====
   function updatePriceDisplay() {
-    // Update price cards
+    // Update price cards - ONLY the number, NO symbol here
     const smallDisplay = document.getElementById('priceSmallDisplay');
     const mediumDisplay = document.getElementById('priceMediumDisplay');
     const bigDisplay = document.getElementById('priceBigDisplay');
     const fridgeDisplay = document.getElementById('priceFridgeDisplay');
     const gasDisplay = document.getElementById('priceGasDisplay');
     
-    if (smallDisplay) smallDisplay.textContent = `₵${prices.small}`;
-    if (mediumDisplay) mediumDisplay.textContent = `₵${prices.medium}`;
-    if (bigDisplay) bigDisplay.textContent = `₵${prices.big}`;
-    if (fridgeDisplay) fridgeDisplay.textContent = `₵${prices.fridge}`;
-    if (gasDisplay) gasDisplay.textContent = `₵${prices.gas}`;
+    if (smallDisplay) smallDisplay.textContent = prices.small;
+    if (mediumDisplay) mediumDisplay.textContent = prices.medium;
+    if (bigDisplay) bigDisplay.textContent = prices.big;
+    if (fridgeDisplay) fridgeDisplay.textContent = prices.fridge;
+    if (gasDisplay) gasDisplay.textContent = prices.gas;
     
-    // Update select dropdowns
     updateSelectOptions();
   }
 
@@ -185,7 +183,6 @@ document.addEventListener("DOMContentLoaded", function() {
       submitBtn.disabled = true;
       submitBtn.textContent = "Sending...";
 
-      // Collect items
       const items = [];
       document.querySelectorAll(".item-row").forEach(row => {
         const select = row.querySelector(".itemSelect");
@@ -207,7 +204,6 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
       }
 
-      // Get form data
       const formData = {
         name: document.getElementById("name")?.value || "",
         email: document.getElementById("email")?.value || "",
@@ -234,7 +230,6 @@ document.addEventListener("DOMContentLoaded", function() {
           
           form.reset();
           
-          // Reset to one empty row
           const allRows = document.querySelectorAll(".item-row");
           for (let i = 1; i < allRows.length; i++) {
             allRows[i].remove();
@@ -281,7 +276,6 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // ===== INITIALIZE =====
-  // Load prices from server first, then setup
   loadPrices().then(() => {
     attachExistingRowListeners();
     calculateTotal();
