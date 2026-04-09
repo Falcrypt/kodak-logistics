@@ -1050,8 +1050,7 @@ select option:checked {
 .price-tag::before,
 .price::before,
 .total-section p::before {
-    content: "₵";
-    margin-right: 2px;
+    content: none;
 }
 
 /* ========== IMAGE FALLBACK ========== */
