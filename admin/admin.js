@@ -1,4 +1,4 @@
-// admin/admin.js - COMPLETE WORKING VERSION (FIXED)
+// admin/admin.js - COMPLETE WORKING VERSION
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 console.log('🚀 Admin JS loaded');
 console.log('🔗 API URL:', API_URL);
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadDashboardData();
         loadAllBookings();
         loadCustomers();
-        window.loadSettings(); // Call the global function
+        window.loadSettings();
         setupEventListeners();
         setupNavigation();
       }
@@ -109,8 +109,15 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========== NAVIGATION SETUP ==========
 function setupNavigation() {
   console.log('🔧 Setting up navigation...');
-  document.querySelectorAll('.sidebar-nav a[data-section]').forEach(link => {
-    link.addEventListener('click', function(e) {
+  
+  // Remove any existing listeners and add new ones
+  const navLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
+  navLinks.forEach(link => {
+    // Remove old listener if exists
+    const newLink = link.cloneNode(true);
+    link.parentNode.replaceChild(newLink, link);
+    
+    newLink.addEventListener('click', function(e) {
       e.preventDefault();
       const sectionId = this.dataset.section;
       console.log('📌 Navigation clicked:', sectionId);
@@ -216,7 +223,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td><tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -254,7 +261,7 @@ function displayAllBookings(bookings) {
   const tbody = document.getElementById('allBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td><tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -312,7 +319,7 @@ function displayCustomers(customers) {
   const tbody = document.getElementById('customersBody');
   if (!tbody) return;
   if (!customers || customers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No customers found</td></table>';
+    tbody.innerHTML = '<tr><td colspan="6">No customers found缓解</tr>';
     return;
   }
   tbody.innerHTML = customers.map(customer => `
@@ -538,16 +545,39 @@ function contactCustomer(phone) {
 // ========== UI FUNCTIONS ==========
 function showSection(sectionId) {
   console.log("🔄 Switching to section:", sectionId);
-  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
-  const target = document.getElementById(sectionId + '-section');
-  if (target) target.classList.add('active-section');
-  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-  const active = document.querySelector(`.sidebar-nav a[data-section="${sectionId}"]`);
-  if (active) active.classList.add('active');
-  const title = document.getElementById('pageTitle');
-  if (title) title.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
   
-  // Load data based on section
+  // Hide all sections
+  document.querySelectorAll('.content-section').forEach(s => {
+    s.classList.remove('active-section');
+  });
+  
+  // Show selected section
+  const target = document.getElementById(sectionId + '-section');
+  if (target) {
+    target.classList.add('active-section');
+    console.log('✅ Section activated:', sectionId + '-section');
+  } else {
+    console.error('❌ Section not found:', sectionId + '-section');
+    return;
+  }
+  
+  // Update active nav link
+  document.querySelectorAll('.sidebar-nav a').forEach(a => {
+    a.classList.remove('active');
+  });
+  
+  const activeLink = document.querySelector(`.sidebar-nav a[data-section="${sectionId}"]`);
+  if (activeLink) {
+    activeLink.classList.add('active');
+  }
+  
+  // Update page title
+  const title = document.getElementById('pageTitle');
+  if (title) {
+    title.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  }
+  
+  // Load section data
   if (sectionId === 'bookings') loadAllBookings();
   if (sectionId === 'customers') loadCustomers();
   if (sectionId === 'settings') window.loadSettings();
