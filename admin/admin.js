@@ -201,51 +201,58 @@ async function apiCall(endpoint, options = {}) {
 }
 // Replace your current showSection() with this:
 // ========== SHOW SECTION - CLEAN & RELIABLE ==========
+// ========== SHOW SECTION - FIXED ==========
 function showSection(sectionId) {
-  console.log("🔄 Switching to section:", sectionId);
+    console.log("🔄 Switching to section:", sectionId);
 
-  // Hide all sections using class (this is the reliable way)
-  document.querySelectorAll('.content-section').forEach(section => {
-    section.classList.remove('active-section');
-  });
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active-section');
+    });
 
-  // Show the target section
-  const target = document.getElementById(sectionId + '-section');
-  if (target) {
-    target.classList.add('active-section');
-    console.log('✅ Section activated:', sectionId + '-section');
+    // Show target section
+    const target = document.getElementById(sectionId + '-section');
+    if (target) {
+        target.classList.add('active-section');
+        console.log('✅ Section activated:', sectionId + '-section');
 
-    // Load data for specific sections
-    if (sectionId === 'bookings') {
-      loadAllBookings();
-    } else if (sectionId === 'customers') {
-      loadCustomers();
-    } else if (sectionId === 'pricing' || sectionId === 'settings') {
-      // Small delay so the section is visible before populating inputs
-      setTimeout(() => {
-        if (typeof window.loadSettings === 'function') {
-          window.loadSettings();
+        // Load data for the section
+        if (sectionId === 'bookings') {
+            loadAllBookings();
+        } else if (sectionId === 'customers') {
+            loadCustomers();
+        } else if (sectionId === 'pricing' || sectionId === 'settings') {
+            // Small delay + check if function exists
+            setTimeout(() => {
+                if (typeof window.loadSettings === 'function') {
+                    window.loadSettings();
+                } else {
+                    console.warn('loadSettings is not available yet');
+                }
+            }, 50);
         }
-      }, 50);
+    } else {
+        console.error('❌ Section not found:', sectionId + '-section');
     }
-  } else {
-    console.error('❌ Section not found:', sectionId + '-section');
-  }
 
-  // Update active navigation link
-  document.querySelectorAll('.sidebar-nav a[data-section]').forEach(link => {
-    link.classList.remove('active');
-    if (link.dataset.section === sectionId) {
-      link.classList.add('active');
+    // Update active nav link
+    document.querySelectorAll('.sidebar-nav a[data-section]').forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.section === sectionId) {
+            link.classList.add('active');
+        }
+    });
+
+    // Update page title
+    const titleEl = document.getElementById('pageTitle');
+    if (titleEl) {
+        titleEl.textContent = sectionId === 'dashboard' 
+            ? 'Dashboard' 
+            : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
     }
-  });
+}  
 
-  // Update page title
-  const titleEl = document.getElementById('pageTitle');
-  if (titleEl) {
-    titleEl.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-  }
-}  // Load data for the section
+// Load data for the section
   if (sectionId === 'bookings') {
     loadAllBookings();
   } else if (sectionId === 'customers') {
@@ -660,7 +667,7 @@ function setupEventListeners() {
   if (exportBtn) exportBtn.addEventListener('click', exportBookings);
 }
 
-// Make key functions available globally
+// ========== GLOBAL EXPORTS ==========
 window.showSection = showSection;
 window.updateBookingStatus = updateBookingStatus;
 window.contactCustomer = contactCustomer;
@@ -671,3 +678,4 @@ window.resetAllBookings = resetAllBookings;
 window.loadSettings = loadSettings;
 window.loadAllBookings = loadAllBookings;
 window.closeCustomerModal = closeCustomerModal;
+window.viewCustomerDetails = viewCustomerDetails;
