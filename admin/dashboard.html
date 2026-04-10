@@ -163,24 +163,105 @@
         </div>
       </section>
       
-      <!-- Settings Section -->
+            <!-- Settings Section - Modern Styling -->
       <section id="settings-section" class="content-section">
-        <h2>Business Settings</h2>
-        <div class="settings-form">
-          <div class="form-group"><label>WhatsApp Number</label><input type="text" id="whatsappNumber" maxlength="20"></div>
-          <div class="form-group"><label>Business Email</label><input type="email" id="businessEmail" maxlength="100"></div>
-          <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" placeholder="Enter current password"></div>
-          <div class="form-group"><label>New Password</label><input type="password" id="newPassword" placeholder="Leave blank to keep current"></div>
-          <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmPassword" placeholder="Confirm new password"></div>
-          <button onclick="saveSettings()" class="btn-save">Save Settings</button>
-          <div id="settingsMessage" class="form-message"></div>
+        <div class="section-header">
+          <h2>⚙️ Business Settings</h2>
+          <p>Manage your business contact information and security</p>
+        </div>
+        
+        <div class="settings-grid-modern">
+          <!-- Contact Settings Card -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <i class="fas fa-address-card"></i>
+              <h3>Contact Information</h3>
+            </div>
+            <div class="settings-card-body">
+              <div class="settings-field">
+                <label><i class="fab fa-whatsapp"></i> WhatsApp Number</label>
+                <div class="settings-input-group">
+                  <span class="country-code">+233</span>
+                  <input type="text" id="whatsappNumber" maxlength="20" placeholder="54 502 5296">
+                </div>
+                <small>Customer WhatsApp contact for bookings</small>
+              </div>
+              
+              <div class="settings-field">
+                <label><i class="fas fa-envelope"></i> Business Email</label>
+                <div class="settings-input-group">
+                  <i class="fas fa-envelope input-icon"></i>
+                  <input type="email" id="businessEmail" maxlength="100" placeholder="admin@kodaklogistics.com">
+                </div>
+                <small>Email for customer inquiries and notifications</small>
+              </div>
+            </div>
+          </div>
           
-          <div class="form-group" style="border-top: 2px solid #dc3545; margin-top: 30px; padding-top: 20px;">
-            <label style="color: #dc3545; font-weight: bold;">⚠️ Danger Zone</label>
-            <button onclick="resetAllBookings()" style="background: #dc3545; color: white; border: none; border-radius: 8px; padding: 12px 25px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;">
-              🗑️ Reset All Bookings (Start Fresh)
-            </button>
-            <p style="font-size: 12px; color: #999; margin-top: 10px;">This will delete ALL bookings permanently. This action cannot be undone.</p>
+          <!-- Security Settings Card -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <i class="fas fa-lock"></i>
+              <h3>Security & Password</h3>
+            </div>
+            <div class="settings-card-body">
+              <div class="settings-field">
+                <label><i class="fas fa-key"></i> Current Password</label>
+                <div class="settings-input-group">
+                  <i class="fas fa-lock input-icon"></i>
+                  <input type="password" id="currentPassword" placeholder="Enter current password">
+                </div>
+              </div>
+              
+              <div class="settings-field">
+                <label><i class="fas fa-plus-circle"></i> New Password</label>
+                <div class="settings-input-group">
+                  <i class="fas fa-shield-alt input-icon"></i>
+                  <input type="password" id="newPassword" placeholder="Leave blank to keep current">
+                </div>
+                <small>Minimum 8 characters</small>
+              </div>
+              
+              <div class="settings-field">
+                <label><i class="fas fa-check-circle"></i> Confirm New Password</label>
+                <div class="settings-input-group">
+                  <i class="fas fa-repeat input-icon"></i>
+                  <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="settings-action">
+          <button onclick="saveSettings()" class="btn-save-modern">
+            <i class="fas fa-save"></i> Save All Settings
+          </button>
+          <div id="settingsMessage" class="form-message"></div>
+        </div>
+        
+        <!-- Danger Zone - Modern Styling -->
+        <div class="danger-zone-modern">
+          <div class="danger-zone-header">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+              <h3>Danger Zone</h3>
+              <p>Irreversible actions - proceed with caution</p>
+            </div>
+          </div>
+          <div class="danger-zone-content">
+            <div class="danger-action">
+              <div class="danger-info">
+                <i class="fas fa-trash-alt"></i>
+                <div>
+                  <strong>Reset All Bookings</strong>
+                  <p>Delete ALL customer booking data permanently</p>
+                </div>
+              </div>
+              <button onclick="resetAllBookings()" class="btn-danger-modern">
+                <i class="fas fa-trash-alt"></i> Reset All Bookings
+              </button>
+            </div>
           </div>
         </div>
       </section>
