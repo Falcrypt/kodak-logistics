@@ -97,10 +97,10 @@ document.addEventListener('DOMContentLoaded', function() {
         loadDashboardData();
         loadAllBookings();
         loadCustomers();
-        loadAllSettings(); // Load settings immediately
+        loadAllSettings();
         setupNavigation();
         setupEventListeners();
-        setupMobileMenu(); //for mobile menu
+        setupMobileMenu(); // Mobile menu setup
       }
     });
   }
@@ -113,6 +113,60 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// ========== MOBILE MENU FUNCTIONALITY ==========
+function setupMobileMenu() {
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (!mobileToggle || !sidebar) return;
+    
+    // Create overlay element
+    let overlay = document.querySelector('.menu-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'menu-overlay';
+        document.body.appendChild(overlay);
+    }
+    
+    // Toggle menu function
+    function toggleMenu() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+    }
+    
+    // Close menu function
+    function closeMenu() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Make toggleMenu available globally for the button's onclick
+    window.toggleMobileMenu = toggleMenu;
+    
+    // Event listeners
+    mobileToggle.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', closeMenu);
+    
+    // Close menu when a nav link is clicked (on mobile)
+    const navLinks = document.querySelectorAll('.sidebar-nav a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeMenu();
+            }
+        });
+    });
+    
+    // Close menu on window resize if open
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
+            closeMenu();
+        }
+    });
+}
 
 // ========== LOAD ALL SETTINGS ==========
 async function loadAllSettings() {
@@ -193,7 +247,7 @@ function setupNavigation() {
       } else if (sectionId === 'customers') {
         loadCustomers();
       } else if (sectionId === 'pricing' || sectionId === 'settings') {
-        loadAllSettings(); // Reload settings when switching to these tabs
+        loadAllSettings();
       }
     });
   });
@@ -303,7 +357,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No recent bookings缓解<tr>';
+    tbody.innerHTML = '<td><td colspan="6">No recent bookings</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -352,7 +406,6 @@ async function loadFilteredBookings() {
 
 // ========== LOAD ALL BOOKINGS (resets search) ==========
 async function loadAllBookings() {
-    // Reset search and filter
     currentSearchTerm = '';
     currentStatusFilter = 'all';
     
@@ -369,7 +422,7 @@ function displayAllBookings(bookings) {
   const tbody = document.getElementById('allBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10">No bookings found缓解</td>';
+    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -398,7 +451,7 @@ function displayAllBookings(bookings) {
           <option value="confirmed" ${status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
           <option value="completed" ${status === 'completed' ? 'selected' : ''}>Completed</option>
         </select>
-      </td>
+       </td>
       <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button></td>
     </tr>`;
   }).join('');
@@ -432,7 +485,7 @@ function displayCustomers(customers) {
   if (!tbody) return;
   
   if (!customers || customers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No customers found缓解</tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No customers found</td></tr>';
     return;
   }
   
@@ -680,7 +733,6 @@ function setupEventListeners() {
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.addEventListener('click', exportBookings);
   
-  // Setup search and filter
   setupSearchListeners();
 }
 
@@ -693,61 +745,6 @@ window.showSection = function(sectionId) {
   if (sectionId === 'bookings') loadAllBookings();
   if (sectionId === 'customers') loadCustomers();
   if (sectionId === 'pricing' || sectionId === 'settings') loadAllSettings();
-
-  // ========== MOBILE MENU FUNCTIONALITY ==========
-function setupMobileMenu() {
-    const mobileToggle = document.getElementById('mobileMenuToggle');
-    const sidebar = document.querySelector('.sidebar');
-    
-    if (!mobileToggle || !sidebar) return;
-    
-    // Create overlay element
-    let overlay = document.querySelector('.menu-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.className = 'menu-overlay';
-        document.body.appendChild(overlay);
-    }
-    
-    // Toggle menu function
-    function toggleMenu() {
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-        document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-    }
-    
-    // Close menu function
-    function closeMenu() {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
-    // Event listeners
-    mobileToggle.addEventListener('click', toggleMenu);
-    overlay.addEventListener('click', closeMenu);
-    
-    // Close menu when a nav link is clicked (on mobile)
-    const navLinks = document.querySelectorAll('.sidebar-nav a');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
-                closeMenu();
-            }
-        });
-    });
-    
-    // Close menu on window resize if open
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
-            closeMenu();
-        }
-    });
-}
-
-// Call this function after DOM is loaded
-// Add this line inside your DOMContentLoaded event listener
-// setupMobileMenu();
 };
 
 window.updateBookingStatus = updateBookingStatus;
