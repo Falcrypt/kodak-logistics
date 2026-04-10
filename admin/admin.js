@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadAllSettings(); // Load settings immediately
         setupNavigation();
         setupEventListeners();
+        setupMobileMenu(); //for mobile menu
       }
     });
   }
@@ -692,6 +693,61 @@ window.showSection = function(sectionId) {
   if (sectionId === 'bookings') loadAllBookings();
   if (sectionId === 'customers') loadCustomers();
   if (sectionId === 'pricing' || sectionId === 'settings') loadAllSettings();
+
+  // ========== MOBILE MENU FUNCTIONALITY ==========
+function setupMobileMenu() {
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (!mobileToggle || !sidebar) return;
+    
+    // Create overlay element
+    let overlay = document.querySelector('.menu-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'menu-overlay';
+        document.body.appendChild(overlay);
+    }
+    
+    // Toggle menu function
+    function toggleMenu() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+    }
+    
+    // Close menu function
+    function closeMenu() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Event listeners
+    mobileToggle.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', closeMenu);
+    
+    // Close menu when a nav link is clicked (on mobile)
+    const navLinks = document.querySelectorAll('.sidebar-nav a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeMenu();
+            }
+        });
+    });
+    
+    // Close menu on window resize if open
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
+            closeMenu();
+        }
+    });
+}
+
+// Call this function after DOM is loaded
+// Add this line inside your DOMContentLoaded event listener
+// setupMobileMenu();
 };
 
 window.updateBookingStatus = updateBookingStatus;

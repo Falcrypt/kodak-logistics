@@ -870,3 +870,149 @@
         flex-wrap: wrap;
     }
 }
+
+/* ====================== MOBILE RESPONSIVE MENU ====================== */
+.mobile-menu-toggle {
+    display: none !important;
+}
+
+/* Sidebar hidden by default on mobile */
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: #ffb347;
+        border-radius: 8px;
+        color: #8b0000 !important;
+        font-size: 1.3rem;
+    }
+    
+    .mobile-menu-toggle:hover {
+        background: #ffa01c;
+    }
+    
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        z-index: 1001;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    }
+    
+    .sidebar.open {
+        left: 0;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .top-bar {
+        padding: 12px 15px;
+    }
+    
+    .top-bar h1 {
+        font-size: 1.2rem;
+        flex: 1;
+        text-align: center;
+    }
+    
+    .admin-user span {
+        display: none;
+    }
+    
+    .admin-user i {
+        font-size: 1.8rem;
+    }
+    
+    /* Overlay when menu is open */
+    .menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        display: none;
+    }
+    
+    .menu-overlay.active {
+        display: block;
+    }
+    
+    /* Stats cards on mobile */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-icon {
+        font-size: 1.8rem;
+        padding: 10px;
+    }
+    
+    .stat-info p {
+        font-size: 1.5rem;
+    }
+    
+    /* Tables on mobile */
+    .table-responsive {
+        padding: 10px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+    
+    /* Filters on mobile */
+    .filters {
+        flex-direction: column;
+    }
+    
+    .filters input,
+    .filters select,
+    .filters button {
+        width: 100%;
+    }
+    
+    /* Pricing cards on mobile */
+    .pricing-card-modern {
+        flex-wrap: wrap;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .pricing-input-group {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Settings on mobile */
+    .settings-grid-modern {
+        grid-template-columns: 1fr;
+    }
+    
+    .danger-action {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .danger-info {
+        flex-direction: column;
+        text-align: center;
+    }
+}
