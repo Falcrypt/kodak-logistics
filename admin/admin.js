@@ -1,90 +1,260 @@
-// admin/admin.js - FINAL WORKING VERSION
+// admin/admin.js - FIXED & REFINED VERSION
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
-console.log('🚀 Admin JS loaded');
+console.log('🚀 Admin JS loaded - Fixed Version');
+
+let currentUser = null;
+let sessionCheckInterval = null;
+
+// ========== AUTHENTICATION ==========
+async function checkAuth() {
+  const token = localStorage.getItem('adminToken');
+  
+  if (!token) {
+    if (!window.location.pathname.includes('index.html')) {
+      window.location.href = 'index.html';
+    }
+    return false;
+  }
+  
+  try {
+    const response = await fetch(`${API_URL}/auth/verify`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      currentUser = data.user;
+      const adminNameEl = document.getElementById('adminName');
+      if (adminNameEl) adminNameEl.textContent = currentUser.username || 'Admin';
+      startSessionMonitor();
+      return true;
+    } else {
+      logout();
+      return false;
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error);
+    logout();
+    return false;
+  }
+}
 
 // ========== LOGIN FORM ==========
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM loaded');
-  
-  // Handle login page
+  // Login page handling
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
     loginForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const username = document.getElementById('username').value;
+      const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
       const loginBtn = document.getElementById('loginBtn');
       const errorDiv = document.getElementById('loginError');
       
       loginBtn.disabled = true;
       loginBtn.textContent = 'Logging in...';
-      errorDiv.style.display = 'none';
-      
+      if (errorDiv) errorDiv.style.display = 'none';
+
       try {
         const response = await fetch(`${API_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
+        
         const data = await response.json();
         
         if (response.ok && data.token) {
           localStorage.setItem('adminToken', data.token);
           window.location.href = 'dashboard.html';
         } else {
-          errorDiv.textContent = data.error || 'Invalid credentials';
-          errorDiv.style.display = 'block';
+          if (errorDiv) {
+            errorDiv.textContent = data.error || 'Invalid credentials';
+            errorDiv.style.display = 'block';
+          }
         }
       } catch (error) {
-        errorDiv.textContent = 'Connection error';
-        errorDiv.style.display = 'block';
+        console.error('Login error:', error);
+        if (errorDiv) {
+          errorDiv.textContent = 'Connection error';
+          errorDiv.style.display = 'block';
+        }
       } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login to Dashboard';
       }
     });
   }
-  
-  // Handle dashboard page
+
+  // Dashboard initialization
   if (window.location.pathname.includes('dashboard.html')) {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      window.location.href = 'index.html';
-      return;
-    }
-    
-    // Set admin name
-    const adminNameEl = document.getElementById('adminName');
-    if (adminNameEl) adminNameEl.textContent = 'Admin';
-    
-    // Load all data
-    loadStats();
-    loadBookings();
-    loadCustomers();
-    loadAllSettings();
-    setupSidebarNavigation();
+    checkAuth().then(isAuthed => {
+      if (isAuthed) {
+        loadDashboardData();
+        loadAllBookings();
+        loadCustomers();
+        window.loadSettings();           // Load pricing + settings on start
+        setupNavigation();
+        setupEventListeners();
+      }
+    });
   }
-  
+
   // Logout button
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      localStorage.removeItem('adminToken');
-      window.location.href = 'index.html';
+      logout();
     });
   }
 });
 
-// ========== LOAD STATS ==========
-async function loadStats() {
-  try {
-    const token = localStorage.getItem('adminToken');
-    const response = await fetch(`${API_URL}/bookings/stats`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+// ========== NAVIGATION SETUP (Fixed) ==========
+function setupNavigation() {
+  console.log('🔧 Setting up navigation...');
+  
+  const navLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
+  
+  navLinks.forEach(link => {
+    // Remove any previous listeners safely
+    const newLink = link.cloneNode(true);
+    if (link.parentNode) {
+      link.parentNode.replaceChild(newLink, link);
+    }
+
+    newLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      const sectionId = this.dataset.section;
+      console.log('📌 Navigation clicked:', sectionId);
+      showSection(sectionId);
     });
-    const stats = await response.json();
+  });
+}
+
+// ========== SESSION MANAGEMENT ==========
+function startSessionMonitor() {
+  if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+  
+  sessionCheckInterval = setInterval(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expiry = payload.exp * 1000;
+      const timeLeft = expiry - Date.now();
+      
+      if (timeLeft < 5 * 60 * 1000) showSessionWarning();
+      if (timeLeft <= 0) logout('Session expired');
+    } catch (e) {}
+  }, 60000);
+}
+
+function showSessionWarning() {
+  const warning = document.getElementById('sessionWarning');
+  if (warning) warning.style.display = 'block';
+}
+
+function extendSession() {
+  const warning = document.getElementById('sessionWarning');
+  if (warning) warning.style.display = 'none';
+}
+
+function logout(reason = '') {
+  if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+  localStorage.removeItem('adminToken');
+  window.location.href = 'index.html' + (reason ? '?reason=' + encodeURIComponent(reason) : '');
+}
+
+// ========== API HELPER ==========
+async function apiCall(endpoint, options = {}) {
+  const token = localStorage.getItem('adminToken');
+  if (!token) {
+    logout();
+    return null;
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    ...options.headers
+  };
+
+  try {
+    console.log(`📡 API Call: ${options.method || 'GET'} ${endpoint}`);
+    const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+    
+    if (response.status === 401) {
+      logout('Session expired');
+      return null;
+    }
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  } catch (error) {
+    console.error('❌ API call failed:', error);
+    throw error;
+  }
+}
+
+// ========== SHOW SECTION - FIXED ==========
+function showSection(sectionId) {
+  console.log("🔄 Switching to section:", sectionId);
+
+  // Hide all sections
+  document.querySelectorAll('.content-section').forEach(s => {
+    s.classList.remove('active-section');
+  });
+
+  // Show the target section
+  const target = document.getElementById(sectionId + '-section');
+  if (target) {
+    target.classList.add('active-section');
+    console.log('✅ Section activated:', sectionId + '-section');
+  } else {
+    console.error('❌ Section not found:', sectionId + '-section');
+    return;
+  }
+
+  // Update active nav link
+  document.querySelectorAll('.sidebar-nav a[data-section]').forEach(a => {
+    a.classList.remove('active');
+    if (a.dataset.section === sectionId) {
+      a.classList.add('active');
+    }
+  });
+
+  // Update page title
+  const title = document.getElementById('pageTitle');
+  if (title) {
+    title.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  }
+
+  // Load data for the section
+  if (sectionId === 'bookings') {
+    loadAllBookings();
+  } else if (sectionId === 'customers') {
+    loadCustomers();
+  } else if (sectionId === 'pricing' || sectionId === 'settings') {
+    // Small delay ensures DOM is visible before populating inputs
+    setTimeout(() => {
+      if (typeof window.loadSettings === 'function') {
+        window.loadSettings();
+      }
+    }, 100);
+  }
+}
+
+// ========== DASHBOARD ==========
+async function loadDashboardData() {
+  try {
+    const stats = await apiCall('/bookings/stats');
+    if (!stats) return;
+    
+    const revenue = typeof stats.revenue === 'number' ? stats.revenue : parseFloat(stats.revenue) || 0;
     
     const statsGrid = document.getElementById('statsGrid');
     if (statsGrid) {
@@ -92,16 +262,146 @@ async function loadStats() {
         <div class="stat-card"><i class="fas fa-calendar-alt stat-icon"></i><div class="stat-info"><h3>Today's Bookings</h3><p>${stats.today || 0}</p></div></div>
         <div class="stat-card"><i class="fas fa-clock stat-icon"></i><div class="stat-info"><h3>Pending</h3><p>${stats.pending || 0}</p></div></div>
         <div class="stat-card"><i class="fas fa-check-circle stat-icon"></i><div class="stat-info"><h3>Confirmed</h3><p>${stats.confirmed || 0}</p></div></div>
-        <div class="stat-card"><i class="fas fa-money-bill-wave stat-icon"></i><div class="stat-info"><h3>Revenue (₵)</h3><p>${(parseFloat(stats.revenue) || 0).toFixed(2)}</p></div></div>
+        <div class="stat-card"><i class="fas fa-money-bill-wave stat-icon"></i><div class="stat-info"><h3>Revenue (₵)</h3><p>${revenue.toFixed(2)}</p></div></div>
       `;
     }
+    await loadRecentBookings();
   } catch (error) {
-    console.error('Failed to load stats:', error);
+    console.error('❌ Dashboard load failed:', error);
   }
 }
 
-// ========== LOAD BOOKINGS ==========
-async function loadBookings() {
+async function loadRecentBookings() {
+  try {
+    const data = await apiCall('/bookings?limit=5');
+    displayRecentBookings(data?.bookings || []);
+  } catch (error) {
+    console.error('❌ Failed to load recent bookings:', error);
+    displayRecentBookings([]);
+  }
+}
+
+function displayRecentBookings(bookings) {
+  const tbody = document.getElementById('recentBookingsBody');
+  if (!tbody) return;
+  if (!bookings || bookings.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
+    return;
+  }
+  tbody.innerHTML = bookings.map(booking => {
+    const date = booking.booking_date || booking.date || '';
+    const name = booking.customer_name || booking.name || '';
+    const items = (booking.items_summary || booking.items || '').substring(0, 30) + '...';
+    const total = booking.total_amount || booking.total || '0';
+    const status = booking.status || 'pending';
+    const phone = booking.customer_phone || booking.phone || '';
+    return `<tr>
+      <td>${escapeHtml(date)}</td>
+      <td>${escapeHtml(name)}</td>
+      <td>${escapeHtml(items)}</td>
+      <td>₵${escapeHtml(total)}</td>
+      <td><span class="status-badge status-${escapeHtml(status)}">${escapeHtml(status)}</span></td>
+      <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ========== BOOKINGS ==========
+async function loadAllBookings() {
+  try {
+    const data = await apiCall('/bookings');
+    displayAllBookings(data?.bookings || []);
+  } catch (error) {
+    console.error('❌ Failed to load bookings:', error);
+    displayAllBookings([]);
+  }
+}
+
+function displayAllBookings(bookings) {
+  const tbody = document.getElementById('allBookingsBody');
+  if (!tbody) return;
+  if (!bookings || bookings.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = bookings.map(booking => {
+    const ref = booking.booking_ref || '';
+    const id = booking.id || '';
+    const date = booking.booking_date || booking.date || '';
+    const name = booking.customer_name || booking.name || '';
+    const phone = booking.customer_phone || booking.phone || '';
+    const hostel = booking.hostel_name || booking.hostel || '';
+    const items = booking.items_summary || booking.items || '';
+    const total = booking.total_amount || booking.total || '0';
+    const status = booking.status || 'pending';
+
+    return `<tr>
+      <td>${escapeHtml(ref)}</td>
+      <td>#${escapeHtml(id)}</td>
+      <td>${escapeHtml(date)}</td>
+      <td>${escapeHtml(name)}</td>
+      <td>${escapeHtml(phone)}</td>
+      <td>${escapeHtml(hostel)}</td>
+      <td>${escapeHtml(items.substring(0, 20))}</td>
+      <td>₵${escapeHtml(total)}</td>
+      <td>
+        <select class="status-select" onchange="updateBookingStatus(${id}, this.value)">
+          <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="confirmed" ${status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+          <option value="completed" ${status === 'completed' ? 'selected' : ''}>Completed</option>
+        </select>
+      </td>
+      <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function updateBookingStatus(bookingId, status) {
+  if (!confirm('Update booking status?')) return;
+  try {
+    await apiCall(`/bookings/${bookingId}`, { method: 'PUT', body: JSON.stringify({ status }) });
+    showNotification('Status updated successfully', 'success');
+    loadAllBookings();
+    loadDashboardData();
+  } catch (error) {
+    showNotification('Failed to update status', 'error');
+  }
+}
+
+// ========== CUSTOMERS ==========
+async function loadCustomers() {
+  try {
+    const data = await apiCall('/customers');
+    displayCustomers(data || []);
+  } catch (error) {
+    console.error('Failed to load customers:', error);
+    displayCustomers([]);
+  }
+}
+
+function displayCustomers(customers) {
+  const tbody = document.getElementById('customersBody');
+  if (!tbody) return;
+  
+  if (!customers || customers.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6">No customers found</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = customers.map(customer => `
+    <tr>
+      <td><a href="#" onclick="viewCustomerDetails('${escapeHtml(customer.phone)}'); return false;" style="color: #ffb347; text-decoration: underline; cursor: pointer;">${escapeHtml(customer.name || '')}</a></td>
+      <td>${escapeHtml(customer.phone || '')}</td>
+      <td>${escapeHtml(customer.email || '')}</td>
+      <td>${escapeHtml(customer.total_bookings || 0)}</td>
+      <td>${escapeHtml(customer.last_booking || '')}</td>
+      <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(customer.phone)}')"><i class="fab fa-whatsapp"></i></button></td>
+    </tr>
+  `).join('');
+}
+
+// ========== CUSTOMER MODAL ==========
+window.viewCustomerDetails = async function(phone) {
   try {
     const token = localStorage.getItem('adminToken');
     const response = await fetch(`${API_URL}/bookings`, {
@@ -109,241 +409,54 @@ async function loadBookings() {
     });
     const data = await response.json();
     const bookings = data.bookings || [];
-    
-    const tbody = document.getElementById('allBookingsBody');
-    if (!tbody) return;
-    
-    if (bookings.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10">No bookings found缓解</td>';
+    const customerBookings = bookings.filter(b => b.customer_phone === phone);
+
+    if (customerBookings.length === 0) {
+      alert('No bookings found for this customer');
       return;
     }
-    
-    tbody.innerHTML = bookings.map(b => `
-      <tr>
-        <td>${b.booking_ref || ''}</td>
-        <td>#${b.id}</td>
-        <td>${b.booking_date || ''}</td>
-        <td>${b.customer_name || ''}</td>
-        <td>${b.customer_phone || ''}</td>
-        <td>${b.hostel_name || ''}</td>
-        <td>${(b.items_summary || '').substring(0, 20)}</td>
-        <td>₵${b.total_amount || '0'}</td>
-        <td>
-          <select onchange="updateBookingStatus(${b.id}, this.value)">
-            <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>Pending</option>
-            <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-            <option value="completed" ${b.status === 'completed' ? 'selected' : ''}>Completed</option>
-          </select>
+
+    document.getElementById('modalCustomerName').textContent = customerBookings[0].customer_name || 'Customer';
+    document.getElementById('modalCustomerPhone').textContent = `📞 ${phone} | 📧 ${customerBookings[0].customer_email || ''}`;
+
+    const tableBody = document.getElementById('modalBookingsTableBody');
+    tableBody.innerHTML = '';
+
+    customerBookings.forEach(booking => {
+      const row = tableBody.insertRow();
+      row.innerHTML = `
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_ref || 'N/A')}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_date || 'N/A')}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.items_summary || 'N/A')}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">₵${escapeHtml(booking.total_amount || '0')}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">
+          <span class="status-badge status-${escapeHtml(booking.status)}">${escapeHtml(booking.status)}</span>
         </td>
-        <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${b.customer_phone}')"><i class="fab fa-whatsapp"></i></button></td>
-      </tr>
-    `).join('');
-  } catch (error) {
-    console.error('Failed to load bookings:', error);
-  }
-}
-
-// ========== LOAD CUSTOMERS ==========
-async function loadCustomers() {
-  try {
-    const token = localStorage.getItem('adminToken');
-    const response = await fetch(`${API_URL}/customers`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      `;
     });
-    const customers = await response.json();
-    
-    const tbody = document.getElementById('customersBody');
-    if (!tbody) return;
-    
-    if (!customers || customers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6">No customers found缓解</tr>';
-      return;
-    }
-    
-    tbody.innerHTML = customers.map(c => `
-      <tr>
-        <td>${c.name || ''}</td>
-        <td>${c.phone || ''}</td>
-        <td>${c.email || ''}</td>
-        <td>${c.total_bookings || 0}</td>
-        <td>${c.last_booking || ''}</td>
-        <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${c.phone}')"><i class="fab fa-whatsapp"></i></button></td>
-      </tr>
-    `).join('');
-  } catch (error) {
-    console.error('Failed to load customers:', error);
-  }
-}
 
-// ========== LOAD ALL SETTINGS (PRICING + SETTINGS) ==========
-async function loadAllSettings() {
-  console.log('Loading settings and pricing...');
-  try {
-    const token = localStorage.getItem('adminToken');
-    const response = await fetch(`${API_URL}/settings`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const settings = await response.json();
-    console.log('Settings data:', settings);
-    
-    // Pricing section inputs
-    const priceSmall = document.getElementById('priceSmall');
-    const priceMedium = document.getElementById('priceMedium');
-    const priceBig = document.getElementById('priceBig');
-    const priceFridge = document.getElementById('priceFridge');
-    const priceGas = document.getElementById('priceGas');
-    
-    if (priceSmall) priceSmall.value = settings.price_small || 40;
-    if (priceMedium) priceMedium.value = settings.price_medium || 50;
-    if (priceBig) priceBig.value = settings.price_big || 60;
-    if (priceFridge) priceFridge.value = settings.price_fridge || 70;
-    if (priceGas) priceGas.value = settings.price_gas || 60;
-    
-    // Settings section inputs
-    const whatsapp = document.getElementById('whatsappNumber');
-    const email = document.getElementById('businessEmail');
-    
-    if (whatsapp) whatsapp.value = settings.whatsapp_number || '';
-    if (email) email.value = settings.business_email || '';
-    
-    console.log('Pricing and settings loaded successfully');
+    document.getElementById('customerModal').style.display = 'flex';
   } catch (error) {
-    console.error('Failed to load settings:', error);
-  }
-}
-
-// ========== SAVE PRICING ==========
-window.savePricing = async function() {
-  const prices = {
-    price_small: document.getElementById('priceSmall')?.value || 40,
-    price_medium: document.getElementById('priceMedium')?.value || 50,
-    price_big: document.getElementById('priceBig')?.value || 60,
-    price_fridge: document.getElementById('priceFridge')?.value || 70,
-    price_gas: document.getElementById('priceGas')?.value || 60
-  };
-  
-  console.log('Saving prices:', prices);
-  
-  try {
-    const token = localStorage.getItem('adminToken');
-    const response = await fetch(`${API_URL}/settings`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(prices)
-    });
-    const result = await response.json();
-    
-    if (result.success) {
-      alert('✅ Pricing saved successfully!');
-      loadAllSettings();
-    } else {
-      alert('❌ Save failed: ' + (result.error || 'Unknown error'));
-    }
-  } catch (error) {
-    console.error('Save error:', error);
-    alert('❌ Save failed. Please try again.');
+    console.error('Error loading customer details:', error);
+    alert('Failed to load customer details');
   }
 };
 
-// ========== SAVE SETTINGS ==========
-window.saveSettings = async function() {
-  const settings = {
-    whatsapp_number: document.getElementById('whatsappNumber')?.value || '',
-    business_email: document.getElementById('businessEmail')?.value || ''
-  };
-  
-  const newPassword = document.getElementById('newPassword')?.value;
-  const currentPassword = document.getElementById('currentPassword')?.value;
-  const confirmPassword = document.getElementById('confirmPassword')?.value;
-  
-  if (newPassword) {
-    if (newPassword !== confirmPassword) {
-      alert('Passwords do not match!');
-      return;
-    }
-    if (newPassword.length < 8) {
-      alert('Password must be at least 8 characters!');
-      return;
-    }
-    settings.current_password = currentPassword;
-    settings.new_password = newPassword;
-  }
-  
-  console.log('Saving settings:', settings);
-  
-  try {
-    const token = localStorage.getItem('adminToken');
-    const response = await fetch(`${API_URL}/settings`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(settings)
-    });
-    const result = await response.json();
-    
-    if (result.success) {
-      alert('✅ Settings saved successfully!');
-      if (newPassword) {
-        document.getElementById('currentPassword').value = '';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-      }
-      loadAllSettings();
-    } else {
-      alert('❌ Save failed: ' + (result.error || 'Unknown error'));
-    }
-  } catch (error) {
-    console.error('Save error:', error);
-    alert('❌ Save failed. Please try again.');
-  }
-};
-
-// ========== UPDATE BOOKING STATUS ==========
-window.updateBookingStatus = async function(id, status) {
-  if (!confirm('Update booking status?')) return;
-  try {
-    const token = localStorage.getItem('adminToken');
-    await fetch(`${API_URL}/bookings/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ status })
-    });
-    alert('✅ Status updated!');
-    loadBookings();
-    loadStats();
-  } catch (error) {
-    alert('❌ Update failed');
-  }
-};
-
-// ========== CONTACT CUSTOMER ==========
-window.contactCustomer = function(phone) {
-  if (phone) {
-    window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank');
-  }
+window.closeCustomerModal = function() {
+  document.getElementById('customerModal').style.display = 'none';
 };
 
 // ========== RESET ALL BOOKINGS ==========
 window.resetAllBookings = async function() {
-  if (!confirm('⚠️ WARNING: This will delete ALL bookings permanently!\n\nAre you absolutely sure?')) return;
-  if (!confirm('⚠️ LAST WARNING: This action CANNOT be undone!\n\nAll customer booking data will be lost forever.')) return;
+  if (!confirm('⚠️ WARNING: This will delete ALL bookings permanently!')) return;
+  if (!confirm('⚠️ LAST WARNING: This action CANNOT be undone!')) return;
   
-  const userInput = prompt('Type "RESET" to confirm deletion of all bookings:');
+  const userInput = prompt('Type "RESET" to confirm:');
   if (userInput !== 'RESET') {
-    alert('Reset cancelled. Bookings were not deleted.');
+    alert('Reset cancelled.');
     return;
   }
-  
-  if (!confirm('One last confirmation: Delete ALL bookings?')) return;
-  
+
   try {
     const token = localStorage.getItem('adminToken');
     const response = await fetch(`${API_URL}/bookings/reset`, {
@@ -354,80 +467,195 @@ window.resetAllBookings = async function() {
       }
     });
     const result = await response.json();
-    
+
     if (result.success) {
-      alert('✅ All bookings have been deleted successfully!\n\nYou can start fresh with new bookings.');
+      alert('✅ All bookings deleted successfully!');
       location.reload();
     } else {
-      alert('❌ Failed to delete bookings: ' + (result.error || 'Unknown error'));
+      alert('❌ Failed: ' + (result.error || 'Unknown error'));
     }
   } catch (error) {
     console.error('Reset error:', error);
-    alert('❌ Failed to reset bookings. Please try again.');
+    alert('❌ Failed to reset bookings');
   }
 };
 
-// ========== CUSTOMER DETAILS MODAL ==========
-window.viewCustomerDetails = async function(phone) {
-  alert('Customer details coming soon! Phone: ' + phone);
-};
-
-window.closeCustomerModal = function() {
-  const modal = document.getElementById('customerModal');
-  if (modal) modal.style.display = 'none';
-};
-
-// ========== SIDEBAR NAVIGATION ==========
-function setupSidebarNavigation() {
-  const navLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
-  
-  navLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      const sectionId = this.dataset.section;
-      console.log('Navigating to:', sectionId);
-      
-      // Hide all sections
-      document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active-section');
-      });
-      
-      // Show selected section
-      const targetSection = document.getElementById(sectionId + '-section');
-      if (targetSection) {
-        targetSection.classList.add('active-section');
-      }
-      
-      // Update active link
-      navLinks.forEach(l => l.classList.remove('active'));
-      this.classList.add('active');
-      
-      // Update page title
-      const pageTitle = document.getElementById('pageTitle');
-      if (pageTitle) {
-        pageTitle.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-      }
-      
-      // Load data when switching to certain tabs
-      if (sectionId === 'bookings') loadBookings();
-      if (sectionId === 'customers') loadCustomers();
-      if (sectionId === 'pricing') loadAllSettings();
-      if (sectionId === 'settings') loadAllSettings();
+// ========== SETTINGS & PRICING ==========
+window.loadSettings = async function() {
+  console.log('⚙️ loadSettings() called');
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/settings`, {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
-  });
+    
+    if (!response.ok) throw new Error('Failed to fetch settings');
+    
+    const settings = await response.json();
+    console.log('Settings received:', settings);
+
+    // Populate Settings fields
+    const ws = document.getElementById('whatsappNumber');
+    const em = document.getElementById('businessEmail');
+    if (ws) ws.value = settings.whatsapp_number || '';
+    if (em) em.value = settings.business_email || '';
+
+    // Populate Pricing fields
+    const ps = document.getElementById('priceSmall');
+    const pm = document.getElementById('priceMedium');
+    const pb = document.getElementById('priceBig');
+    const pf = document.getElementById('priceFridge');
+    const pg = document.getElementById('priceGas');
+
+    if (ps) ps.value = settings.price_small || 40;
+    if (pm) pm.value = settings.price_medium || 50;
+    if (pb) pb.value = settings.price_big || 60;
+    if (pf) pf.value = settings.price_fridge || 70;
+    if (pg) pg.value = settings.price_gas || 60;
+
+  } catch (error) {
+    console.error('Failed to load settings:', error);
+  }
+};
+
+window.savePricing = async function() {
+  const prices = {
+    price_small: parseFloat(document.getElementById('priceSmall')?.value) || 40,
+    price_medium: parseFloat(document.getElementById('priceMedium')?.value) || 50,
+    price_big: parseFloat(document.getElementById('priceBig')?.value) || 60,
+    price_fridge: parseFloat(document.getElementById('priceFridge')?.value) || 70,
+    price_gas: parseFloat(document.getElementById('priceGas')?.value) || 60
+  };
+
+  const saveButton = document.querySelector('#pricing-section .btn-save');
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+  }
+
+  try {
+    const result = await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
+    if (result?.success) {
+      showMessage('pricingMessage', 'Pricing saved successfully!', 'success');
+      await window.loadSettings();
+    } else {
+      throw new Error(result?.error || 'Save failed');
+    }
+  } catch (error) {
+    showMessage('pricingMessage', `Error: ${error.message}`, 'error');
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent = 'Save Pricing';
+    }
+  }
+};
+
+window.saveSettings = async function() {
+  const settings = {
+    whatsapp_number: document.getElementById('whatsappNumber')?.value.trim() || '',
+    business_email: document.getElementById('businessEmail')?.value.trim() || ''
+  };
+
+  const np = document.getElementById('newPassword')?.value;
+  const cp = document.getElementById('currentPassword')?.value;
+  const cf = document.getElementById('confirmPassword')?.value;
+
+  if (np) {
+    if (np !== cf) return showMessage('settingsMessage', 'Passwords do not match', 'error');
+    if (np.length < 8) return showMessage('settingsMessage', 'Password must be at least 8 characters', 'error');
+    settings.current_password = cp;
+    settings.new_password = np;
+  }
+
+  try {
+    await apiCall('/settings', { method: 'PUT', body: JSON.stringify(settings) });
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    showMessage('settingsMessage', 'Settings saved successfully!', 'success');
+  } catch (error) {
+    showMessage('settingsMessage', error.message || 'Save failed', 'error');
+  }
+};
+
+// ========== UTILITIES ==========
+function escapeHtml(unsafe) {
+  if (!unsafe) return '';
+  return unsafe.toString()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
-// Make functions globally available
-window.showSection = function(sectionId) {
-  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
-  const target = document.getElementById(sectionId + '-section');
-  if (target) target.classList.add('active-section');
-  document.getElementById('pageTitle').textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-  if (sectionId === 'bookings') loadBookings();
-  if (sectionId === 'customers') loadCustomers();
-  if (sectionId === 'pricing') loadAllSettings();
-  if (sectionId === 'settings') loadAllSettings();
-};
+function showMessage(elementId, message, type) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.textContent = message;
+  el.className = `form-message ${type}`;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
 
-window.extendSession = function() {};
-window.loadAllBookings = loadBookings;
+function showNotification(message, type = 'success') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+function contactCustomer(phone) {
+  if (!phone) return;
+  const cleanPhone = phone.replace(/\D/g, '');
+  window.open(`https://wa.me/${cleanPhone}`, '_blank', 'noopener,noreferrer');
+}
+
+// ========== EXPORT (unchanged) ==========
+async function exportBookings() {
+  try {
+    const data = await apiCall('/bookings/export');
+    if (!data) return;
+    
+    const headers = ['Reference', 'Date', 'Name', 'Phone', 'Hostel', 'Items', 'Total', 'Status'];
+    const rows = data.map(b => [
+      b.booking_ref || '', b.booking_date || '', b.customer_name || '',
+      b.customer_phone || '', b.hostel_name || '',
+      b.items_summary || '', b.total_amount || '0', b.status || ''
+    ]);
+
+    const csv = [headers, ...rows].map(row => 
+      row.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bookings_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    showNotification('Export failed', 'error');
+  }
+}
+
+function setupEventListeners() {
+  // You can expand this later for search and filter functionality
+  const exportBtn = document.getElementById('exportBtn');
+  if (exportBtn) exportBtn.addEventListener('click', exportBookings);
+}
+
+// Make key functions available globally
+window.showSection = showSection;
+window.updateBookingStatus = updateBookingStatus;
+window.contactCustomer = contactCustomer;
+window.savePricing = savePricing;
+window.saveSettings = saveSettings;
+window.extendSession = extendSession;
+window.resetAllBookings = resetAllBookings;
+window.loadSettings = loadSettings;
+window.loadAllBookings = loadAllBookings;
+window.closeCustomerModal = closeCustomerModal;
