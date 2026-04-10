@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Dashboard - Kodak Logistics Admin</title>
   <link rel="stylesheet" href="admin-style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -25,9 +25,9 @@
     </aside>
     
     <main class="main-content">
-            <!-- Top Bar -->
+      <!-- Top Bar with Mobile Menu Button -->
       <header class="top-bar">
-        <button id="mobileMenuToggle" class="mobile-menu-toggle" style="display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #8b0000;">
+        <button id="mobileMenuToggle" class="mobile-menu-toggle" onclick="toggleMobileMenu()" style="display: none; background: #ffb347; border: none; border-radius: 8px; width: 40px; height: 40px; font-size: 1.3rem; cursor: pointer; color: #8b0000;">
           <i class="fas fa-bars"></i>
         </button>
         <h1 id="pageTitle">Dashboard</h1>
@@ -45,7 +45,7 @@
           <div class="table-responsive">
             <table class="data-table">
               <thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
-              <tbody id="recentBookingsBody"><tr><td colspan="6">Loading...</td></tr></tbody>
+              <tbody id="recentBookingsBody"><tr><td colspan="6">Loading...缓解</td></tbody>
             </table>
           </div>
         </div>
@@ -73,7 +73,7 @@
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Reference</th><th>ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Hostel</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="allBookingsBody"><tr><td colspan="10">Loading...</td></tr></tbody>
+            <tbody id="allBookingsBody"><tr><td colspan="10">Loading...缓解</td></tbody>
           </table>
           <div id="pagination" class="pagination"></div>
         </div>
@@ -85,12 +85,12 @@
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Bookings</th><th>Last Booking</th><th>Action</th></tr></thead>
-            <tbody id="customersBody"><tr><td colspan="6">Loading...</td></tr></tbody>
+            <tbody id="customersBody"><td><td colspan="6">Loading...缓解</td></tbody>
           </table>
         </div>
       </section>
       
-            <!-- Pricing Section - Modern Styling -->
+      <!-- Pricing Section - Modern Styling -->
       <section id="pricing-section" class="content-section">
         <div class="section-header">
           <h2>💰 Pricing Management</h2>
@@ -167,7 +167,7 @@
         </div>
       </section>
       
-            <!-- Settings Section - Modern Styling -->
+      <!-- Settings Section - Modern Styling -->
       <section id="settings-section" class="content-section">
         <div class="section-header">
           <h2>⚙️ Business Settings</h2>
@@ -182,14 +182,14 @@
               <h3>Contact Information</h3>
             </div>
             <div class="settings-card-body">
-          <div class="settings-field">
-  <label><i class="fab fa-whatsapp"></i> WhatsApp Number</label>
-  <div class="settings-input-group">
-    <span class="country-code">+233</span>
-    <input type="text" id="whatsappNumber" maxlength="20" placeholder="54 502 5296">
-  </div>
-  <small>Enter number without country code (e.g., 54 502 5296)</small>
-</div>
+              <div class="settings-field">
+                <label><i class="fab fa-whatsapp"></i> WhatsApp Number</label>
+                <div class="settings-input-group">
+                  <span class="country-code">+233</span>
+                  <input type="text" id="whatsappNumber" maxlength="20" placeholder="54 502 5296">
+                </div>
+                <small>Enter number without country code (e.g., 54 502 5296)</small>
+              </div>
               
               <div class="settings-field">
                 <label><i class="fas fa-envelope"></i> Business Email</label>
