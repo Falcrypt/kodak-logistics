@@ -872,8 +872,9 @@
     display: none !important;
 }
 
-/* Sidebar hidden by default on mobile */
+/* Mobile styles - Simplified and guaranteed to work */
 @media (max-width: 768px) {
+    /* Show the menu button */
     .mobile-menu-toggle {
         display: flex !important;
         align-items: center;
@@ -884,48 +885,51 @@
         border-radius: 8px;
         color: #8b0000 !important;
         font-size: 1.3rem;
+        cursor: pointer;
+        border: none;
     }
     
-    .mobile-menu-toggle:hover {
-        background: #ffa01c;
-    }
-    
+    /* Sidebar starts hidden off-screen */
     .sidebar {
-        position: fixed;
-        left: -280px;
-        top: 0;
-        width: 280px;
-        height: 100vh;
-        z-index: 1001;
-        transition: left 0.3s ease;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        position: fixed !important;
+        left: -280px !important;
+        top: 0 !important;
+        width: 280px !important;
+        height: 100vh !important;
+        z-index: 1001 !important;
+        transition: left 0.3s ease !important;
+        background: #1a1a1a !important;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2) !important;
     }
     
+    /* When open, slide in */
     .sidebar.open {
-        left: 0;
+        left: 0 !important;
     }
     
+    /* Main content takes full width */
     .main-content {
-        margin-left: 0;
-        width: 100%;
+        margin-left: 0 !important;
+        width: 100% !important;
     }
     
+    /* Top bar adjustments */
     .top-bar {
-        padding: 12px 15px;
+        padding: 12px 15px !important;
     }
     
     .top-bar h1 {
-        font-size: 1.2rem;
-        flex: 1;
-        text-align: center;
+        font-size: 1.2rem !important;
+        flex: 1 !important;
+        text-align: center !important;
     }
     
     .admin-user span {
-        display: none;
+        display: none !important;
     }
     
     .admin-user i {
-        font-size: 1.8rem;
+        font-size: 1.8rem !important;
     }
     
     /* Overlay when menu is open */
@@ -946,69 +950,73 @@
     
     /* Stats cards on mobile */
     .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
     }
     
     .stat-card {
-        padding: 15px;
+        padding: 15px !important;
     }
     
     .stat-icon {
-        font-size: 1.8rem;
-        padding: 10px;
+        font-size: 1.8rem !important;
+        padding: 10px !important;
     }
     
     .stat-info p {
-        font-size: 1.5rem;
+        font-size: 1.5rem !important;
     }
     
     /* Tables on mobile */
     .table-responsive {
-        padding: 10px;
+        padding: 10px !important;
     }
     
     .data-table th,
     .data-table td {
-        padding: 8px 10px;
-        font-size: 0.75rem;
+        padding: 8px 10px !important;
+        font-size: 0.75rem !important;
     }
     
     /* Filters on mobile */
     .filters {
-        flex-direction: column;
+        flex-direction: column !important;
     }
     
     .filters input,
     .filters select,
     .filters button {
-        width: 100%;
+        width: 100% !important;
     }
     
     /* Pricing cards on mobile */
+    .pricing-grid-modern {
+        grid-template-columns: 1fr !important;
+    }
+    
     .pricing-card-modern {
-        flex-wrap: wrap;
-        text-align: center;
-        justify-content: center;
+        flex-wrap: wrap !important;
+        text-align: center !important;
+        justify-content: center !important;
     }
     
     .pricing-input-group {
-        width: 100%;
-        justify-content: center;
+        width: 100% !important;
+        justify-content: center !important;
     }
     
     /* Settings on mobile */
     .settings-grid-modern {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
     }
     
     .danger-action {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: column !important;
+        text-align: center !important;
     }
     
     .danger-info {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: column !important;
+        text-align: center !important;
     }
 }
