@@ -1,6 +1,6 @@
-// admin/admin.js - FIXED & REFINED VERSION (Minimal Changes)
+// admin/admin.js - REFINED & FIXED VERSION
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
-console.log('🚀 Admin JS loaded - Fixed Version');
+console.log('🚀 Admin JS loaded - Refined Version');
 
 let currentUser = null;
 let sessionCheckInterval = null;
@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', function() {
         loadDashboardData();
         loadAllBookings();
         loadCustomers();
+        loadAllSettings(); // Load settings immediately
         setupNavigation();
         setupEventListeners();
-        setTimeout(() => window.loadSettings && window.loadSettings(), 150); // Safe call
       }
     });
   }
@@ -108,7 +108,46 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ========== NAVIGATION SETUP (Safer version) ==========
+// ========== LOAD ALL SETTINGS (FIXED) ==========
+async function loadAllSettings() {
+  console.log('⚙️ Loading settings and pricing...');
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/settings`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) throw new Error('Failed to fetch settings');
+    
+    const settings = await response.json();
+    console.log('Settings received:', settings);
+
+    // Settings section
+    const ws = document.getElementById('whatsappNumber');
+    const em = document.getElementById('businessEmail');
+    if (ws) ws.value = settings.whatsapp_number || '';
+    if (em) em.value = settings.business_email || '';
+
+    // Pricing section
+    const ps = document.getElementById('priceSmall');
+    const pm = document.getElementById('priceMedium');
+    const pb = document.getElementById('priceBig');
+    const pf = document.getElementById('priceFridge');
+    const pg = document.getElementById('priceGas');
+
+    if (ps) ps.value = settings.price_small || 40;
+    if (pm) pm.value = settings.price_medium || 50;
+    if (pb) pb.value = settings.price_big || 60;
+    if (pf) pf.value = settings.price_fridge || 70;
+    if (pg) pg.value = settings.price_gas || 60;
+
+    console.log('✅ Settings and pricing loaded successfully');
+  } catch (error) {
+    console.error('Failed to load settings:', error);
+  }
+}
+
+// ========== NAVIGATION SETUP (FIXED) ==========
 function setupNavigation() {
   console.log('🔧 Setting up navigation...');
   
@@ -119,7 +158,37 @@ function setupNavigation() {
       e.preventDefault();
       const sectionId = this.dataset.section;
       console.log('📌 Navigation clicked:', sectionId);
-      showSection(sectionId);
+      
+      // Hide all sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active-section');
+      });
+      
+      // Show selected section
+      const targetSection = document.getElementById(sectionId + '-section');
+      if (targetSection) {
+        targetSection.classList.add('active-section');
+        console.log('✅ Section activated:', sectionId + '-section');
+      }
+      
+      // Update active nav link
+      navLinks.forEach(link => link.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Update page title
+      const titleEl = document.getElementById('pageTitle');
+      if (titleEl) {
+        titleEl.textContent = sectionId === 'dashboard' ? 'Dashboard' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+      }
+      
+      // Load data for the section
+      if (sectionId === 'bookings') {
+        loadAllBookings();
+      } else if (sectionId === 'customers') {
+        loadCustomers();
+      } else if (sectionId === 'pricing' || sectionId === 'settings') {
+        loadAllSettings(); // Reload settings when switching to these tabs
+      }
     });
   });
 }
@@ -191,50 +260,6 @@ async function apiCall(endpoint, options = {}) {
   }
 }
 
-// ========== SHOW SECTION - FIXED ==========
-function showSection(sectionId) {
-  console.log("🔄 Switching to section:", sectionId);
-
-  document.querySelectorAll('.content-section').forEach(section => {
-    section.classList.remove('active-section');
-  });
-
-  const target = document.getElementById(sectionId + '-section');
-  if (target) {
-    target.classList.add('active-section');
-    console.log('✅ Section activated:', sectionId + '-section');
-
-    if (sectionId === 'bookings') {
-      loadAllBookings();
-    } else if (sectionId === 'customers') {
-      loadCustomers();
-    } else if (sectionId === 'pricing' || sectionId === 'settings') {
-      setTimeout(() => {
-        if (typeof window.loadSettings === 'function') {
-          window.loadSettings();
-        }
-      }, 50);
-    }
-  } else {
-    console.error('❌ Section not found:', sectionId + '-section');
-  }
-
-  // Update active nav link
-  document.querySelectorAll('.sidebar-nav a[data-section]').forEach(link => {
-    link.classList.remove('active');
-    if (link.dataset.section === sectionId) {
-      link.classList.add('active');
-    }
-  });
-
-  const titleEl = document.getElementById('pageTitle');
-  if (titleEl) {
-    titleEl.textContent = sectionId === 'dashboard' 
-      ? 'Dashboard' 
-      : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-  }
-}
-
 // ========== DASHBOARD ==========
 async function loadDashboardData() {
   try {
@@ -293,7 +318,7 @@ function displayRecentBookings(bookings) {
   }).join('');
 }
 
-// ========== BOOKINGS, CUSTOMERS, SETTINGS, etc. (unchanged) ==========
+// ========== BOOKINGS ==========
 async function loadAllBookings() {
   try {
     const data = await apiCall('/bookings');
@@ -355,6 +380,7 @@ async function updateBookingStatus(bookingId, status) {
   }
 }
 
+// ========== CUSTOMERS ==========
 async function loadCustomers() {
   try {
     const data = await apiCall('/customers');
@@ -386,7 +412,7 @@ function displayCustomers(customers) {
   `).join('');
 }
 
-// ========== CUSTOMER MODAL, RESET, SETTINGS, UTILITIES (unchanged) ==========
+// ========== CUSTOMER DETAILS MODAL ==========
 window.viewCustomerDetails = async function(phone) {
   try {
     const token = localStorage.getItem('adminToken');
@@ -432,6 +458,7 @@ window.closeCustomerModal = function() {
   document.getElementById('customerModal').style.display = 'none';
 };
 
+// ========== RESET ALL BOOKINGS ==========
 window.resetAllBookings = async function() {
   if (!confirm('⚠️ WARNING: This will delete ALL bookings permanently!')) return;
   if (!confirm('⚠️ LAST WARNING: This action CANNOT be undone!')) return;
@@ -465,41 +492,7 @@ window.resetAllBookings = async function() {
   }
 };
 
-window.loadSettings = async function() {
-  console.log('⚙️ loadSettings() called');
-  try {
-    const token = localStorage.getItem('adminToken');
-    const response = await fetch(`${API_URL}/settings`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
-    if (!response.ok) throw new Error('Failed to fetch settings');
-    
-    const settings = await response.json();
-    console.log('Settings received:', settings);
-
-    const ws = document.getElementById('whatsappNumber');
-    const em = document.getElementById('businessEmail');
-    if (ws) ws.value = settings.whatsapp_number || '';
-    if (em) em.value = settings.business_email || '';
-
-    const ps = document.getElementById('priceSmall');
-    const pm = document.getElementById('priceMedium');
-    const pb = document.getElementById('priceBig');
-    const pf = document.getElementById('priceFridge');
-    const pg = document.getElementById('priceGas');
-
-    if (ps) ps.value = settings.price_small || 40;
-    if (pm) pm.value = settings.price_medium || 50;
-    if (pb) pb.value = settings.price_big || 60;
-    if (pf) pf.value = settings.price_fridge || 70;
-    if (pg) pg.value = settings.price_gas || 60;
-
-  } catch (error) {
-    console.error('Failed to load settings:', error);
-  }
-};
-
+// ========== SAVE PRICING ==========
 window.savePricing = async function() {
   const prices = {
     price_small: parseFloat(document.getElementById('priceSmall')?.value) || 40,
@@ -519,7 +512,7 @@ window.savePricing = async function() {
     const result = await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
     if (result?.success) {
       showMessage('pricingMessage', 'Pricing saved successfully!', 'success');
-      await window.loadSettings();
+      await loadAllSettings();
     } else {
       throw new Error(result?.error || 'Save failed');
     }
@@ -533,6 +526,7 @@ window.savePricing = async function() {
   }
 };
 
+// ========== SAVE SETTINGS ==========
 window.saveSettings = async function() {
   const settings = {
     whatsapp_number: document.getElementById('whatsappNumber')?.value.trim() || '',
@@ -629,14 +623,22 @@ function setupEventListeners() {
 }
 
 // ========== GLOBAL EXPORTS ==========
-window.showSection = showSection;
+window.showSection = function(sectionId) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
+  const target = document.getElementById(sectionId + '-section');
+  if (target) target.classList.add('active-section');
+  document.getElementById('pageTitle').textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  if (sectionId === 'bookings') loadAllBookings();
+  if (sectionId === 'customers') loadCustomers();
+  if (sectionId === 'pricing' || sectionId === 'settings') loadAllSettings();
+};
+
 window.updateBookingStatus = updateBookingStatus;
 window.contactCustomer = contactCustomer;
 window.savePricing = savePricing;
 window.saveSettings = saveSettings;
 window.extendSession = extendSession;
 window.resetAllBookings = resetAllBookings;
-window.loadSettings = loadSettings;
 window.loadAllBookings = loadAllBookings;
 window.closeCustomerModal = closeCustomerModal;
 window.viewCustomerDetails = viewCustomerDetails;
