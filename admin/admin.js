@@ -1,4 +1,4 @@
-// admin/admin.js - COMPLETE WORKING VERSION
+// admin/admin.js - COMPLETE WORKING VERSION with Customer Details & Reset
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 console.log('🚀 Admin JS loaded');
 console.log('🔗 API URL:', API_URL);
@@ -308,7 +308,7 @@ async function updateBookingStatus(bookingId, status) {
   }
 }
 
-// ========== CUSTOMERS ==========
+// ========== CUSTOMERS (UPDATED with clickable names) ==========
 async function loadCustomers() {
   try {
     const customers = await apiCall('/customers');
@@ -325,15 +325,111 @@ function displayCustomers(customers) {
     tbody.innerHTML = '<tr><td colspan="6">No customers found</td></tr>';
     return;
   }
-  tbody.innerHTML = customers.map(customer => `<tr>
-    <td>${escapeHtml(customer.name || '')}</td>
-    <td>${escapeHtml(customer.phone || '')}</td>
-    <td>${escapeHtml(customer.email || '')}</td>
-    <td>${escapeHtml(customer.total_bookings || 0)}</td>
-    <td>${escapeHtml(customer.last_booking || '')}</td>
-    <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(customer.phone)}')"><i class="fab fa-whatsapp"></i></button></td>
-  </tr>`).join('');
+  tbody.innerHTML = customers.map(customer => `
+    <tr>
+      <td><a href="#" onclick="viewCustomerDetails('${escapeHtml(customer.phone)}'); return false;" style="color: #ffb347; text-decoration: underline; cursor: pointer;">${escapeHtml(customer.name || '')}</a></td>
+      <td>${escapeHtml(customer.phone || '')}</td>
+      <td>${escapeHtml(customer.email || '')}</td>
+      <td>${escapeHtml(customer.total_bookings || 0)}</td>
+      <td>${escapeHtml(customer.last_booking || '')}</td>
+      <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(customer.phone)}')"><i class="fab fa-whatsapp"></i></button></td>
+    </tr>
+  `).join('');
 }
+
+// ========== CUSTOMER DETAILS MODAL ==========
+window.viewCustomerDetails = async function(phone) {
+  console.log('🔍 Fetching customer details for:', phone);
+  
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/bookings`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    const bookings = data.bookings || [];
+    
+    const customerBookings = bookings.filter(b => b.customer_phone === phone);
+    
+    if (customerBookings.length === 0) {
+      alert('No bookings found for this customer');
+      return;
+    }
+    
+    const customer = customerBookings[0];
+    const customerName = customer.customer_name;
+    
+    document.getElementById('modalCustomerName').textContent = customerName;
+    document.getElementById('modalCustomerPhone').textContent = `📞 Phone: ${phone} | 📧 Email: ${customer.customer_email}`;
+    
+    const tableBody = document.getElementById('modalBookingsTableBody');
+    tableBody.innerHTML = '';
+    
+    customerBookings.forEach(booking => {
+      const row = tableBody.insertRow();
+      row.innerHTML = `
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_ref || 'N/A')}<\/td>
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_date || 'N/A')}<\/td>
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.items_summary || 'N/A')}<\/td>
+        <td style="padding: 10px; border: 1px solid #ddd;">₵${escapeHtml(booking.total_amount || '0')}<\/td>
+        <td style="padding: 10px; border: 1px solid #ddd;">
+          <span class="status-badge status-${escapeHtml(booking.status)}">${escapeHtml(booking.status)}<\/span>
+        <\/td>
+      `;
+    });
+    
+    document.getElementById('customerModal').style.display = 'flex';
+    
+  } catch (error) {
+    console.error('Error fetching customer details:', error);
+    alert('Failed to load customer details');
+  }
+};
+
+window.closeCustomerModal = function() {
+  document.getElementById('customerModal').style.display = 'none';
+};
+
+// ========== RESET ALL BOOKINGS ==========
+window.resetAllBookings = async function() {
+  const confirm1 = confirm('⚠️ WARNING: This will delete ALL bookings permanently!\n\nAre you absolutely sure?');
+  if (!confirm1) return;
+  
+  const confirm2 = confirm('⚠️ LAST WARNING: This action CANNOT be undone!\n\nAll customer booking data will be lost forever.\n\nClick OK to proceed.');
+  if (!confirm2) return;
+  
+  const userInput = prompt('Type "RESET" to confirm deletion of all bookings:');
+  if (userInput !== 'RESET') {
+    alert('Reset cancelled. Bookings were not deleted.');
+    return;
+  }
+  
+  const confirm3 = confirm('One last confirmation: Delete ALL bookings?');
+  if (!confirm3) return;
+  
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/bookings/reset`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert('✅ All bookings have been deleted successfully!\n\nYou can start fresh with new bookings.');
+      location.reload();
+    } else {
+      alert('❌ Failed to delete bookings: ' + (result.error || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error('Reset error:', error);
+    alert('❌ Failed to reset bookings. Please try again.');
+  }
+};
 
 // ========== SETTINGS ==========
 async function loadSettings() {
@@ -360,7 +456,7 @@ async function loadSettings() {
   }
 }
 
-// ========== SAVE PRICING (FIXED) ==========
+// ========== SAVE PRICING ==========
 async function savePricing() {
   const gasElement = document.getElementById('priceGas');
   const gasValue = gasElement ? gasElement.value : 'not found';
