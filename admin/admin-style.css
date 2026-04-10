@@ -106,7 +106,7 @@
   min-height: 100vh;
 }
 
-/* Sidebar */
+/* Sidebar - Desktop version */
 .sidebar {
   width: 260px;
   background: #1a1a1a;
@@ -114,6 +114,8 @@
   position: fixed;
   height: 100vh;
   overflow-y: auto;
+  z-index: 1001;
+  transition: left 0.3s ease;
 }
 
 .sidebar-header {
@@ -188,7 +190,7 @@
   color: #ffb347;
 }
 
-/* ====================== CONTENT SECTIONS - FIXED VISIBILITY ====================== */
+/* ====================== CONTENT SECTIONS ====================== */
 .content-section {
     display: none !important;
     padding: 30px;
@@ -200,7 +202,6 @@
     display: block !important;
 }
 
-/* Strong force for Pricing and Settings */
 #pricing-section,
 #settings-section {
     display: none !important;
@@ -216,27 +217,7 @@
     display: block !important;
 }
 
-/* Inner styling */
-.pricing-editor,
-.settings-form {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-}
-
-.form-group {
-    margin-bottom: 22px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #333;
-}
-
-/* ====================== OTHER COMPONENTS ====================== */
-/* Stats Cards */
+/* ====================== STATS CARDS ====================== */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -274,7 +255,7 @@
   color: #333;
 }
 
-/* Tables */
+/* ====================== TABLES ====================== */
 .table-responsive {
   background: white;
   border-radius: 10px;
@@ -307,7 +288,7 @@
   background: #f8f9fa;
 }
 
-/* Status Badges */
+/* ====================== STATUS BADGES ====================== */
 .status-badge {
   padding: 5px 10px;
   border-radius: 20px;
@@ -320,7 +301,7 @@
 .status-confirmed { background: #d4edda; color: #155724; }
 .status-completed { background: #cce5ff; color: #004085; }
 
-/* Action Buttons */
+/* ====================== BUTTONS ====================== */
 .action-btn {
   padding: 5px 10px;
   border: none;
@@ -336,7 +317,26 @@
   color: white;
 }
 
-/* Filters & Header */
+.btn-export, .btn-save {
+  padding: 8px 15px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-save {
+  background: #ffb347;
+  color: #8b0000;
+  font-weight: bold;
+}
+
+.btn-save:hover {
+  background: #ffa01c;
+}
+
+/* ====================== FILTERS ====================== */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -360,31 +360,7 @@
   font-size: 14px;
 }
 
-.btn-export, .btn-save {
-  padding: 8px 15px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.btn-save {
-  background: #ffb347;
-  color: #8b0000;
-  font-weight: bold;
-}
-
-.btn-save:hover {
-  background: #ffa01c;
-}
-
-/* Pricing Editor */
-.pricing-editor {
-  max-width: 600px;
-}
-
-/* Notifications */
+/* ====================== NOTIFICATIONS ====================== */
 .notification {
   position: fixed;
   top: 20px;
@@ -405,7 +381,6 @@
   to { transform: translateX(0); opacity: 1; }
 }
 
-/* Form messages */
 .form-message {
   margin-top: 10px;
   padding: 10px;
@@ -425,7 +400,7 @@
   border: 1px solid #c3e6cb;
 }
 
-/* Session warning */
+/* ====================== SESSION WARNING ====================== */
 .session-warning {
   position: fixed;
   bottom: 20px;
@@ -438,7 +413,7 @@
   z-index: 9998;
 }
 
-/* Pagination */
+/* ====================== PAGINATION ====================== */
 .pagination {
   margin-top: 20px;
   display: flex;
@@ -458,25 +433,6 @@
   background: #ffb347;
   color: #8b0000;
   border-color: #ffb347;
-}
-
-.pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-  }
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  .section-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
 
 /* ====================== MODERN PRICING SECTION ====================== */
@@ -578,11 +534,6 @@
     outline: none;
 }
 
-.pricing-input::-webkit-inner-spin-button,
-.pricing-input::-webkit-outer-spin-button {
-    opacity: 0.5;
-}
-
 .pricing-action {
     text-align: center;
     margin-top: 20px;
@@ -608,28 +559,6 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 179, 71, 0.4);
     background: linear-gradient(135deg, #ffa01c, #ff7a2f);
-}
-
-.btn-save-modern:active {
-    transform: translateY(0);
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-    .pricing-grid-modern {
-        grid-template-columns: 1fr;
-    }
-    
-    .pricing-card-modern {
-        flex-wrap: wrap;
-        text-align: center;
-        justify-content: center;
-    }
-    
-    .pricing-input-group {
-        width: 100%;
-        justify-content: center;
-    }
 }
 
 /* ====================== MODERN SETTINGS SECTION ====================== */
@@ -752,7 +681,7 @@
     margin-bottom: 30px;
 }
 
-/* Danger Zone Modern */
+/* Danger Zone */
 .danger-zone-modern {
     background: #fff5f5;
     border: 2px solid #f8d7da;
@@ -846,35 +775,13 @@
     background: linear-gradient(135deg, #c82333, #a71d2a);
 }
 
-/* Mobile responsive for settings */
-@media (max-width: 768px) {
-    .settings-grid-modern {
-        grid-template-columns: 1fr;
-    }
-    
-    .danger-action {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .danger-info {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .settings-card-header {
-        flex-wrap: wrap;
-    }
-}
-
-/* ====================== MOBILE RESPONSIVE MENU ====================== */
+/* ====================== MOBILE MENU (FIXED) ====================== */
 .mobile-menu-toggle {
     display: none !important;
 }
 
-/* Mobile styles - Simplified and guaranteed to work */
 @media (max-width: 768px) {
-    /* Show the menu button */
+    /* Show menu button */
     .mobile-menu-toggle {
         display: flex !important;
         align-items: center;
@@ -889,7 +796,7 @@
         border: none;
     }
     
-    /* Sidebar starts hidden off-screen */
+    /* Sidebar - hidden by default, slides in when open */
     .sidebar {
         position: fixed !important;
         left: -280px !important;
@@ -902,18 +809,15 @@
         box-shadow: 2px 0 10px rgba(0,0,0,0.2) !important;
     }
     
-    /* When open, slide in */
     .sidebar.open {
         left: 0 !important;
     }
     
-    /* Main content takes full width */
     .main-content {
         margin-left: 0 !important;
         width: 100% !important;
     }
     
-    /* Top bar adjustments */
     .top-bar {
         padding: 12px 15px !important;
     }
@@ -932,23 +836,6 @@
         font-size: 1.8rem !important;
     }
     
-    /* Overlay when menu is open */
-    .menu-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 1000;
-        display: none;
-    }
-    
-    .menu-overlay.active {
-        display: block;
-    }
-    
-    /* Stats cards on mobile */
     .stats-grid {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
@@ -967,7 +854,6 @@
         font-size: 1.5rem !important;
     }
     
-    /* Tables on mobile */
     .table-responsive {
         padding: 10px !important;
     }
@@ -978,7 +864,6 @@
         font-size: 0.75rem !important;
     }
     
-    /* Filters on mobile */
     .filters {
         flex-direction: column !important;
     }
@@ -989,7 +874,6 @@
         width: 100% !important;
     }
     
-    /* Pricing cards on mobile */
     .pricing-grid-modern {
         grid-template-columns: 1fr !important;
     }
@@ -1005,7 +889,6 @@
         justify-content: center !important;
     }
     
-    /* Settings on mobile */
     .settings-grid-modern {
         grid-template-columns: 1fr !important;
     }
