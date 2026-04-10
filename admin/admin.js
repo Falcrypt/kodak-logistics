@@ -5,6 +5,11 @@ console.log('🚀 Admin JS loaded - Refined Version');
 let currentUser = null;
 let sessionCheckInterval = null;
 
+// ========== SEARCH & FILTER VARIABLES ==========
+let currentSearchTerm = '';
+let currentStatusFilter = 'all';
+let searchTimeout = null;
+
 // ========== AUTHENTICATION ==========
 async function checkAuth() {
   const token = localStorage.getItem('adminToken');
@@ -108,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ========== LOAD ALL SETTINGS (FIXED) ==========
+// ========== LOAD ALL SETTINGS ==========
 async function loadAllSettings() {
   console.log('⚙️ Loading settings and pricing...');
   try {
@@ -147,7 +152,7 @@ async function loadAllSettings() {
   }
 }
 
-// ========== NAVIGATION SETUP (FIXED) ==========
+// ========== NAVIGATION SETUP ==========
 function setupNavigation() {
   console.log('🔧 Setting up navigation...');
   
@@ -297,7 +302,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No recent bookings缓解<tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -318,22 +323,52 @@ function displayRecentBookings(bookings) {
   }).join('');
 }
 
-// ========== BOOKINGS ==========
+// ========== LOAD BOOKINGS WITH SEARCH & FILTER ==========
+async function loadFilteredBookings() {
+    try {
+        console.log(`🔍 Searching: "${currentSearchTerm}", Filter: ${currentStatusFilter}`);
+        
+        const token = localStorage.getItem('adminToken');
+        const params = new URLSearchParams();
+        
+        if (currentSearchTerm) {
+            params.append('search', currentSearchTerm);
+        }
+        if (currentStatusFilter !== 'all') {
+            params.append('status', currentStatusFilter);
+        }
+        
+        const url = `/bookings${params.toString() ? '?' + params.toString() : ''}`;
+        const data = await apiCall(url);
+        
+        displayAllBookings(data?.bookings || []);
+        
+    } catch (error) {
+        console.error('Failed to load filtered bookings:', error);
+        displayAllBookings([]);
+    }
+}
+
+// ========== LOAD ALL BOOKINGS (resets search) ==========
 async function loadAllBookings() {
-  try {
-    const data = await apiCall('/bookings');
-    displayAllBookings(data?.bookings || []);
-  } catch (error) {
-    console.error('❌ Failed to load bookings:', error);
-    displayAllBookings([]);
-  }
+    // Reset search and filter
+    currentSearchTerm = '';
+    currentStatusFilter = 'all';
+    
+    const searchInput = document.getElementById('searchBooking');
+    const statusFilter = document.getElementById('statusFilter');
+    
+    if (searchInput) searchInput.value = '';
+    if (statusFilter) statusFilter.value = 'all';
+    
+    await loadFilteredBookings();
 }
 
 function displayAllBookings(bookings) {
   const tbody = document.getElementById('allBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10">No bookings found缓解</td>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -396,7 +431,7 @@ function displayCustomers(customers) {
   if (!tbody) return;
   
   if (!customers || customers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No customers found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No customers found缓解</tr>';
     return;
   }
   
@@ -555,6 +590,29 @@ window.saveSettings = async function() {
   }
 };
 
+// ========== SETUP SEARCH LISTENERS ==========
+function setupSearchListeners() {
+    const searchInput = document.getElementById('searchBooking');
+    const statusFilter = document.getElementById('statusFilter');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentSearchTerm = this.value;
+                loadFilteredBookings();
+            }, 500);
+        });
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            currentStatusFilter = this.value;
+            loadFilteredBookings();
+        });
+    }
+}
+
 // ========== UTILITIES ==========
 function escapeHtml(unsafe) {
   if (!unsafe) return '';
@@ -620,6 +678,9 @@ async function exportBookings() {
 function setupEventListeners() {
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.addEventListener('click', exportBookings);
+  
+  // Setup search and filter
+  setupSearchListeners();
 }
 
 // ========== GLOBAL EXPORTS ==========
