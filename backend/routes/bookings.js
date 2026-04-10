@@ -159,4 +159,25 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// ========== RESET ALL BOOKINGS (NEW) ==========
+// DELETE /api/bookings/reset - Delete all bookings (admin only)
+router.delete('/reset', authenticateToken, async (req, res) => {
+    try {
+        console.log('🗑️ Resetting all bookings...');
+        
+        // Delete all bookings
+        await db.query('DELETE FROM bookings');
+        
+        // Reset the sequence so IDs start from 1 again
+        await db.query('ALTER SEQUENCE bookings_id_seq RESTART WITH 1');
+        
+        console.log('✅ All bookings deleted and sequence reset');
+        res.json({ success: true, message: 'All bookings have been deleted' });
+        
+    } catch (error) {
+        console.error('❌ Reset bookings error:', error);
+        res.status(500).json({ error: 'Failed to reset bookings' });
+    }
+});
+
 module.exports = router;
