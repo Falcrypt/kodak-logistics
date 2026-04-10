@@ -27,6 +27,43 @@ setTimeout(function() {
   if (loader) loader.classList.add('hidden');
 }, 2000);
 
+// ===== LOAD BUSINESS SETTINGS (WhatsApp, Email) =====
+async function loadBusinessSettings() {
+    try {
+        const timestamp = Date.now();
+        const response = await fetch(`${API_URL}/settings?t=${timestamp}`);
+        if (response.ok) {
+            const settings = await response.json();
+            console.log('Business settings loaded:', settings);
+            
+            // Update WhatsApp links
+            const whatsappNumber = settings.whatsapp_number || '233545025296';
+            const cleanNumber = whatsappNumber.replace(/\D/g, '');
+            
+            // Update floating WhatsApp button
+            const whatsappBtn = document.querySelector('.whatsapp-btn');
+            if (whatsappBtn) {
+                whatsappBtn.href = `https://wa.me/${cleanNumber}?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage...`;
+            }
+            
+            // Update footer WhatsApp link
+            const footerWhatsapp = document.querySelector('.footer-whatsapp');
+            if (footerWhatsapp) {
+                footerWhatsapp.href = `https://wa.me/${cleanNumber}`;
+            }
+            
+            // Update footer email
+            const footerEmail = document.querySelector('.footer-email a');
+            if (footerEmail && settings.business_email) {
+                footerEmail.href = `mailto:${settings.business_email}`;
+                footerEmail.textContent = settings.business_email;
+            }
+        }
+    } catch (error) {
+        console.log('Using default contact info');
+    }
+}
+
 // ===== UPDATE PRICE DISPLAYS =====
 function updatePriceDisplay() {
   const smallDisplay = document.getElementById('priceSmallDisplay');
@@ -212,9 +249,22 @@ function setupForm() {
           firstRow.querySelector(".quantity").value = "1";
         }
         calculateTotal();
-        if (confirm("Open WhatsApp?")) {
-          const msg = encodeURIComponent(`Hi Kodak Logistics!\n\nBooking confirmed.\nReference: ${result.bookingRef}\nName: ${formData.name}\nDate: ${formData.date}\nTotal: ₵${formData.total}`);
-          window.open(`https://wa.me/233545025296?text=${msg}`, "_blank");
+        
+        // Get the latest WhatsApp number from settings for the booking confirmation
+        const settingsResponse = await fetch(`${API_URL}/settings?t=${Date.now()}`);
+        if (settingsResponse.ok) {
+          const settings = await settingsResponse.json();
+          const whatsappNumber = settings.whatsapp_number || '233545025296';
+          const cleanNumber = whatsappNumber.replace(/\D/g, '');
+          if (confirm("Open WhatsApp?")) {
+            const msg = encodeURIComponent(`Hi Kodak Logistics!\n\nBooking confirmed.\nReference: ${result.bookingRef}\nName: ${formData.name}\nDate: ${formData.date}\nTotal: ₵${formData.total}`);
+            window.open(`https://wa.me/${cleanNumber}?text=${msg}`, "_blank");
+          }
+        } else {
+          if (confirm("Open WhatsApp?")) {
+            const msg = encodeURIComponent(`Hi Kodak Logistics!\n\nBooking confirmed.\nReference: ${result.bookingRef}\nName: ${formData.name}\nDate: ${formData.date}\nTotal: ₵${formData.total}`);
+            window.open(`https://wa.me/233545025296?text=${msg}`, "_blank");
+          }
         }
       } else {
         alert("❌ Failed to send booking.");
@@ -247,13 +297,17 @@ document.addEventListener("DOMContentLoaded", function() {
   setupExistingRows();
   setupForm();
   
+  // Load prices and business settings
   loadPrices().then(() => {
     calculateTotal();
     console.log("✅ Script initialized");
   });
+  
+  loadBusinessSettings();
 });
 
 // Make available in console for testing
 window.prices = prices;
 window.refreshPrices = loadPrices;
 window.updateDisplay = updatePriceDisplay;
+window.refreshBusinessSettings = loadBusinessSettings;
