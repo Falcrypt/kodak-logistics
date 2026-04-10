@@ -1,4 +1,4 @@
-// admin/admin.js - COMPLETE REWRITE FOR SECURITY
+// admin/admin.js - COMPLETE WORKING VERSION
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 console.log('🚀 Admin JS loaded');
 console.log('🔗 API URL:', API_URL);
@@ -154,6 +154,8 @@ async function logout(reason = '') {
 // ========== API HELPER ==========
 async function apiCall(endpoint, options = {}) {
   const token = localStorage.getItem('adminToken');
+  console.log(`🔑 Token: ${token ? token.substring(0, 20) + '...' : 'NOT FOUND'}`);
+  
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
@@ -163,12 +165,20 @@ async function apiCall(endpoint, options = {}) {
   try {
     console.log(`📡 API Call: ${options.method || 'GET'} ${endpoint}`);
     const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+    console.log(`📡 Response Status: ${response.status}`);
+    
     if (response.status === 401) {
+      console.error('❌ Unauthorized! Token may be invalid or expired.');
       logout('Session expired');
       return null;
     }
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error ${response.status}`);
+    }
+    
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Request failed');
     return data;
   } catch (error) {
     console.error('❌ API call failed:', error);
@@ -216,7 +226,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '</table><td colspan="6">No recent bookings</td><tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -350,6 +360,7 @@ async function loadSettings() {
   }
 }
 
+// ========== SAVE PRICING (FIXED) ==========
 async function savePricing() {
   const gasElement = document.getElementById('priceGas');
   const gasValue = gasElement ? gasElement.value : 'not found';
@@ -366,12 +377,29 @@ async function savePricing() {
   
   console.log('📦 Saving prices:', prices);
   
+  const saveButton = document.querySelector('#pricing-section .btn-save');
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+  }
+
   try {
-    await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
-    showMessage('pricingMessage', 'Pricing saved!', 'success');
+    const result = await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
+    
+    if (result && result.success) {
+      showMessage('pricingMessage', 'Pricing saved!', 'success');
+      await loadSettings();
+    } else {
+      throw new Error(result?.error || 'Unknown error from server');
+    }
   } catch (error) {
     console.error('❌ Save error:', error);
-    showMessage('pricingMessage', 'Save failed', 'error');
+    showMessage('pricingMessage', `Save failed: ${error.message}`, 'error');
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent = 'Save Pricing';
+    }
   }
 }
 
@@ -498,6 +526,7 @@ async function exportBookings() {
   }
 }
 
+// Make functions globally available
 window.showSection = showSection;
 window.updateBookingStatus = updateBookingStatus;
 window.contactCustomer = contactCustomer;
