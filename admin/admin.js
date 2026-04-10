@@ -183,7 +183,6 @@ async function loadDashboardData() {
     const stats = await apiCall('/bookings/stats');
     if (!stats) return;
     
-    // FIX: Convert revenue to number safely
     const revenue = typeof stats.revenue === 'number' ? stats.revenue : parseFloat(stats.revenue) || 0;
     
     const statsGrid = document.getElementById('statsGrid');
@@ -217,7 +216,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
+    tbody.innerHTML = '</table><td colspan="6">No recent bookings</td><tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -345,23 +344,33 @@ async function loadSettings() {
     if (pb) pb.value = settings.price_big || 60;
     if (pf) pf.value = settings.price_fridge || 70;
     if (pg) pg.value = settings.price_gas || 60;
+    console.log('📦 Loaded gas price:', settings.price_gas);
   } catch (error) {
     console.error('Failed to load settings:', error);
   }
 }
 
 async function savePricing() {
+  const gasElement = document.getElementById('priceGas');
+  const gasValue = gasElement ? gasElement.value : 'not found';
+  console.log('🔍 Gas input found:', !!gasElement);
+  console.log('🔍 Gas value:', gasValue);
+  
   const prices = {
     price_small: document.getElementById('priceSmall')?.value || 40,
     price_medium: document.getElementById('priceMedium')?.value || 50,
     price_big: document.getElementById('priceBig')?.value || 60,
     price_fridge: document.getElementById('priceFridge')?.value || 70,
-    price_gas: document.getElementById('priceGas')?.value || 60
+    price_gas: gasValue || 60
   };
+  
+  console.log('📦 Saving prices:', prices);
+  
   try {
     await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
     showMessage('pricingMessage', 'Pricing saved!', 'success');
   } catch (error) {
+    console.error('❌ Save error:', error);
     showMessage('pricingMessage', 'Save failed', 'error');
   }
 }
