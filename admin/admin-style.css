@@ -1,4 +1,4 @@
-/* admin/admin-style.css */
+/* admin/admin-style.css - REFINED VERSION */
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +6,7 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Login Page */
+/* ====================== LOGIN PAGE ====================== */
 .login-body {
   background: linear-gradient(135deg, #8b0000, #b30000);
   min-height: 100vh;
@@ -100,14 +100,7 @@
   border-radius: 5px;
 }
 
-.login-footer {
-  margin-top: 20px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
-}
-
-/* Admin Dashboard Layout */
+/* ====================== ADMIN DASHBOARD LAYOUT ====================== */
 .admin-wrapper {
   display: flex;
   min-height: 100vh;
@@ -138,10 +131,6 @@
   font-size: 14px;
   display: block;
   margin-top: 5px;
-}
-
-.sidebar-nav {
-  padding: 20px 0;
 }
 
 .sidebar-nav a {
@@ -199,7 +188,7 @@
   color: #ffb347;
 }
 
-/* ==================== CONTENT SECTIONS - FIXED ==================== */
+/* ====================== CONTENT SECTIONS - FIXED VISIBILITY ====================== */
 .content-section {
     display: none !important;
     padding: 30px;
@@ -211,13 +200,13 @@
     display: block !important;
 }
 
-/* Extra strong force for Pricing and Settings */
+/* Strong force for Pricing and Settings */
 #pricing-section,
 #settings-section {
     display: none !important;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     padding: 30px;
     min-height: 500px;
 }
@@ -227,7 +216,7 @@
     display: block !important;
 }
 
-/* Make sure the inner containers look good */
+/* Inner styling */
 .pricing-editor,
 .settings-form {
     background: white;
@@ -246,10 +235,7 @@
     color: #333;
 }
 
-.content-section.active-section {
-  display: block;
-}
-
+/* ====================== OTHER COMPONENTS ====================== */
 /* Stats Cards */
 .stats-grid {
   display: grid;
@@ -330,20 +316,9 @@
   display: inline-block;
 }
 
-.status-pending {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.status-confirmed {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status-completed {
-  background: #cce5ff;
-  color: #004085;
-}
+.status-pending { background: #fff3cd; color: #856404; }
+.status-confirmed { background: #d4edda; color: #155724; }
+.status-completed { background: #cce5ff; color: #004085; }
 
 /* Action Buttons */
 .action-btn {
@@ -356,22 +331,12 @@
   transition: all 0.3s;
 }
 
-.btn-confirm {
-  background: #28a745;
-  color: white;
-}
-
 .btn-whatsapp {
   background: #25d366;
   color: white;
 }
 
-.btn-view {
-  background: #17a2b8;
-  color: white;
-}
-
-/* Filters */
+/* Filters & Header */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -395,59 +360,109 @@
   font-size: 14px;
 }
 
-.btn-export {
+.btn-export, .btn-save {
   padding: 8px 15px;
   background: #28a745;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-/* Pricing Editor */
-.pricing-editor {
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  max-width: 500px;
-}
-
-.pricing-editor .form-group {
-  margin-bottom: 20px;
-}
-
-.pricing-editor label {
-  display: block;
-  margin-bottom: 5px;
-  color: #333;
-  font-weight: 500;
-}
-
-.pricing-editor input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
 }
 
 .btn-save {
-  padding: 12px 25px;
   background: #ffb347;
   color: #8b0000;
-  border: none;
-  border-radius: 5px;
   font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
 }
 
 .btn-save:hover {
   background: #ffa01c;
-  transform: translateY(-2px);
+}
+
+/* Pricing Editor */
+.pricing-editor {
+  max-width: 600px;
+}
+
+/* Notifications */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 5px;
+  color: white;
+  z-index: 9999;
+  animation: slideIn 0.3s;
+}
+
+.notification-success { background: #28a745; }
+.notification-error { background: #dc3545; }
+.notification-warning { background: #ffc107; color: #333; }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Form messages */
+.form-message {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  display: none;
+}
+
+.form-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.form-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+/* Session warning */
+.session-warning {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #ffc107;
+  color: #333;
+  padding: 15px 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9998;
+}
+
+/* Pagination */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.pagination button.active {
+  background: #ffb347;
+  color: #8b0000;
+  border-color: #ffb347;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Mobile Responsive */
@@ -456,111 +471,14 @@
     width: 0;
     transform: translateX(-100%);
   }
-  
   .main-content {
     margin-left: 0;
   }
-  
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
   .section-header {
     flex-direction: column;
     align-items: stretch;
   }
 }
-
-/* Add to the bottom of your admin-style.css */
-
-/* Notifications */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px 20px;
-    border-radius: 5px;
-    color: white;
-    z-index: 9999;
-    animation: slideIn 0.3s;
-}
-
-.notification-success { background: #28a745; }
-.notification-error { background: #dc3545; }
-.notification-warning { background: #ffc107; color: #333; }
-
-@keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-/* Form messages */
-.form-message {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    display: none;
-}
-
-.form-message.error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.form-message.success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-/* Session warning */
-.session-warning {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #ffc107;
-    color: #333;
-    padding: 15px 20px;
-    border-radius: 5px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 9998;
-}
-
-.session-warning button {
-    background: #333;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 3px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-/* Pagination */
-.pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-}
-
-.pagination button {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    background: white;
-    cursor: pointer;
-    border-radius: 3px;
-}
-
-.pagination button.active {
-    background: #ffb347;
-    color: #8b0000;
-    border-color: #ffb347;
-}
-
-.pagination button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
