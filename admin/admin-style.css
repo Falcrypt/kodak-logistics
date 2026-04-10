@@ -522,3 +522,20 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* Force visibility for pricing and settings */
+#pricing-section, #settings-section {
+  background: white;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
+}
+
+.pricing-editor {
+  max-width: 600px;
+}
+
+.section-header {
+  margin-bottom: 25px;
+}
