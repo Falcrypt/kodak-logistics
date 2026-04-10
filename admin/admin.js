@@ -557,7 +557,23 @@ function showNotification(message, type) {
   setTimeout(() => notification.remove(), 3000);
 }
 
-function contactCustomer(phone) {
+function showSection(sectionId) {
+  console.log("🔄 Switching to section:", sectionId);
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
+  const target = document.getElementById(sectionId + '-section');
+  if (target) target.classList.add('active-section');
+  else { console.error("❌ Section not found:", sectionId + '-section'); return; }
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  const active = document.querySelector(`.sidebar-nav a[data-section="${sectionId}"]`);
+  if (active) active.classList.add('active');
+  const title = document.getElementById('pageTitle');
+  if (title) title.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  if (sectionId === 'bookings') loadAllBookings();
+  if (sectionId === 'customers') loadCustomers();
+  if (sectionId === 'settings') loadSettings();
+  if (sectionId === 'pricing') loadSettings();  // ← THIS LINE IS IMPORTANT
+}
+
   if (phone) {
     const cleanPhone = phone.replace(/\D/g, '');
     window.open(`https://wa.me/${cleanPhone}`, '_blank', 'noopener,noreferrer');
@@ -620,6 +636,11 @@ async function exportBookings() {
   } catch (error) {
     showNotification('Export failed', 'error');
   }
+
+  // Force load pricing when clicking on pricing tab
+document.querySelector('.sidebar-nav a[data-section="pricing"]').addEventListener('click', function() {
+  setTimeout(loadSettings, 100);
+});
 }
 
 // Make functions globally available
