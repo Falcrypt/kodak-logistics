@@ -467,10 +467,6 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 0;
-    transform: translateX(-100%);
-  }
   .main-content {
     margin-left: 0;
   }
