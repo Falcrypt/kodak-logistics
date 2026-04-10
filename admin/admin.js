@@ -200,45 +200,52 @@ async function apiCall(endpoint, options = {}) {
   }
 }
 // Replace your current showSection() with this:
+// ========== SHOW SECTION - CLEAN & RELIABLE ==========
 function showSection(sectionId) {
   console.log("🔄 Switching to section:", sectionId);
 
-  // Hide all sections
-  document.querySelectorAll('.content-section').forEach(s => {
-    s.classList.remove('active-section');
+  // Hide all sections using class (this is the reliable way)
+  document.querySelectorAll('.content-section').forEach(section => {
+    section.classList.remove('active-section');
   });
 
+  // Show the target section
   const target = document.getElementById(sectionId + '-section');
   if (target) {
     target.classList.add('active-section');
     console.log('✅ Section activated:', sectionId + '-section');
 
-    // Force reflow + small delay for DOM to render inputs
-    target.style.display = 'none';
-    void target.offsetHeight; // Force reflow
-    target.style.display = 'block';
-
-    // Load settings for Pricing and Settings tabs
-    if (sectionId === 'pricing' || sectionId === 'settings') {
+    // Load data for specific sections
+    if (sectionId === 'bookings') {
+      loadAllBookings();
+    } else if (sectionId === 'customers') {
+      loadCustomers();
+    } else if (sectionId === 'pricing' || sectionId === 'settings') {
+      // Small delay so the section is visible before populating inputs
       setTimeout(() => {
-        if (window.loadSettings) window.loadSettings();
-      }, 10);
+        if (typeof window.loadSettings === 'function') {
+          window.loadSettings();
+        }
+      }, 50);
     }
   } else {
     console.error('❌ Section not found:', sectionId + '-section');
   }
 
-  // Update active nav
-  document.querySelectorAll('.sidebar-nav a[data-section]').forEach(a => {
-    a.classList.remove('active');
-    if (a.dataset.section === sectionId) a.classList.add('active');
+  // Update active navigation link
+  document.querySelectorAll('.sidebar-nav a[data-section]').forEach(link => {
+    link.classList.remove('active');
+    if (link.dataset.section === sectionId) {
+      link.classList.add('active');
+    }
   });
 
-  // Update title
-  const title = document.getElementById('pageTitle');
-  if (title) title.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-}
-  // Load data for the section
+  // Update page title
+  const titleEl = document.getElementById('pageTitle');
+  if (titleEl) {
+    titleEl.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  }
+}  // Load data for the section
   if (sectionId === 'bookings') {
     loadAllBookings();
   } else if (sectionId === 'customers') {
