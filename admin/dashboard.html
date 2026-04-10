@@ -27,9 +27,9 @@
     <main class="main-content">
       <!-- Top Bar with Mobile Menu Button -->
       <header class="top-bar">
-       <button id="mobileMenuToggle" class="mobile-menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.menu-overlay').classList.toggle('active');" style="display: none; background: #ffb347; border: none; border-radius: 8px; width: 40px; height: 40px; font-size: 1.3rem; cursor: pointer; color: #8b0000;">
-  <i class="fas fa-bars"></i>
-</button>
+        <button id="mobileMenuToggle" class="mobile-menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
         <h1 id="pageTitle">Dashboard</h1>
         <div class="admin-user">
           <span>Welcome, <span id="adminName"></span></span>
@@ -72,7 +72,7 @@
         </div>
         <div class="table-responsive">
           <table class="data-table">
-            <thead><tr><th>Reference</th><th>ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Hostel</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><td><th>Reference</th><th>ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Hostel</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="allBookingsBody"><tr><td colspan="10">Loading...缓解</td></tbody>
           </table>
           <div id="pagination" class="pagination"></div>
