@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadDashboardData();
         loadAllBookings();
         loadCustomers();
-        loadSettings();
+        window.loadSettings(); // Call the global function
         setupEventListeners();
         setupNavigation();
       }
@@ -216,7 +216,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td><tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -312,7 +312,7 @@ function displayCustomers(customers) {
   const tbody = document.getElementById('customersBody');
   if (!tbody) return;
   if (!customers || customers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No customers found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No customers found</td></table>';
     return;
   }
   tbody.innerHTML = customers.map(customer => `
@@ -402,15 +402,15 @@ window.resetAllBookings = async function() {
   }
 };
 
-// ========== SETTINGS (FIXED) ==========
-async function loadSettings() {
+// ========== SETTINGS (GLOBAL FUNCTION) ==========
+window.loadSettings = async function() {
   console.log('⚙️ loadSettings() called - loading settings and pricing...');
   try {
-    const settings = await apiCall('/settings');
-    if (!settings) {
-      console.log('No settings returned from API');
-      return;
-    }
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/settings`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const settings = await response.json();
     console.log('Settings received:', settings);
     
     // Settings section
@@ -436,10 +436,10 @@ async function loadSettings() {
   } catch (error) {
     console.error('Failed to load settings:', error);
   }
-}
+};
 
 // ========== SAVE PRICING ==========
-async function savePricing() {
+window.savePricing = async function() {
   const prices = {
     price_small: document.getElementById('priceSmall')?.value || 40,
     price_medium: document.getElementById('priceMedium')?.value || 50,
@@ -459,7 +459,7 @@ async function savePricing() {
     const result = await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
     if (result && result.success) {
       showMessage('pricingMessage', 'Pricing saved!', 'success');
-      await loadSettings();
+      await window.loadSettings();
     } else {
       throw new Error(result?.error || 'Unknown error from server');
     }
@@ -472,9 +472,9 @@ async function savePricing() {
       saveButton.textContent = 'Save Pricing';
     }
   }
-}
+};
 
-async function saveSettings() {
+window.saveSettings = async function() {
   const settings = {
     whatsapp_number: document.getElementById('whatsappNumber')?.value || '',
     business_email: document.getElementById('businessEmail')?.value || ''
@@ -497,7 +497,7 @@ async function saveSettings() {
   } catch (error) {
     showMessage('settingsMessage', error.message || 'Save failed', 'error');
   }
-}
+};
 
 // ========== UTILITIES ==========
 function escapeHtml(unsafe) {
@@ -550,8 +550,8 @@ function showSection(sectionId) {
   // Load data based on section
   if (sectionId === 'bookings') loadAllBookings();
   if (sectionId === 'customers') loadCustomers();
-  if (sectionId === 'settings') loadSettings();
-  if (sectionId === 'pricing') loadSettings();
+  if (sectionId === 'settings') window.loadSettings();
+  if (sectionId === 'pricing') window.loadSettings();
 }
 
 function setupEventListeners() {
