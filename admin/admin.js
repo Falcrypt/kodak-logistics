@@ -199,8 +199,7 @@ async function apiCall(endpoint, options = {}) {
     throw error;
   }
 }
-
-// ========== SHOW SECTION - FIXED ==========
+// Replace your current showSection() with this:
 function showSection(sectionId) {
   console.log("🔄 Switching to section:", sectionId);
 
@@ -209,30 +208,36 @@ function showSection(sectionId) {
     s.classList.remove('active-section');
   });
 
-  // Show the target section
   const target = document.getElementById(sectionId + '-section');
   if (target) {
     target.classList.add('active-section');
     console.log('✅ Section activated:', sectionId + '-section');
+
+    // Force reflow + small delay for DOM to render inputs
+    target.style.display = 'none';
+    void target.offsetHeight; // Force reflow
+    target.style.display = 'block';
+
+    // Load settings for Pricing and Settings tabs
+    if (sectionId === 'pricing' || sectionId === 'settings') {
+      setTimeout(() => {
+        if (window.loadSettings) window.loadSettings();
+      }, 10);
+    }
   } else {
     console.error('❌ Section not found:', sectionId + '-section');
-    return;
   }
 
-  // Update active nav link
+  // Update active nav
   document.querySelectorAll('.sidebar-nav a[data-section]').forEach(a => {
     a.classList.remove('active');
-    if (a.dataset.section === sectionId) {
-      a.classList.add('active');
-    }
+    if (a.dataset.section === sectionId) a.classList.add('active');
   });
 
-  // Update page title
+  // Update title
   const title = document.getElementById('pageTitle');
-  if (title) {
-    title.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-  }
-
+  if (title) title.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+}
   // Load data for the section
   if (sectionId === 'bookings') {
     loadAllBookings();
@@ -246,7 +251,7 @@ function showSection(sectionId) {
       }
     }, 100);
   }
-}
+
 
 // ========== DASHBOARD ==========
 async function loadDashboardData() {
