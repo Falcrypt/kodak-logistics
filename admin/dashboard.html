@@ -86,18 +86,79 @@
         </div>
       </section>
       
-      <!-- Pricing Section -->
+            <!-- Pricing Section - Modern Styling -->
       <section id="pricing-section" class="content-section">
         <div class="section-header">
-          <h2>Manage Pricing</h2>
+          <h2>💰 Pricing Management</h2>
+          <p>Update your storage prices - changes reflect immediately on the website</p>
         </div>
-        <div class="pricing-editor">
-          <div class="form-group"><label>Small Bag (₵)</label><input type="number" id="priceSmall" min="0" step="0.5" value="40"></div>
-          <div class="form-group"><label>Medium Bag (₵)</label><input type="number" id="priceMedium" min="0" step="0.5" value="50"></div>
-          <div class="form-group"><label>Big Bag (₵)</label><input type="number" id="priceBig" min="0" step="0.5" value="60"></div>
-          <div class="form-group"><label>Fridge (₵)</label><input type="number" id="priceFridge" min="0" step="0.5" value="70"></div>
-          <div class="form-group"><label>Gas Cylinder (₵)</label><input type="number" id="priceGas" min="0" step="0.5" value="60"></div>
-          <button onclick="savePricing()" class="btn-save">Save Pricing</button>
+        
+        <div class="pricing-grid-modern">
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">👜</div>
+            <div class="pricing-info">
+              <h3>Small Bag</h3>
+              <p>Perfect for clothes, books, shoes</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceSmall" min="0" step="0.5" value="40" class="pricing-input">
+            </div>
+          </div>
+          
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">🎒</div>
+            <div class="pricing-info">
+              <h3>Medium Bag</h3>
+              <p>Ideal for larger loads</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceMedium" min="0" step="0.5" value="50" class="pricing-input">
+            </div>
+          </div>
+          
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">🧳</div>
+            <div class="pricing-info">
+              <h3>Big Bag</h3>
+              <p>Maximum storage capacity</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceBig" min="0" step="0.5" value="60" class="pricing-input">
+            </div>
+          </div>
+          
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">❄️</div>
+            <div class="pricing-info">
+              <h3>Fridge</h3>
+              <p>Temperature controlled storage</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceFridge" min="0" step="0.5" value="70" class="pricing-input">
+            </div>
+          </div>
+          
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">🔥</div>
+            <div class="pricing-info">
+              <h3>Gas Cylinder</h3>
+              <p>Safe storage for cooking gas</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceGas" min="0" step="0.5" value="60" class="pricing-input">
+            </div>
+          </div>
+        </div>
+        
+        <div class="pricing-action">
+          <button onclick="savePricing()" class="btn-save-modern">
+            <i class="fas fa-save"></i> Save All Changes
+          </button>
           <div id="pricingMessage" class="form-message"></div>
         </div>
       </section>
