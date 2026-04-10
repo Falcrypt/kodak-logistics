@@ -79,11 +79,11 @@ function updatePriceDisplay() {
   const fridgeDisplay = document.getElementById('priceFridgeDisplay');
   const gasDisplay = document.getElementById('priceGasDisplay');
   
-  if (smallDisplay) smallDisplay.textContent = `₵${prices.small}`;
-  if (mediumDisplay) mediumDisplay.textContent = `₵${prices.medium}`;
-  if (bigDisplay) bigDisplay.textContent = `₵${prices.big}`;
-  if (fridgeDisplay) fridgeDisplay.textContent = `₵${prices.fridge}`;
-  if (gasDisplay) gasDisplay.textContent = `₵${prices.gas}`;
+  if (smallDisplay) smallDisplay.textContent = prices.small;
+  if (mediumDisplay) mediumDisplay.textContent = prices.medium;
+  if (bigDisplay) bigDisplay.textContent = prices.big;
+  if (fridgeDisplay) fridgeDisplay.textContent = prices.fridge;
+  if (gasDisplay) gasDisplay.textContent = prices.gas;
   
   updateSelectOptions();
 }
