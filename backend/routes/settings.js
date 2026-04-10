@@ -83,7 +83,8 @@ router.put('/', authenticateToken, async (req, res) => {
             'price_small', 
             'price_medium', 
             'price_big', 
-            'price_fridge'
+            'price_fridge',
+            'price_gas'
         ];
         
         for (const key of settingKeys) {
