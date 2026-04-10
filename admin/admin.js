@@ -1,4 +1,4 @@
-// admin/admin.js - FIXED & REFINED VERSION
+// admin/admin.js - FIXED & REFINED VERSION (Minimal Changes)
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 console.log('🚀 Admin JS loaded - Fixed Version');
 
@@ -41,7 +41,6 @@ async function checkAuth() {
 
 // ========== LOGIN FORM ==========
 document.addEventListener('DOMContentLoaded', function() {
-  // Login page handling
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
     loginForm.addEventListener('submit', async function(e) {
@@ -87,21 +86,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Dashboard initialization
   if (window.location.pathname.includes('dashboard.html')) {
     checkAuth().then(isAuthed => {
       if (isAuthed) {
         loadDashboardData();
         loadAllBookings();
         loadCustomers();
-        window.loadSettings();           // Load pricing + settings on start
         setupNavigation();
         setupEventListeners();
+        setTimeout(() => window.loadSettings && window.loadSettings(), 150); // Safe call
       }
     });
   }
 
-  // Logout button
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', function(e) {
@@ -111,20 +108,14 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ========== NAVIGATION SETUP (Fixed) ==========
+// ========== NAVIGATION SETUP (Safer version) ==========
 function setupNavigation() {
   console.log('🔧 Setting up navigation...');
   
   const navLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
   
   navLinks.forEach(link => {
-    // Remove any previous listeners safely
-    const newLink = link.cloneNode(true);
-    if (link.parentNode) {
-      link.parentNode.replaceChild(newLink, link);
-    }
-
-    newLink.addEventListener('click', function(e) {
+    link.addEventListener('click', function(e) {
       e.preventDefault();
       const sectionId = this.dataset.section;
       console.log('📌 Navigation clicked:', sectionId);
@@ -199,73 +190,50 @@ async function apiCall(endpoint, options = {}) {
     throw error;
   }
 }
-// Replace your current showSection() with this:
-// ========== SHOW SECTION - CLEAN & RELIABLE ==========
+
 // ========== SHOW SECTION - FIXED ==========
 function showSection(sectionId) {
-    console.log("🔄 Switching to section:", sectionId);
+  console.log("🔄 Switching to section:", sectionId);
 
-    // Hide all sections
-    document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active-section');
-    });
+  document.querySelectorAll('.content-section').forEach(section => {
+    section.classList.remove('active-section');
+  });
 
-    // Show target section
-    const target = document.getElementById(sectionId + '-section');
-    if (target) {
-        target.classList.add('active-section');
-        console.log('✅ Section activated:', sectionId + '-section');
+  const target = document.getElementById(sectionId + '-section');
+  if (target) {
+    target.classList.add('active-section');
+    console.log('✅ Section activated:', sectionId + '-section');
 
-        // Load data for the section
-        if (sectionId === 'bookings') {
-            loadAllBookings();
-        } else if (sectionId === 'customers') {
-            loadCustomers();
-        } else if (sectionId === 'pricing' || sectionId === 'settings') {
-            // Small delay + check if function exists
-            setTimeout(() => {
-                if (typeof window.loadSettings === 'function') {
-                    window.loadSettings();
-                } else {
-                    console.warn('loadSettings is not available yet');
-                }
-            }, 50);
+    if (sectionId === 'bookings') {
+      loadAllBookings();
+    } else if (sectionId === 'customers') {
+      loadCustomers();
+    } else if (sectionId === 'pricing' || sectionId === 'settings') {
+      setTimeout(() => {
+        if (typeof window.loadSettings === 'function') {
+          window.loadSettings();
         }
-    } else {
-        console.error('❌ Section not found:', sectionId + '-section');
+      }, 50);
     }
-
-    // Update active nav link
-    document.querySelectorAll('.sidebar-nav a[data-section]').forEach(link => {
-        link.classList.remove('active');
-        if (link.dataset.section === sectionId) {
-            link.classList.add('active');
-        }
-    });
-
-    // Update page title
-    const titleEl = document.getElementById('pageTitle');
-    if (titleEl) {
-        titleEl.textContent = sectionId === 'dashboard' 
-            ? 'Dashboard' 
-            : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-    }
-}  
-
-// Load data for the section
-  if (sectionId === 'bookings') {
-    loadAllBookings();
-  } else if (sectionId === 'customers') {
-    loadCustomers();
-  } else if (sectionId === 'pricing' || sectionId === 'settings') {
-    // Small delay ensures DOM is visible before populating inputs
-    setTimeout(() => {
-      if (typeof window.loadSettings === 'function') {
-        window.loadSettings();
-      }
-    }, 100);
+  } else {
+    console.error('❌ Section not found:', sectionId + '-section');
   }
 
+  // Update active nav link
+  document.querySelectorAll('.sidebar-nav a[data-section]').forEach(link => {
+    link.classList.remove('active');
+    if (link.dataset.section === sectionId) {
+      link.classList.add('active');
+    }
+  });
+
+  const titleEl = document.getElementById('pageTitle');
+  if (titleEl) {
+    titleEl.textContent = sectionId === 'dashboard' 
+      ? 'Dashboard' 
+      : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  }
+}
 
 // ========== DASHBOARD ==========
 async function loadDashboardData() {
@@ -325,7 +293,7 @@ function displayRecentBookings(bookings) {
   }).join('');
 }
 
-// ========== BOOKINGS ==========
+// ========== BOOKINGS, CUSTOMERS, SETTINGS, etc. (unchanged) ==========
 async function loadAllBookings() {
   try {
     const data = await apiCall('/bookings');
@@ -387,7 +355,6 @@ async function updateBookingStatus(bookingId, status) {
   }
 }
 
-// ========== CUSTOMERS ==========
 async function loadCustomers() {
   try {
     const data = await apiCall('/customers');
@@ -419,7 +386,7 @@ function displayCustomers(customers) {
   `).join('');
 }
 
-// ========== CUSTOMER MODAL ==========
+// ========== CUSTOMER MODAL, RESET, SETTINGS, UTILITIES (unchanged) ==========
 window.viewCustomerDetails = async function(phone) {
   try {
     const token = localStorage.getItem('adminToken');
@@ -465,7 +432,6 @@ window.closeCustomerModal = function() {
   document.getElementById('customerModal').style.display = 'none';
 };
 
-// ========== RESET ALL BOOKINGS ==========
 window.resetAllBookings = async function() {
   if (!confirm('⚠️ WARNING: This will delete ALL bookings permanently!')) return;
   if (!confirm('⚠️ LAST WARNING: This action CANNOT be undone!')) return;
@@ -499,7 +465,6 @@ window.resetAllBookings = async function() {
   }
 };
 
-// ========== SETTINGS & PRICING ==========
 window.loadSettings = async function() {
   console.log('⚙️ loadSettings() called');
   try {
@@ -513,13 +478,11 @@ window.loadSettings = async function() {
     const settings = await response.json();
     console.log('Settings received:', settings);
 
-    // Populate Settings fields
     const ws = document.getElementById('whatsappNumber');
     const em = document.getElementById('businessEmail');
     if (ws) ws.value = settings.whatsapp_number || '';
     if (em) em.value = settings.business_email || '';
 
-    // Populate Pricing fields
     const ps = document.getElementById('priceSmall');
     const pm = document.getElementById('priceMedium');
     const pb = document.getElementById('priceBig');
@@ -632,7 +595,6 @@ function contactCustomer(phone) {
   window.open(`https://wa.me/${cleanPhone}`, '_blank', 'noopener,noreferrer');
 }
 
-// ========== EXPORT (unchanged) ==========
 async function exportBookings() {
   try {
     const data = await apiCall('/bookings/export');
@@ -662,7 +624,6 @@ async function exportBookings() {
 }
 
 function setupEventListeners() {
-  // You can expand this later for search and filter functionality
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.addEventListener('click', exportBookings);
 }
