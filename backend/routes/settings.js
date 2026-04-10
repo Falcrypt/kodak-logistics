@@ -104,4 +104,23 @@ router.put('/', authenticateToken, async (req, res) => {
     }
 });
 
+// GET /api/settings/contact - Public contact settings (no login required)
+router.get('/contact', async (req, res) => {
+    try {
+        const settings = await db.query(
+            "SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('whatsapp_number', 'business_email')"
+        );
+        
+        const contactInfo = {};
+        settings.forEach(s => {
+            contactInfo[s.setting_key] = s.setting_value;
+        });
+        
+        res.json(contactInfo);
+    } catch (error) {
+        console.error('Get contact settings error:', error);
+        res.status(500).json({ error: 'Failed to fetch contact settings' });
+    }
+});
+
 module.exports = router;

@@ -27,17 +27,19 @@ setTimeout(function() {
   if (loader) loader.classList.add('hidden');
 }, 2000);
 
-// ===== LOAD BUSINESS SETTINGS (WhatsApp, Email) =====
+// ===== LOAD BUSINESS SETTINGS (WhatsApp, Email) from PUBLIC endpoint =====
 async function loadBusinessSettings() {
     try {
+        // Using the public contact endpoint (no authentication required)
         const timestamp = Date.now();
-        const response = await fetch(`${API_URL}/settings?t=${timestamp}`);
+        const response = await fetch(`${API_URL}/settings/contact?t=${timestamp}`);
+        
         if (response.ok) {
-            const settings = await response.json();
-            console.log('Business settings loaded:', settings);
+            const contactInfo = await response.json();
+            console.log('Business settings loaded:', contactInfo);
             
             // Update WhatsApp links
-            const whatsappNumber = settings.whatsapp_number || '233545025296';
+            const whatsappNumber = contactInfo.whatsapp_number || '233545025296';
             const cleanNumber = whatsappNumber.replace(/\D/g, '');
             
             // Update floating WhatsApp button
@@ -50,14 +52,19 @@ async function loadBusinessSettings() {
             const footerWhatsapp = document.querySelector('.footer-whatsapp');
             if (footerWhatsapp) {
                 footerWhatsapp.href = `https://wa.me/${cleanNumber}`;
+                // Update the displayed text
+                const displayNumber = cleanNumber.slice(-9);
+                footerWhatsapp.innerHTML = `<span class="icon">💬</span> +233 ${displayNumber}`;
             }
             
             // Update footer email
             const footerEmail = document.querySelector('.footer-email a');
-            if (footerEmail && settings.business_email) {
-                footerEmail.href = `mailto:${settings.business_email}`;
-                footerEmail.textContent = settings.business_email;
+            if (footerEmail && contactInfo.business_email) {
+                footerEmail.href = `mailto:${contactInfo.business_email}`;
+                footerEmail.textContent = contactInfo.business_email;
             }
+        } else {
+            console.log('Failed to fetch contact settings, status:', response.status);
         }
     } catch (error) {
         console.log('Using default contact info');
@@ -250,11 +257,11 @@ function setupForm() {
         }
         calculateTotal();
         
-        // Get the latest WhatsApp number from settings for the booking confirmation
-        const settingsResponse = await fetch(`${API_URL}/settings?t=${Date.now()}`);
-        if (settingsResponse.ok) {
-          const settings = await settingsResponse.json();
-          const whatsappNumber = settings.whatsapp_number || '233545025296';
+        // Get the latest WhatsApp number from the public contact endpoint
+        const contactResponse = await fetch(`${API_URL}/settings/contact?t=${Date.now()}`);
+        if (contactResponse.ok) {
+          const contactInfo = await contactResponse.json();
+          const whatsappNumber = contactInfo.whatsapp_number || '233545025296';
           const cleanNumber = whatsappNumber.replace(/\D/g, '');
           if (confirm("Open WhatsApp?")) {
             const msg = encodeURIComponent(`Hi Kodak Logistics!\n\nBooking confirmed.\nReference: ${result.bookingRef}\nName: ${formData.name}\nDate: ${formData.date}\nTotal: ₵${formData.total}`);
