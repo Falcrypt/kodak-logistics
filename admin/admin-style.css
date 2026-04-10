@@ -199,10 +199,51 @@
   color: #ffb347;
 }
 
-/* Content Sections */
+/* ==================== CONTENT SECTIONS - FIXED ==================== */
 .content-section {
-  display: none;
-  padding: 30px;
+    display: none !important;
+    padding: 30px;
+    min-height: 600px;
+    background: #f8f9fa;
+}
+
+.content-section.active-section {
+    display: block !important;
+}
+
+/* Extra strong force for Pricing and Settings */
+#pricing-section,
+#settings-section {
+    display: none !important;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    min-height: 500px;
+}
+
+#pricing-section.active-section,
+#settings-section.active-section {
+    display: block !important;
+}
+
+/* Make sure the inner containers look good */
+.pricing-editor,
+.settings-form {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
 }
 
 .content-section.active-section {
@@ -523,19 +564,3 @@
     cursor: not-allowed;
 }
 
-/* Force visibility for pricing and settings */
-#pricing-section, #settings-section {
-  background: white;
-  border-radius: 10px;
-  padding: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  min-height: 400px;
-}
-
-.pricing-editor {
-  max-width: 600px;
-}
-
-.section-header {
-  margin-bottom: 25px;
-}
