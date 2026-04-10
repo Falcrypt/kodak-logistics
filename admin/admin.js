@@ -308,7 +308,7 @@ async function updateBookingStatus(bookingId, status) {
   }
 }
 
-// ========== CUSTOMERS (UPDATED with clickable names) ==========
+// ========== CUSTOMERS ==========
 async function loadCustomers() {
   try {
     const customers = await apiCall('/customers');
@@ -434,6 +434,7 @@ window.resetAllBookings = async function() {
 // ========== SETTINGS ==========
 async function loadSettings() {
   try {
+    console.log('⚙️ Loading settings...');
     const settings = await apiCall('/settings');
     if (!settings) return;
     const ws = document.getElementById('whatsappNumber');
@@ -557,23 +558,7 @@ function showNotification(message, type) {
   setTimeout(() => notification.remove(), 3000);
 }
 
-function showSection(sectionId) {
-  console.log("🔄 Switching to section:", sectionId);
-  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
-  const target = document.getElementById(sectionId + '-section');
-  if (target) target.classList.add('active-section');
-  else { console.error("❌ Section not found:", sectionId + '-section'); return; }
-  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-  const active = document.querySelector(`.sidebar-nav a[data-section="${sectionId}"]`);
-  if (active) active.classList.add('active');
-  const title = document.getElementById('pageTitle');
-  if (title) title.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-  if (sectionId === 'bookings') loadAllBookings();
-  if (sectionId === 'customers') loadCustomers();
-  if (sectionId === 'settings') loadSettings();
-  if (sectionId === 'pricing') loadSettings();  // ← THIS LINE IS IMPORTANT
-}
-
+function contactCustomer(phone) {
   if (phone) {
     const cleanPhone = phone.replace(/\D/g, '');
     window.open(`https://wa.me/${cleanPhone}`, '_blank', 'noopener,noreferrer');
@@ -585,8 +570,12 @@ function showSection(sectionId) {
   console.log("🔄 Switching to section:", sectionId);
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
   const target = document.getElementById(sectionId + '-section');
-  if (target) target.classList.add('active-section');
-  else { console.error("❌ Section not found:", sectionId + '-section'); return; }
+  if (target) {
+    target.classList.add('active-section');
+  } else {
+    console.error("❌ Section not found:", sectionId + '-section');
+    return;
+  }
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   const active = document.querySelector(`.sidebar-nav a[data-section="${sectionId}"]`);
   if (active) active.classList.add('active');
@@ -636,12 +625,14 @@ async function exportBookings() {
   } catch (error) {
     showNotification('Export failed', 'error');
   }
-
-  // Force load pricing when clicking on pricing tab
-document.querySelector('.sidebar-nav a[data-section="pricing"]').addEventListener('click', function() {
-  setTimeout(loadSettings, 100);
-});
 }
+
+// Force load settings when clicking on pricing or settings tab
+document.querySelectorAll('.sidebar-nav a[data-section="pricing"], .sidebar-nav a[data-section="settings"]').forEach(link => {
+  link.addEventListener('click', function() {
+    setTimeout(loadSettings, 100);
+  });
+});
 
 // Make functions globally available
 window.showSection = showSection;
