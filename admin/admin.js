@@ -357,7 +357,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No recent bookings缓解</tr>';
+    tbody.innerHTML = '<td><td colspan="6">No recent bookings缓解</td>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -422,7 +422,7 @@ function displayAllBookings(bookings) {
   const tbody = document.getElementById('allBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10">No bookings found缓解</td>';
+    tbody.innerHTML = '<td><td colspan="10">No bookings found缓解</td>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -485,7 +485,7 @@ function displayCustomers(customers) {
   if (!tbody) return;
   
   if (!customers || customers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No customers found缓解</tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No customers found缓解</table>';
     return;
   }
   
@@ -755,3 +755,56 @@ window.resetAllBookings = resetAllBookings;
 window.loadAllBookings = loadAllBookings;
 window.closeCustomerModal = closeCustomerModal;
 window.viewCustomerDetails = viewCustomerDetails;
+
+// ========== SIMPLE STANDALONE MOBILE MENU TOGGLE ==========
+// This ensures the mobile menu button works even if other functions fail
+window.toggleMobileMenu = function() {
+    console.log('toggleMobileMenu called');
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('open');
+        console.log('Sidebar classes:', sidebar.className);
+    } else {
+        console.log('Sidebar not found');
+    }
+};
+
+// Also ensure the button is visible on mobile and close menu when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (menuBtn && sidebar) {
+        // Show button on mobile
+        function checkWidth() {
+            if (window.innerWidth <= 768) {
+                menuBtn.style.display = 'flex';
+            } else {
+                menuBtn.style.display = 'none';
+                sidebar.classList.remove('open');
+            }
+        }
+        
+        checkWidth();
+        window.addEventListener('resize', checkWidth);
+        
+        // Also make sure clicking on nav links closes the menu on mobile
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+        
+        // Close menu when clicking outside (on the main content)
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 768) {
+                const isClickInside = sidebar.contains(event.target) || menuBtn.contains(event.target);
+                if (!isClickInside && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    }
+});
