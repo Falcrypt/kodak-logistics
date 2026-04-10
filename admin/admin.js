@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadAllSettings();
         setupNavigation();
         setupEventListeners();
-        setupMobileMenu(); // Mobile menu setup
+        setupMobileMenu();
       }
     });
   }
@@ -182,13 +182,11 @@ async function loadAllSettings() {
     const settings = await response.json();
     console.log('Settings received:', settings);
 
-    // Settings section
     const ws = document.getElementById('whatsappNumber');
     const em = document.getElementById('businessEmail');
     if (ws) ws.value = settings.whatsapp_number || '';
     if (em) em.value = settings.business_email || '';
 
-    // Pricing section
     const ps = document.getElementById('priceSmall');
     const pm = document.getElementById('priceMedium');
     const pb = document.getElementById('priceBig');
@@ -219,29 +217,24 @@ function setupNavigation() {
       const sectionId = this.dataset.section;
       console.log('📌 Navigation clicked:', sectionId);
       
-      // Hide all sections
       document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active-section');
       });
       
-      // Show selected section
       const targetSection = document.getElementById(sectionId + '-section');
       if (targetSection) {
         targetSection.classList.add('active-section');
         console.log('✅ Section activated:', sectionId + '-section');
       }
       
-      // Update active nav link
       navLinks.forEach(link => link.classList.remove('active'));
       this.classList.add('active');
       
-      // Update page title
       const titleEl = document.getElementById('pageTitle');
       if (titleEl) {
         titleEl.textContent = sectionId === 'dashboard' ? 'Dashboard' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
       }
       
-      // Load data for the section
       if (sectionId === 'bookings') {
         loadAllBookings();
       } else if (sectionId === 'customers') {
@@ -357,7 +350,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<td><td colspan="6">No recent bookings</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No recent bookings缓解</tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -422,7 +415,7 @@ function displayAllBookings(bookings) {
   const tbody = document.getElementById('allBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10">No bookings found缓解</tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -451,7 +444,7 @@ function displayAllBookings(bookings) {
           <option value="confirmed" ${status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
           <option value="completed" ${status === 'completed' ? 'selected' : ''}>Completed</option>
         </select>
-       </td>
+      </td>
       <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button></td>
     </tr>`;
   }).join('');
@@ -485,7 +478,7 @@ function displayCustomers(customers) {
   if (!tbody) return;
   
   if (!customers || customers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No customers found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No customers found缓解</tr>';
     return;
   }
   
@@ -732,7 +725,6 @@ async function exportBookings() {
 function setupEventListeners() {
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.addEventListener('click', exportBookings);
-  
   setupSearchListeners();
 }
 
