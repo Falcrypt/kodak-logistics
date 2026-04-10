@@ -1,4 +1,4 @@
-// admin/admin.js - COMPLETE WORKING VERSION with Customer Details & Reset
+// admin/admin.js - COMPLETE WORKING VERSION
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 console.log('🚀 Admin JS loaded');
 console.log('🔗 API URL:', API_URL);
@@ -154,8 +154,6 @@ async function logout(reason = '') {
 // ========== API HELPER ==========
 async function apiCall(endpoint, options = {}) {
   const token = localStorage.getItem('adminToken');
-  console.log(`🔑 Token: ${token ? token.substring(0, 20) + '...' : 'NOT FOUND'}`);
-  
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
@@ -165,20 +163,12 @@ async function apiCall(endpoint, options = {}) {
   try {
     console.log(`📡 API Call: ${options.method || 'GET'} ${endpoint}`);
     const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
-    console.log(`📡 Response Status: ${response.status}`);
-    
     if (response.status === 401) {
-      console.error('❌ Unauthorized! Token may be invalid or expired.');
       logout('Session expired');
       return null;
     }
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `HTTP error ${response.status}`);
-    }
-    
     const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Request failed');
     return data;
   } catch (error) {
     console.error('❌ API call failed:', error);
@@ -226,7 +216,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
+    tbody.innerHTML = '<td><td colspan="6">No recent bookings</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -340,7 +330,6 @@ function displayCustomers(customers) {
 // ========== CUSTOMER DETAILS MODAL ==========
 window.viewCustomerDetails = async function(phone) {
   console.log('🔍 Fetching customer details for:', phone);
-  
   try {
     const token = localStorage.getItem('adminToken');
     const response = await fetch(`${API_URL}/bookings`, {
@@ -348,38 +337,29 @@ window.viewCustomerDetails = async function(phone) {
     });
     const data = await response.json();
     const bookings = data.bookings || [];
-    
     const customerBookings = bookings.filter(b => b.customer_phone === phone);
-    
     if (customerBookings.length === 0) {
       alert('No bookings found for this customer');
       return;
     }
-    
     const customer = customerBookings[0];
-    const customerName = customer.customer_name;
-    
-    document.getElementById('modalCustomerName').textContent = customerName;
+    document.getElementById('modalCustomerName').textContent = customer.customer_name;
     document.getElementById('modalCustomerPhone').textContent = `📞 Phone: ${phone} | 📧 Email: ${customer.customer_email}`;
-    
     const tableBody = document.getElementById('modalBookingsTableBody');
     tableBody.innerHTML = '';
-    
     customerBookings.forEach(booking => {
       const row = tableBody.insertRow();
       row.innerHTML = `
-        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_ref || 'N/A')}<\/td>
-        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_date || 'N/A')}<\/td>
-        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.items_summary || 'N/A')}<\/td>
-        <td style="padding: 10px; border: 1px solid #ddd;">₵${escapeHtml(booking.total_amount || '0')}<\/td>
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_ref || 'N/A')}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_date || 'N/A')}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.items_summary || 'N/A')}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">₵${escapeHtml(booking.total_amount || '0')}</td>
         <td style="padding: 10px; border: 1px solid #ddd;">
-          <span class="status-badge status-${escapeHtml(booking.status)}">${escapeHtml(booking.status)}<\/span>
-        <\/td>
+          <span class="status-badge status-${escapeHtml(booking.status)}">${escapeHtml(booking.status)}</span>
+        </td>
       `;
     });
-    
     document.getElementById('customerModal').style.display = 'flex';
-    
   } catch (error) {
     console.error('Error fetching customer details:', error);
     alert('Failed to load customer details');
@@ -392,21 +372,14 @@ window.closeCustomerModal = function() {
 
 // ========== RESET ALL BOOKINGS ==========
 window.resetAllBookings = async function() {
-  const confirm1 = confirm('⚠️ WARNING: This will delete ALL bookings permanently!\n\nAre you absolutely sure?');
-  if (!confirm1) return;
-  
-  const confirm2 = confirm('⚠️ LAST WARNING: This action CANNOT be undone!\n\nAll customer booking data will be lost forever.\n\nClick OK to proceed.');
-  if (!confirm2) return;
-  
+  if (!confirm('⚠️ WARNING: This will delete ALL bookings permanently!\n\nAre you absolutely sure?')) return;
+  if (!confirm('⚠️ LAST WARNING: This action CANNOT be undone!\n\nAll customer booking data will be lost forever.')) return;
   const userInput = prompt('Type "RESET" to confirm deletion of all bookings:');
   if (userInput !== 'RESET') {
     alert('Reset cancelled. Bookings were not deleted.');
     return;
   }
-  
-  const confirm3 = confirm('One last confirmation: Delete ALL bookings?');
-  if (!confirm3) return;
-  
+  if (!confirm('One last confirmation: Delete ALL bookings?')) return;
   try {
     const token = localStorage.getItem('adminToken');
     const response = await fetch(`${API_URL}/bookings/reset`, {
@@ -416,9 +389,7 @@ window.resetAllBookings = async function() {
         'Authorization': `Bearer ${token}`
       }
     });
-    
     const result = await response.json();
-    
     if (result.success) {
       alert('✅ All bookings have been deleted successfully!\n\nYou can start fresh with new bookings.');
       location.reload();
@@ -459,30 +430,21 @@ async function loadSettings() {
 
 // ========== SAVE PRICING ==========
 async function savePricing() {
-  const gasElement = document.getElementById('priceGas');
-  const gasValue = gasElement ? gasElement.value : 'not found';
-  console.log('🔍 Gas input found:', !!gasElement);
-  console.log('🔍 Gas value:', gasValue);
-  
   const prices = {
     price_small: document.getElementById('priceSmall')?.value || 40,
     price_medium: document.getElementById('priceMedium')?.value || 50,
     price_big: document.getElementById('priceBig')?.value || 60,
     price_fridge: document.getElementById('priceFridge')?.value || 70,
-    price_gas: gasValue || 60
+    price_gas: document.getElementById('priceGas')?.value || 60
   };
-  
   console.log('📦 Saving prices:', prices);
-  
   const saveButton = document.querySelector('#pricing-section .btn-save');
   if (saveButton) {
     saveButton.disabled = true;
     saveButton.textContent = 'Saving...';
   }
-
   try {
     const result = await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
-    
     if (result && result.success) {
       showMessage('pricingMessage', 'Pricing saved!', 'success');
       await loadSettings();
@@ -528,16 +490,12 @@ async function saveSettings() {
 // ========== UTILITIES ==========
 function escapeHtml(unsafe) {
   if (!unsafe) return '';
-  return unsafe.toString().replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  }).replace(/[\"\']/g, function(m) {
-    if (m === '"') return '&quot;';
-    if (m === "'") return '&#039;';
-    return m;
-  });
+  return unsafe.toString()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function showMessage(elementId, message, type) {
@@ -570,12 +528,7 @@ function showSection(sectionId) {
   console.log("🔄 Switching to section:", sectionId);
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
   const target = document.getElementById(sectionId + '-section');
-  if (target) {
-    target.classList.add('active-section');
-  } else {
-    console.error("❌ Section not found:", sectionId + '-section');
-    return;
-  }
+  if (target) target.classList.add('active-section');
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   const active = document.querySelector(`.sidebar-nav a[data-section="${sectionId}"]`);
   if (active) active.classList.add('active');
@@ -626,13 +579,6 @@ async function exportBookings() {
     showNotification('Export failed', 'error');
   }
 }
-
-// Force load settings when clicking on pricing or settings tab
-document.querySelectorAll('.sidebar-nav a[data-section="pricing"], .sidebar-nav a[data-section="settings"]').forEach(link => {
-  link.addEventListener('click', function() {
-    setTimeout(loadSettings, 100);
-  });
-});
 
 // Make functions globally available
 window.showSection = showSection;
