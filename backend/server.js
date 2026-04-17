@@ -1,4 +1,4 @@
-// backend/server.js - MAIN SERVER FILE
+// backend/server.js - MAIN SERVER FILE (UPDATED WITH NEW ITEMS)
 // This starts everything and connects all the pieces
 
 // ===== STEP 1: LOAD ENVIRONMENT VARIABLES =====
@@ -127,14 +127,44 @@ async function setupDatabase() {
         `);
         console.log('✅ settings table ready');
         
+        // ===== UPDATED: ALL DEFAULT SETTINGS WITH NEW ITEMS =====
         const defaultSettings = [
+            // Contact settings
             ['whatsapp_number', '233545025296'],
             ['business_email', 'Philiptesimbo@gmail.com'],
+            
+            // Original Items
             ['price_small', '40'],
             ['price_medium', '50'],
             ['price_big', '60'],
             ['price_fridge', '70'],
-            ['price_gas', '60']
+            ['price_gas', '60'],
+            
+            // NEW: Microwave
+            ['price_microwave', '30'],
+            
+            // NEW: Duffle Bags
+            ['price_duffle_small', '29.99'],
+            ['price_duffle_big', '49.99'],
+            
+            // NEW: Jute Bags
+            ['price_jute_small', '39.99'],
+            ['price_jute_medium', '59.99'],
+            ['price_jute_big', '79.99'],
+            
+            // NEW: Traveling Bags
+            ['price_travel_small', '29.99'],
+            ['price_travel_medium', '49.99'],
+            ['price_travel_big', '69.99'],
+            
+            // NEW: Other Containers
+            ['price_container_small', '29.99'],
+            ['price_container_big', '49.99'],
+            
+            // NEW: Gas Cylinder sizes
+            ['price_gas_small', '29.99'],
+            ['price_gas_medium', '34.99'],
+            ['price_gas_big', '39.99']
         ];
         
         for (const [key, value] of defaultSettings) {
@@ -143,7 +173,7 @@ async function setupDatabase() {
                 [key, value]
             );
         }
-        console.log('✅ default settings inserted');
+        console.log('✅ default settings inserted (including new items)');
         console.log('✅ All database tables are ready!');
         
     } catch (error) {

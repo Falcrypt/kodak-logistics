@@ -1,6 +1,4 @@
-// backend/routes/settings.js
-// This file handles prices and business settings
-
+// backend/routes/settings.js - FIXED VERSION (actually saves prices)
 const express = require('express');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
@@ -12,7 +10,6 @@ const router = express.Router();
 // GET /api/settings/public - Get public settings (prices only)
 router.get('/public', async (req, res) => {
     try {
-        // PostgreSQL uses LIKE with $1 placeholder
         const settings = await db.query(
             "SELECT setting_key, setting_value FROM settings WHERE setting_key LIKE $1",
             ['price_%']
@@ -52,15 +49,16 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
-// PUT /api/settings - Update settings
+// PUT /api/settings - Update settings (FIXED - actually saves!)
 router.put('/', authenticateToken, async (req, res) => {
     try {
         const updates = req.body;
         const userId = req.user.id;
         
+        console.log('📥 Received updates:', JSON.stringify(updates, null, 2));
+        
         // ===== HANDLE PASSWORD CHANGE =====
         if (updates.current_password && updates.new_password) {
-            // PostgreSQL uses $1
             const admin = await db.getOne('SELECT * FROM admin_users WHERE id = $1', [userId]);
             
             const validPassword = await bcrypt.compare(updates.current_password, admin.password_hash);
@@ -76,31 +74,63 @@ router.put('/', authenticateToken, async (req, res) => {
             );
         }
         
-        // ===== HANDLE SETTINGS UPDATE =====
-        const settingKeys = [
-            'whatsapp_number', 
-            'business_email', 
-            'price_small', 
-            'price_medium', 
-            'price_big', 
-            'price_fridge',
-            'price_gas'
+        // ===== ALL PRICE KEYS (without price_ prefix for easier handling) =====
+        const priceKeys = [
+            'small', 'medium', 'big', 'fridge', 'gas',
+            'microwave',
+            'duffle_small', 'duffle_big',
+            'jute_small', 'jute_medium', 'jute_big',
+            'travel_small', 'travel_medium', 'travel_big',
+            'container_small', 'container_big',
+            'gas_small', 'gas_medium', 'gas_big'
         ];
         
-        for (const key of settingKeys) {
-            if (updates[key] !== undefined) {
+        // Save each price - check for both with and without 'price_' prefix
+        let savedCount = 0;
+        for (const key of priceKeys) {
+            const fullKey = `price_${key}`;
+            // Check if update was sent with 'price_' prefix
+            let value = updates[fullKey];
+            // Also check without prefix (just in case)
+            if (value === undefined && updates[key] !== undefined) {
+                value = updates[key];
+            }
+            
+            if (value !== undefined) {
+                console.log(`💾 Saving ${fullKey} = ${value}`);
                 await db.update(
                     'UPDATE settings SET setting_value = $1, updated_at = CURRENT_TIMESTAMP WHERE setting_key = $2',
-                    [updates[key].toString(), key]
+                    [value.toString(), fullKey]
                 );
+                savedCount++;
             }
         }
         
+        // ===== HANDLE CONTACT SETTINGS =====
+        if (updates.whatsapp_number !== undefined) {
+            console.log(`💾 Saving whatsapp_number = ${updates.whatsapp_number}`);
+            await db.update(
+                'UPDATE settings SET setting_value = $1, updated_at = CURRENT_TIMESTAMP WHERE setting_key = $2',
+                [updates.whatsapp_number, 'whatsapp_number']
+            );
+            savedCount++;
+        }
+        
+        if (updates.business_email !== undefined) {
+            console.log(`💾 Saving business_email = ${updates.business_email}`);
+            await db.update(
+                'UPDATE settings SET setting_value = $1, updated_at = CURRENT_TIMESTAMP WHERE setting_key = $2',
+                [updates.business_email, 'business_email']
+            );
+            savedCount++;
+        }
+        
+        console.log(`✅ Settings updated successfully! (${savedCount} values saved)`);
         res.json({ success: true, message: 'Settings updated successfully' });
         
     } catch (error) {
-        console.error('Update settings error:', error);
-        res.status(500).json({ error: 'Failed to update settings' });
+        console.error('❌ Update settings error:', error);
+        res.status(500).json({ error: 'Failed to update settings: ' + error.message });
     }
 });
 

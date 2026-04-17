@@ -168,7 +168,7 @@ function setupMobileMenu() {
     });
 }
 
-// ========== LOAD ALL SETTINGS ==========
+// ========== LOAD ALL SETTINGS (UPDATED WITH NEW ITEMS) ==========
 async function loadAllSettings() {
   console.log('⚙️ Loading settings and pricing...');
   try {
@@ -188,7 +188,7 @@ async function loadAllSettings() {
     if (ws) ws.value = settings.whatsapp_number || '';
     if (em) em.value = settings.business_email || '';
 
-    // Pricing section
+    // ===== ORIGINAL PRICING SECTION =====
     const ps = document.getElementById('priceSmall');
     const pm = document.getElementById('priceMedium');
     const pb = document.getElementById('priceBig');
@@ -200,6 +200,47 @@ async function loadAllSettings() {
     if (pb) pb.value = settings.price_big || 60;
     if (pf) pf.value = settings.price_fridge || 70;
     if (pg) pg.value = settings.price_gas || 60;
+
+    // ===== NEW PRICING SECTION =====
+    // Microwave
+    const pMicrowave = document.getElementById('priceMicrowave');
+    if (pMicrowave) pMicrowave.value = settings.price_microwave || 30;
+    
+    // Duffle Bags
+    const pDuffleSmall = document.getElementById('priceDuffleSmall');
+    const pDuffleBig = document.getElementById('priceDuffleBig');
+    if (pDuffleSmall) pDuffleSmall.value = settings.price_duffle_small || 29.99;
+    if (pDuffleBig) pDuffleBig.value = settings.price_duffle_big || 49.99;
+    
+    // Jute Bags
+    const pJuteSmall = document.getElementById('priceJuteSmall');
+    const pJuteMedium = document.getElementById('priceJuteMedium');
+    const pJuteBig = document.getElementById('priceJuteBig');
+    if (pJuteSmall) pJuteSmall.value = settings.price_jute_small || 39.99;
+    if (pJuteMedium) pJuteMedium.value = settings.price_jute_medium || 59.99;
+    if (pJuteBig) pJuteBig.value = settings.price_jute_big || 79.99;
+    
+    // Traveling Bags
+    const pTravelSmall = document.getElementById('priceTravelSmall');
+    const pTravelMedium = document.getElementById('priceTravelMedium');
+    const pTravelBig = document.getElementById('priceTravelBig');
+    if (pTravelSmall) pTravelSmall.value = settings.price_travel_small || 29.99;
+    if (pTravelMedium) pTravelMedium.value = settings.price_travel_medium || 49.99;
+    if (pTravelBig) pTravelBig.value = settings.price_travel_big || 69.99;
+    
+    // Other Containers
+    const pContainerSmall = document.getElementById('priceContainerSmall');
+    const pContainerBig = document.getElementById('priceContainerBig');
+    if (pContainerSmall) pContainerSmall.value = settings.price_container_small || 29.99;
+    if (pContainerBig) pContainerBig.value = settings.price_container_big || 49.99;
+    
+    // Gas Cylinder Sizes
+    const pGasSmall = document.getElementById('priceGasSmall');
+    const pGasMedium = document.getElementById('priceGasMedium');
+    const pGasBig = document.getElementById('priceGasBig');
+    if (pGasSmall) pGasSmall.value = settings.price_gas_small || 29.99;
+    if (pGasMedium) pGasMedium.value = settings.price_gas_medium || 34.99;
+    if (pGasBig) pGasBig.value = settings.price_gas_big || 39.99;
 
     console.log('✅ Settings and pricing loaded successfully');
   } catch (error) {
@@ -581,36 +622,63 @@ window.resetAllBookings = async function() {
   }
 };
 
-// ========== SAVE PRICING ==========
+// ========== SAVE PRICING (UPDATED WITH NEW ITEMS) ==========
 window.savePricing = async function() {
   const prices = {
+    // Original items
     price_small: parseFloat(document.getElementById('priceSmall')?.value) || 40,
     price_medium: parseFloat(document.getElementById('priceMedium')?.value) || 50,
     price_big: parseFloat(document.getElementById('priceBig')?.value) || 60,
     price_fridge: parseFloat(document.getElementById('priceFridge')?.value) || 70,
-    price_gas: parseFloat(document.getElementById('priceGas')?.value) || 60
+    price_gas: parseFloat(document.getElementById('priceGas')?.value) || 60,
+    
+    // New: Microwave
+    price_microwave: parseFloat(document.getElementById('priceMicrowave')?.value) || 30,
+    
+    // New: Duffle Bags
+    price_duffle_small: parseFloat(document.getElementById('priceDuffleSmall')?.value) || 29.99,
+    price_duffle_big: parseFloat(document.getElementById('priceDuffleBig')?.value) || 49.99,
+    
+    // New: Jute Bags
+    price_jute_small: parseFloat(document.getElementById('priceJuteSmall')?.value) || 39.99,
+    price_jute_medium: parseFloat(document.getElementById('priceJuteMedium')?.value) || 59.99,
+    price_jute_big: parseFloat(document.getElementById('priceJuteBig')?.value) || 79.99,
+    
+    // New: Traveling Bags
+    price_travel_small: parseFloat(document.getElementById('priceTravelSmall')?.value) || 29.99,
+    price_travel_medium: parseFloat(document.getElementById('priceTravelMedium')?.value) || 49.99,
+    price_travel_big: parseFloat(document.getElementById('priceTravelBig')?.value) || 69.99,
+    
+    // New: Other Containers
+    price_container_small: parseFloat(document.getElementById('priceContainerSmall')?.value) || 29.99,
+    price_container_big: parseFloat(document.getElementById('priceContainerBig')?.value) || 49.99,
+    
+    // New: Gas Cylinder Sizes
+    price_gas_small: parseFloat(document.getElementById('priceGasSmall')?.value) || 29.99,
+    price_gas_medium: parseFloat(document.getElementById('priceGasMedium')?.value) || 34.99,
+    price_gas_big: parseFloat(document.getElementById('priceGasBig')?.value) || 39.99
   };
 
-  const saveButton = document.querySelector('#pricing-section .btn-save');
+  const saveButton = document.querySelector('#pricing-section .btn-save-modern');
   if (saveButton) {
     saveButton.disabled = true;
-    saveButton.textContent = 'Saving...';
+    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
   }
 
   try {
     const result = await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
     if (result?.success) {
-      showMessage('pricingMessage', 'Pricing saved successfully!', 'success');
+      showMessage('pricingMessage', '✅ All prices saved successfully!', 'success');
       await loadAllSettings();
     } else {
       throw new Error(result?.error || 'Save failed');
     }
   } catch (error) {
-    showMessage('pricingMessage', `Error: ${error.message}`, 'error');
+    showMessage('pricingMessage', `❌ Error: ${error.message}`, 'error');
   } finally {
     if (saveButton) {
       saveButton.disabled = false;
-      saveButton.textContent = 'Save Pricing';
+      saveButton.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
     }
   }
 };

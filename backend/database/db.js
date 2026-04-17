@@ -2,9 +2,10 @@
 const { Pool } = require('pg');
 
 // Create a connection pool for PostgreSQL
+// 🔧 FIX: Always use SSL with rejectUnauthorized: false for Render
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/kodak_logistics',
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: { rejectUnauthorized: false }  // ✅ THIS IS THE ONLY CHANGE
 });
 
 // Test the connection

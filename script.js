@@ -1,13 +1,42 @@
-// script.js - COMPLETELY FIXED VERSION
+// script.js - UPDATED WITH ALL NEW ITEMS (Microwave, Duffle, Jute, Travel, Containers, Gas Sizes)
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 
-// Global prices object
+// Global prices object - UPDATED WITH NEW ITEMS
 let prices = {
+  // Original items
   small: 40,
   medium: 50,
   big: 60,
   fridge: 70,
   gas: 60,
+  
+  // NEW: Microwave
+  microwave: 30,
+  
+  // NEW: Duffle Bags
+  duffle_small: 29.99,
+  duffle_big: 49.99,
+  
+  // NEW: Jute Bags
+  jute_small: 39.99,
+  jute_medium: 59.99,
+  jute_big: 79.99,
+  
+  // NEW: Traveling Bags
+  travel_small: 29.99,
+  travel_medium: 49.99,
+  travel_big: 69.99,
+  
+  // NEW: Other Containers
+  container_small: 29.99,
+  container_big: 49.99,
+  
+  // NEW: Gas Cylinder Sizes
+  gas_small: 29.99,
+  gas_medium: 34.99,
+  gas_big: 39.99,
+  
+  // Free item
   free: 0
 };
 
@@ -30,7 +59,6 @@ setTimeout(function() {
 // ===== LOAD BUSINESS SETTINGS (WhatsApp, Email) from PUBLIC endpoint =====
 async function loadBusinessSettings() {
     try {
-        // Using the public contact endpoint (no authentication required)
         const timestamp = Date.now();
         const response = await fetch(`${API_URL}/settings/contact?t=${timestamp}`);
         
@@ -38,26 +66,21 @@ async function loadBusinessSettings() {
             const contactInfo = await response.json();
             console.log('Business settings loaded:', contactInfo);
             
-            // Update WhatsApp links
             const whatsappNumber = contactInfo.whatsapp_number || '233545025296';
             const cleanNumber = whatsappNumber.replace(/\D/g, '');
             
-            // Update floating WhatsApp button
             const whatsappBtn = document.querySelector('.whatsapp-btn');
             if (whatsappBtn) {
                 whatsappBtn.href = `https://wa.me/${cleanNumber}?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage...`;
             }
             
-            // Update footer WhatsApp link
             const footerWhatsapp = document.querySelector('.footer-whatsapp');
             if (footerWhatsapp) {
                 footerWhatsapp.href = `https://wa.me/${cleanNumber}`;
-                // Update the displayed text
                 const displayNumber = cleanNumber.slice(-9);
-                footerWhatsapp.innerHTML = `<span class="icon">💬</span> +233 ${displayNumber}`;
+                footerWhatsapp.innerHTML = `<i class="fab fa-whatsapp"></i> +233 ${displayNumber}`;
             }
             
-            // Update footer email
             const footerEmail = document.querySelector('.footer-email a');
             if (footerEmail && contactInfo.business_email) {
                 footerEmail.href = `mailto:${contactInfo.business_email}`;
@@ -71,8 +94,9 @@ async function loadBusinessSettings() {
     }
 }
 
-// ===== UPDATE PRICE DISPLAYS =====
+// ===== UPDATE PRICE DISPLAYS - UPDATED WITH ALL NEW ITEMS =====
 function updatePriceDisplay() {
+  // Original items
   const smallDisplay = document.getElementById('priceSmallDisplay');
   const mediumDisplay = document.getElementById('priceMediumDisplay');
   const bigDisplay = document.getElementById('priceBigDisplay');
@@ -85,20 +109,89 @@ function updatePriceDisplay() {
   if (fridgeDisplay) fridgeDisplay.textContent = prices.fridge;
   if (gasDisplay) gasDisplay.textContent = prices.gas;
   
+  // NEW: Microwave
+  const microwaveDisplay = document.getElementById('priceMicrowaveDisplay');
+  if (microwaveDisplay) microwaveDisplay.textContent = prices.microwave;
+  
+  // NEW: Duffle Bags
+  const duffleSmallDisplay = document.getElementById('priceDuffleSmallDisplay');
+  const duffleBigDisplay = document.getElementById('priceDuffleBigDisplay');
+  if (duffleSmallDisplay) duffleSmallDisplay.textContent = prices.duffle_small;
+  if (duffleBigDisplay) duffleBigDisplay.textContent = prices.duffle_big;
+  
+  // NEW: Jute Bags
+  const juteSmallDisplay = document.getElementById('priceJuteSmallDisplay');
+  const juteMediumDisplay = document.getElementById('priceJuteMediumDisplay');
+  const juteBigDisplay = document.getElementById('priceJuteBigDisplay');
+  if (juteSmallDisplay) juteSmallDisplay.textContent = prices.jute_small;
+  if (juteMediumDisplay) juteMediumDisplay.textContent = prices.jute_medium;
+  if (juteBigDisplay) juteBigDisplay.textContent = prices.jute_big;
+  
+  // NEW: Traveling Bags
+  const travelSmallDisplay = document.getElementById('priceTravelSmallDisplay');
+  const travelMediumDisplay = document.getElementById('priceTravelMediumDisplay');
+  const travelBigDisplay = document.getElementById('priceTravelBigDisplay');
+  if (travelSmallDisplay) travelSmallDisplay.textContent = prices.travel_small;
+  if (travelMediumDisplay) travelMediumDisplay.textContent = prices.travel_medium;
+  if (travelBigDisplay) travelBigDisplay.textContent = prices.travel_big;
+  
+  // NEW: Other Containers
+  const containerSmallDisplay = document.getElementById('priceContainerSmallDisplay');
+  const containerBigDisplay = document.getElementById('priceContainerBigDisplay');
+  if (containerSmallDisplay) containerSmallDisplay.textContent = prices.container_small;
+  if (containerBigDisplay) containerBigDisplay.textContent = prices.container_big;
+  
+  // NEW: Gas Cylinder Sizes
+  const gasSmallDisplay = document.getElementById('priceGasSmallDisplay');
+  const gasMediumDisplay = document.getElementById('priceGasMediumDisplay');
+  const gasBigDisplay = document.getElementById('priceGasBigDisplay');
+  if (gasSmallDisplay) gasSmallDisplay.textContent = prices.gas_small;
+  if (gasMediumDisplay) gasMediumDisplay.textContent = prices.gas_medium;
+  if (gasBigDisplay) gasBigDisplay.textContent = prices.gas_big;
+  
   updateSelectOptions();
 }
 
-// ===== UPDATE SELECT OPTIONS =====
+// ===== UPDATE SELECT OPTIONS - UPDATED WITH NEW ITEMS =====
 function updateSelectOptions() {
   const selects = document.querySelectorAll('.itemSelect');
   const optionsHtml = `
     <option value="">Select item</option>
-    <option value="small">Small Bag – ₵${prices.small}</option>
-    <option value="medium">Medium Bag – ₵${prices.medium}</option>
-    <option value="big">Big Bag – ₵${prices.big}</option>
-    <option value="fridge">Fridge – ₵${prices.fridge}</option>
-    <option value="gas">Gas Cylinder – ₵${prices.gas}</option>
-    <option value="free">Buckets / Free – ₵0</option>
+    <!-- ORIGINAL ITEMS -->
+    <option value="small">👜 Small Bag – ₵${prices.small}</option>
+    <option value="medium">🎒 Medium Bag – ₵${prices.medium}</option>
+    <option value="big">🧳 Big Bag – ₵${prices.big}</option>
+    <option value="fridge">❄️ Fridge – ₵${prices.fridge}</option>
+    <option value="gas">🔥 Gas Cylinder (Standard) – ₵${prices.gas}</option>
+    
+    <!-- NEW: MICROWAVE -->
+    <option value="microwave">🍿 Microwave – ₵${prices.microwave}</option>
+    
+    <!-- NEW: DUFFLE BAGS -->
+    <option value="duffle_small">🎽 Duffle Bag (Small) – ₵${prices.duffle_small}</option>
+    <option value="duffle_big">🎒 Duffle Bag (Big) – ₵${prices.duffle_big}</option>
+    
+    <!-- NEW: JUTE BAGS -->
+    <option value="jute_small">🌾 Jute Bag (Small) – ₵${prices.jute_small}</option>
+    <option value="jute_medium">🌾 Jute Bag (Medium) – ₵${prices.jute_medium}</option>
+    <option value="jute_big">🌾 Jute Bag (Big) – ₵${prices.jute_big}</option>
+    
+    <!-- NEW: TRAVELING BAGS -->
+    <option value="travel_small">✈️ Traveling Bag (Small) – ₵${prices.travel_small}</option>
+    <option value="travel_medium">✈️ Traveling Bag (Medium) – ₵${prices.travel_medium}</option>
+    <option value="travel_big">✈️ Traveling Bag (Big) – ₵${prices.travel_big}</option>
+    
+    <!-- NEW: OTHER CONTAINERS -->
+    <option value="container_small">📦 Other Container (Small) – ₵${prices.container_small}</option>
+    <option value="container_big">📦 Other Container (Big) – ₵${prices.container_big}</option>
+    
+    <!-- NEW: GAS CYLINDER SIZES -->
+    <option value="gas_small">🔥 Gas Cylinder (Small) – ₵${prices.gas_small}</option>
+    <option value="gas_medium">🔥 Gas Cylinder (Medium) – ₵${prices.gas_medium}</option>
+    <option value="gas_big">🔥 Gas Cylinder (Big) – ₵${prices.gas_big}</option>
+    
+    <!-- FREE ITEM -->
+    <option value="free">📦 Buckets / Small Items – Free</option>
   `;
   
   selects.forEach(select => {
@@ -115,11 +208,13 @@ async function loadPrices() {
     if (response.ok) {
       const serverPrices = await response.json();
       prices = { ...prices, ...serverPrices };
-      console.log('Prices loaded:', prices);
+      console.log('Prices loaded from server:', prices);
       updatePriceDisplay();
+    } else {
+      console.log('Using default prices');
     }
   } catch (error) {
-    console.log('Using default prices');
+    console.log('Network error - using default prices');
   }
 }
 
@@ -130,7 +225,9 @@ function calculateTotal() {
     const select = row.querySelector(".itemSelect");
     const qty = row.querySelector(".quantity");
     if (select && select.value && qty) {
-      total += (prices[select.value] || 0) * (parseInt(qty.value) || 0);
+      const price = prices[select.value] || 0;
+      const quantity = parseInt(qty.value) || 0;
+      total += price * quantity;
     }
   });
   const totalEl = document.getElementById("totalPrice");
@@ -150,12 +247,26 @@ function setupAddItem() {
     newRow.innerHTML = `
       <select class="itemSelect" required>
         <option value="">Select item</option>
-        <option value="small">Small Bag – ₵${prices.small}</option>
-        <option value="medium">Medium Bag – ₵${prices.medium}</option>
-        <option value="big">Big Bag – ₵${prices.big}</option>
-        <option value="fridge">Fridge – ₵${prices.fridge}</option>
-        <option value="gas">Gas Cylinder – ₵${prices.gas}</option>
-        <option value="free">Buckets – Free</option>
+        <option value="small">👜 Small Bag – ₵${prices.small}</option>
+        <option value="medium">🎒 Medium Bag – ₵${prices.medium}</option>
+        <option value="big">🧳 Big Bag – ₵${prices.big}</option>
+        <option value="fridge">❄️ Fridge – ₵${prices.fridge}</option>
+        <option value="gas">🔥 Gas Cylinder (Std) – ₵${prices.gas}</option>
+        <option value="microwave">🍿 Microwave – ₵${prices.microwave}</option>
+        <option value="duffle_small">🎽 Duffle Bag (Small) – ₵${prices.duffle_small}</option>
+        <option value="duffle_big">🎒 Duffle Bag (Big) – ₵${prices.duffle_big}</option>
+        <option value="jute_small">🌾 Jute Bag (Small) – ₵${prices.jute_small}</option>
+        <option value="jute_medium">🌾 Jute Bag (Medium) – ₵${prices.jute_medium}</option>
+        <option value="jute_big">🌾 Jute Bag (Big) – ₵${prices.jute_big}</option>
+        <option value="travel_small">✈️ Travel Bag (Small) – ₵${prices.travel_small}</option>
+        <option value="travel_medium">✈️ Travel Bag (Medium) – ₵${prices.travel_medium}</option>
+        <option value="travel_big">✈️ Travel Bag (Big) – ₵${prices.travel_big}</option>
+        <option value="container_small">📦 Container (Small) – ₵${prices.container_small}</option>
+        <option value="container_big">📦 Container (Big) – ₵${prices.container_big}</option>
+        <option value="gas_small">🔥 Gas (Small) – ₵${prices.gas_small}</option>
+        <option value="gas_medium">🔥 Gas (Medium) – ₵${prices.gas_medium}</option>
+        <option value="gas_big">🔥 Gas (Big) – ₵${prices.gas_big}</option>
+        <option value="free">📦 Buckets – Free</option>
       </select>
       <input type="number" class="quantity" min="1" value="1" required>
       <button type="button" class="remove-btn">✕ Remove</button>
@@ -193,7 +304,7 @@ function setupExistingRows() {
   });
 }
 
-// ===== SETUP FORM =====
+// ===== SETUP FORM SUBMISSION =====
 function setupForm() {
   const form = document.getElementById("bookingForm");
   if (!form) return;
@@ -257,7 +368,6 @@ function setupForm() {
         }
         calculateTotal();
         
-        // Get the latest WhatsApp number from the public contact endpoint
         const contactResponse = await fetch(`${API_URL}/settings/contact?t=${Date.now()}`);
         if (contactResponse.ok) {
           const contactInfo = await contactResponse.json();
@@ -277,6 +387,7 @@ function setupForm() {
         alert("❌ Failed to send booking.");
       }
     } catch (error) {
+      console.error("Booking error:", error);
       alert("Network error. Please use WhatsApp.");
     } finally {
       submitBtn.disabled = false;
@@ -285,9 +396,9 @@ function setupForm() {
   });
 }
 
-// ===== INITIALIZE =====
+// ===== INITIALIZE EVERYTHING =====
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("Page loaded");
+  console.log("🚀 Kodak Logistics - Page loaded");
   
   const dateInput = document.getElementById("date");
   if (dateInput) {
@@ -304,17 +415,17 @@ document.addEventListener("DOMContentLoaded", function() {
   setupExistingRows();
   setupForm();
   
-  // Load prices and business settings
   loadPrices().then(() => {
     calculateTotal();
-    console.log("✅ Script initialized");
+    console.log("✅ Prices loaded and ready");
   });
   
   loadBusinessSettings();
 });
 
-// Make available in console for testing
+// Make functions available in console for testing
 window.prices = prices;
 window.refreshPrices = loadPrices;
 window.updateDisplay = updatePriceDisplay;
 window.refreshBusinessSettings = loadBusinessSettings;
+window.calculateTotal = calculateTotal;

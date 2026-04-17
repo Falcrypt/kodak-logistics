@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>KODAK LOGISTICS | Student Storage & Pickup – KNUST</title>
   <meta name="description" content="Affordable, secure luggage, fridge & student item storage with hostel pickup for KNUST students during vacation."/>
   <meta name="keywords" content="KNUST storage, student luggage Kumasi, fridge storage KNUST, vacation storage Ghana, hostel pickup"/>
@@ -15,6 +15,7 @@
       content: "₵";
       margin-right: 2px;
     }
+    
     /* Ensure images display nicely */
     img {
       max-width: 100%;
@@ -23,12 +24,14 @@
       background-color: #f0f0f0;
       border-radius: 10px;
     }
+    
     /* Make all sections visible */
     section {
       opacity: 1 !important;
       transform: none !important;
     }
-    /* Hero background image - STORAGE FACILITY */
+    
+    /* Hero background image */
     .hero {
       background: linear-gradient(135deg, rgba(139,0,0,0.85), rgba(107,15,26,0.9)),
                   url('https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat fixed;
@@ -40,19 +43,196 @@
       padding: 4rem 2rem;
       position: relative;
     }
-    /* Gallery focus message */
+    
+    /* Gallery intro */
     .gallery-intro {
       text-align: center;
       max-width: 800px;
-      margin: 0 auto 2rem auto;
+      margin: 0 auto 1.5rem auto;
       background: rgba(255,179,71,0.15);
-      padding: 1rem 2rem;
+      padding: 0.75rem 1.5rem;
       border-radius: 60px;
       backdrop-filter: blur(5px);
+      font-size: 0.85rem;
     }
     .gallery-intro i {
       color: #ffb347;
-      margin-right: 10px;
+      margin-right: 8px;
+    }
+    
+    /* ===== MOBILE-FRIENDLY GALLERY SECTION ===== */
+    .image-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+    
+    .gallery-item {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 0.75rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .gallery-item img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .gallery-item h3 {
+      font-size: 0.9rem;
+      color: #ffb347;
+      margin-bottom: 0.25rem;
+    }
+    
+    .gallery-item p {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 0.5rem;
+    }
+    
+    .gallery-item .price-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffb347, #ff8c42);
+      color: #8b0000;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    
+    /* ===== MOBILE-FRIENDLY PRICING CARDS ===== */
+    .price-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    
+    .card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: #ffb347;
+      font-weight: 700;
+    }
+    
+    .card .price {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: white;
+      margin: 0.5rem 0;
+    }
+    
+    .card p {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.8);
+      margin: 0;
+    }
+    
+    .card.highlight {
+      border: 2px solid #ffb347;
+      background: rgba(255,179,71,0.15);
+    }
+    
+    .card.free {
+      background: linear-gradient(135deg, rgba(40,167,69,0.2), rgba(40,167,69,0.1));
+    }
+    
+    /* Mobile: 2 columns */
+    @media (max-width: 480px) {
+      .image-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 0.75rem;
+      }
+      
+      .gallery-item img {
+        height: 100px;
+      }
+      
+      .gallery-item h3 {
+        font-size: 0.8rem;
+      }
+      
+      .gallery-item p {
+        font-size: 0.65rem;
+      }
+      
+      .gallery-item .price-tag {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+      }
+      
+      .price-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 0.75rem;
+      }
+      
+      .card {
+        padding: 0.75rem;
+      }
+      
+      .card h3 {
+        font-size: 0.85rem;
+      }
+      
+      .card .price {
+        font-size: 1.2rem;
+      }
+      
+      .card p {
+        font-size: 0.65rem;
+      }
+    }
+    
+    /* Tablet: 3 columns */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .image-gallery {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .gallery-item img {
+        height: 110px;
+      }
+      
+      .price-cards {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    /* Desktop: 4 columns */
+    @media (min-width: 769px) {
+      .image-gallery {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      
+      .gallery-item img {
+        height: 140px;
+      }
+      
+      .price-cards {
+        grid-template-columns: repeat(4, 1fr);
+      }
     }
   </style>
 </head>
@@ -62,13 +242,13 @@
     <div class="loader">
       <div class="pulse-ring">📦</div>
       <div class="loading-text">KODAK LOGISTICS<span class="loading-dots">...</span></div>
-      </div>
+    </div>
   </div>
 
   <!-- WhatsApp Floating Button -->
   <a href="https://wa.me/233545025296?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage..." 
      class="whatsapp-btn" target="_blank" rel="noopener noreferrer">
-    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+    <i class="fab fa-whatsapp"></i> Chat
   </a>
 
   <!-- Header / Navigation -->
@@ -81,18 +261,18 @@
             <span class="icon-box">🔐</span>
             <span class="icon-box">🚚</span>
           </span>
-          <span class="brand-name">KODAK LOGISTICS</span>
+          <span class="brand-name">KODAK</span>
         </div>
-        <span class="tagline">📍 KNUST – Premium Student Storage</span>
+        <span class="tagline">📍 KNUST Storage</span>
       </div>
 
       <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
 
       <ul class="nav-links">
         <li><a href="#home">Home</a></li>
-        <li><a href="#gallery">What We Store</a></li>
+        <li><a href="#gallery">Items</a></li>
         <li><a href="#prices">Prices</a></li>
-        <li><a href="#book">Book Now</a></li>
+        <li><a href="#book">Book</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
     </nav>
@@ -103,175 +283,214 @@
     <section class="hero" id="home">
       <div class="hero-content">
         <h1>Secure & Affordable<br>Student Storage</h1>
-        <p>Store your bags, fridges, gas cylinders, and essentials safely during vacation — with <strong>free pickup</strong> from your KNUST hostel.</p>
+        <p>Store your items safely during vacation — with <strong>free pickup</strong> from your KNUST hostel.</p>
         <div class="hero-buttons">
-          <a href="#book" class="btn-primary">📦 Book Storage Now</a>
-          <a href="#gallery" class="btn-secondary">📸 See How It Works</a>
+          <a href="#book" class="btn-primary">📦 Book Now</a>
+          <a href="#gallery" class="btn-secondary">📸 See Items</a>
         </div>
-        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-          <span style="background: rgba(255,255,255,0.15); padding: 0.5rem 1rem; border-radius: 50px;">✅ 500+ Students Served</span>
-          <span style="background: rgba(255,255,255,0.15); padding: 0.5rem 1rem; border-radius: 50px;">🔒 24/7 Security</span>
-          <span style="background: rgba(255,255,255,0.15); padding: 0.5rem 1rem; border-radius: 50px;">🚚 Free Pickup</span>
+        <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">✅ 500+ Students</span>
+          <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">🔒 24/7 Security</span>
+          <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">🚚 Free Pickup</span>
         </div>
       </div>
     </section>
 
-    <!-- Image Gallery Section - Focused on STORAGE SERVICE -->
+    <!-- Image Gallery Section -->
     <section class="image-gallery-section" id="gallery">
       <div class="section-header">
-        <h2>📦 What We Store For You</h2>
-        <p>We safely store these items while you're away – pick up when you return</p>
+        <h2>📦 What We Store</h2>
+        <p>We pick up from your hostel, store safely, return when needed</p>
       </div>
       
-      <!-- Clarifying message -->
       <div class="gallery-intro">
-        <i class="fas fa-info-circle"></i> These are examples of items students store with us. We pick them up from your hostel, keep them safe, and return them when you need them.
+        <i class="fas fa-info-circle"></i> Examples of items students store with us
       </div>
       
       <div class="image-gallery">
-        <!-- Large Fridge -->
         <div class="gallery-item">
-          <img src="https://i.pinimg.com/1200x/2a/3f/28/2a3f281be65a174cd98936b0087f1cfa.jpg" alt="Large Fridge" loading="lazy">
-          <h3>❄️ Large Fridges</h3>
-          <p>We store your fridge/freezer safely in our facility.</p>
-          <span class="price-tag">70/semester</span>
+          <img src="https://i.pinimg.com/1200x/2a/3f/28/2a3f281be65a174cd98936b0087f1cfa.jpg" alt="Fridge" loading="lazy">
+          <h3>❄️ Fridges</h3>
+          <p>All sizes stored safely</p>
+          <span class="price-tag">From 70</span>
         </div>
-
-        <!-- Medium Fridge -->
-        <div class="gallery-item">
-          <img src="https://i.pinimg.com/736x/c4/a9/13/c4a91378bcd2c855b186654182c215da.jpg" alt="Medium Fridge" loading="lazy">
-          <h3>🧊 Medium Fridges</h3>
-          <p>Perfect size for student rooms – stored securely.</p>
-          <span class="price-tag">70/semester</span>
-        </div>
-
-        <!-- Small Fridge -->
-        <div class="gallery-item">
-          <img src="https://i.pinimg.com/1200x/1d/dd/a1/1ddda18ab58de891ae9b886fd495ebb9.jpg" alt="Small Fridge" loading="lazy">
-          <h3>🧊 Mini Fridges</h3>
-          <p>Compact coolers stored with care.</p>
-          <span class="price-tag">70/semester</span>
-        </div>
-
-        <!-- Gas Cylinder -->
         <div class="gallery-item">
           <img src="https://i.pinimg.com/736x/53/75/14/5375146956d91b6c351b5ba88316834b.jpg" alt="Gas Cylinder" loading="lazy">
           <h3>🔥 Gas Cylinders</h3>
-          <p>Safe storage for your cooking gas.</p>
-          <span class="price-tag">60/semester</span>
+          <p>Small, Medium, Large</p>
+          <span class="price-tag">From 30</span>
         </div>
-
-        <!-- Ghana Must Go Bags -->
         <div class="gallery-item">
-          <img src="https://i.pinimg.com/736x/9a/a9/dc/9aa9dcde3c05b876119695e4b224050b.jpg" alt="Ghana Must Go" loading="lazy">
-          <h3>👜 Ghana Must Go Bags</h3>
-          <p>Durable woven bags – perfect for clothes & books.</p>
-          <span class="price-tag">40-60/semester</span>
+          <img src="https://i.pinimg.com/736x/9a/a9/dc/9aa9dcde3c05b876119695e4b224050b.jpg" alt="Bags" loading="lazy">
+          <h3>👜 All Bag Types</h3>
+          <p>Ghana Must Go, Suitcases, Duffle, Jute, Travel</p>
+          <span class="price-tag">From 30</span>
         </div>
-
-        <!-- Suitcases -->
-        <div class="gallery-item">
-          <img src="https://i.pinimg.com/1200x/ec/53/26/ec53268450a11844a833b97160907582.jpg" alt="Suitcase" loading="lazy">
-          <h3>🧳 Suitcases & Luggage</h3>
-          <p>All sizes of travel bags stored securely.</p>
-          <span class="price-tag">40-60/semester</span>
-        </div>
-
-        <!-- Ankara / African Print Bags -->
-        <div class="gallery-item">
-          <img src="https://i.pinimg.com/1200x/11/b7/d4/11b7d4e3b132dc15f9e706fb2e4e1cdc.jpg" alt="Ankara Bag" loading="lazy">
-          <h3>🎨 Ankara Travel Bags</h3>
-          <p>Beautiful African print bags – stored safely.</p>
-          <span class="price-tag">50/semester</span>
-        </div>
-
-        <!-- Small Items / Buckets -->
         <div class="gallery-item">
           <img src="https://i.pinimg.com/1200x/f8/ae/91/f8ae91357c119f73993c667fc6082d77.jpg" alt="Small Items" loading="lazy">
-          <h3>📦 Small Items & Buckets</h3>
-          <p>Free storage when stored with paid items.</p>
-          <span class="price-tag">FREE</span>
+          <h3>📦 Small Items</h3>
+          <p>Buckets, Containers, Microwave</p>
+          <span class="price-tag">From 30</span>
         </div>
-      </div>
-      
-      <!-- Storage process explanation -->
-      <div style="text-align: center; margin-top: 2rem; padding: 1rem; background: rgba(255,179,71,0.1); border-radius: 20px; max-width: 800px; margin-left: auto; margin-right: auto;">
-        <p><i class="fas fa-truck" style="color: #ffb347;"></i> <strong>How it works:</strong> We pick up from your hostel → store safely → return when you need it. Simple and secure!</p>
       </div>
     </section>
 
     <!-- Pricing Section -->
     <section class="pricing" id="prices">
       <div class="section-header">
-        <h2>💰 Simple Storage Pricing</h2>
+        <h2>💰 Storage Pricing</h2>
         <p>Pay only for what you store – no hidden fees</p>
       </div>
 
-      <!-- Price Cards -->
       <div class="price-cards">
+        <!-- ORIGINAL ITEMS -->
         <div class="card">
-          <h3>Small Bag</h3>
+          <h3>👜 Small Bag</h3>
           <p class="price" id="priceSmallDisplay">40</p>
           <p>Clothes, books, shoes</p>
         </div>
         <div class="card">
-          <h3>Medium Bag</h3>
+          <h3>🎒 Medium Bag</h3>
           <p class="price" id="priceMediumDisplay">50</p>
           <p>Larger loads</p>
         </div>
         <div class="card">
-          <h3>Big Bag</h3>
+          <h3>🧳 Big Bag</h3>
           <p class="price" id="priceBigDisplay">60</p>
           <p>Maximum capacity</p>
         </div>
         <div class="card highlight">
-          <h3>Fridge</h3>
+          <h3>❄️ Fridge</h3>
           <p class="price" id="priceFridgeDisplay">70</p>
           <p>Temperature controlled</p>
         </div>
         <div class="card">
-          <h3>Gas Cylinder</h3>
+          <h3>🔥 Gas (Std)</h3>
           <p class="price" id="priceGasDisplay">60</p>
-          <p>Any size cooking gas cylinder</p>
+          <p>Standard cylinder</p>
         </div>
+        
+        <!-- NEW: MICROWAVE -->
+        <div class="card">
+          <h3>🍿 Microwave</h3>
+          <p class="price" id="priceMicrowaveDisplay">30</p>
+          <p>Kitchen appliance</p>
+        </div>
+        
+        <!-- NEW: DUFFLE BAGS -->
+        <div class="card">
+          <h3>🎽 Duffle (S)</h3>
+          <p class="price" id="priceDuffleSmallDisplay">30</p>
+          <p>Small duffle bag</p>
+        </div>
+        <div class="card">
+          <h3>🎒 Duffle (B)</h3>
+          <p class="price" id="priceDuffleBigDisplay">50</p>
+          <p>Large duffle bag</p>
+        </div>
+        
+        <!-- NEW: JUTE BAGS -->
+        <div class="card">
+          <h3>🌾 Jute (S)</h3>
+          <p class="price" id="priceJuteSmallDisplay">40</p>
+          <p>Small jute bag</p>
+        </div>
+        <div class="card">
+          <h3>🌾 Jute (M)</h3>
+          <p class="price" id="priceJuteMediumDisplay">60</p>
+          <p>Medium jute bag</p>
+        </div>
+        <div class="card">
+          <h3>🌾 Jute (B)</h3>
+          <p class="price" id="priceJuteBigDisplay">80</p>
+          <p>Large jute bag</p>
+        </div>
+        
+        <!-- NEW: TRAVELING BAGS -->
+        <div class="card">
+          <h3>✈️ Travel (S)</h3>
+          <p class="price" id="priceTravelSmallDisplay">30</p>
+          <p>Small suitcase</p>
+        </div>
+        <div class="card">
+          <h3>✈️ Travel (M)</h3>
+          <p class="price" id="priceTravelMediumDisplay">50</p>
+          <p>Medium suitcase</p>
+        </div>
+        <div class="card">
+          <h3>✈️ Travel (B)</h3>
+          <p class="price" id="priceTravelBigDisplay">70</p>
+          <p>Large suitcase</p>
+        </div>
+        
+        <!-- NEW: OTHER CONTAINERS -->
+        <div class="card">
+          <h3>📦 Container (S)</h3>
+          <p class="price" id="priceContainerSmallDisplay">30</p>
+          <p>Small container/box</p>
+        </div>
+        <div class="card">
+          <h3>📦 Container (B)</h3>
+          <p class="price" id="priceContainerBigDisplay">50</p>
+          <p>Large container/box</p>
+        </div>
+        
+        <!-- NEW: GAS CYLINDER SIZES -->
+        <div class="card">
+          <h3>🔥 Gas (S)</h3>
+          <p class="price" id="priceGasSmallDisplay">30</p>
+          <p>Small gas cylinder</p>
+        </div>
+        <div class="card">
+          <h3>🔥 Gas (M)</h3>
+          <p class="price" id="priceGasMediumDisplay">35</p>
+          <p>Medium gas cylinder</p>
+        </div>
+        <div class="card">
+          <h3>🔥 Gas (B)</h3>
+          <p class="price" id="priceGasBigDisplay">40</p>
+          <p>Large gas cylinder</p>
+        </div>
+        
+        <!-- FREE ITEM -->
         <div class="card free">
-          <h3>Buckets</h3>
+          <h3>📦 Buckets</h3>
           <p class="price">0</p>
-          <p>Free with any paid item</p>
+          <p>Free with paid item</p>
         </div>
       </div>
     </section>
 
-    <!-- How It Works Section (NEW) -->
-    <section style="background: rgba(0,0,0,0.2); padding: 3rem 5%; text-align: center;">
+    <!-- How It Works Section -->
+    <section style="background: rgba(0,0,0,0.2); padding: 2rem 5%; text-align: center;">
       <div class="section-header">
         <h2>⚡ How It Works</h2>
-        <p>Three simple steps to stress‑free storage</p>
+        <p>Three simple steps</p>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto;">
-        <div style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 2rem;">
-          <div style="font-size: 3rem;">📝</div>
-          <h3 style="color: #ffb347;">1. Book Online</h3>
-          <p>Fill the booking form with your details and items.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 800px; margin: 0 auto;">
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;">
+          <div style="font-size: 2rem;">📝</div>
+          <h3 style="color: #ffb347; font-size: 1rem;">1. Book Online</h3>
+          <p style="font-size: 0.85rem;">Fill the booking form</p>
         </div>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 2rem;">
-          <div style="font-size: 3rem;">🚚</div>
-          <h3 style="color: #ffb347;">2. Free Pickup</h3>
-          <p>We pick up your items from your hostel on the scheduled date.</p>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;">
+          <div style="font-size: 2rem;">🚚</div>
+          <h3 style="color: #ffb347; font-size: 1rem;">2. Free Pickup</h3>
+          <p style="font-size: 0.85rem;">From your hostel</p>
         </div>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 2rem;">
-          <div style="font-size: 3rem;">🔒</div>
-          <h3 style="color: #ffb347;">3. Safe Storage</h3>
-          <p>Your items are stored securely and returned when you need them.</p>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;">
+          <div style="font-size: 2rem;">🔒</div>
+          <h3 style="color: #ffb347; font-size: 1rem;">3. Safe Storage</h3>
+          <p style="font-size: 0.85rem;">Securely stored</p>
         </div>
       </div>
     </section>
 
-    <!-- Booking Section (FULL FORM) -->
+    <!-- Booking Section -->
     <section class="booking" id="book">
       <div class="section-header">
-        <h2>📋 Book Your Storage</h2>
-        <p>Fill the form — we'll confirm within hours & give you a unique reference ID</p>
+        <h2>📋 Book Storage</h2>
+        <p>Fill the form — we'll confirm with a reference ID</p>
       </div>
 
       <form class="booking-form" id="bookingForm">
@@ -281,18 +500,18 @@
         </div>
 
         <div class="form-group">
-          <label for="email">Email Address *</label>
+          <label for="email">Email *</label>
           <input type="email" id="email" name="email" required placeholder="your@email.com">
         </div>
 
         <div class="form-group">
-          <label for="phone">Phone (WhatsApp) *</label>
+          <label for="phone">WhatsApp Number *</label>
           <input type="tel" id="phone" name="phone" required placeholder="0545025296">
         </div>
 
         <div class="form-group">
           <label for="hostel">Hostel / Location *</label>
-          <input type="text" id="hostel" name="hostel" required placeholder="e.g., Unity Hall, Q-block">
+          <input type="text" id="hostel" name="hostel" required placeholder="e.g., Unity Hall">
         </div>
 
         <div class="form-row">
@@ -300,7 +519,6 @@
             <label for="date">Pickup Date *</label>
             <input type="date" id="date" name="date" required>
           </div>
-
           <div class="form-group">
             <label for="time">Pickup Time *</label>
             <input type="time" id="time" name="time" required>
@@ -314,12 +532,26 @@
             <div class="item-row">
               <select class="itemSelect" required>
                 <option value="">Select item type</option>
-                <option value="small">Small Bag – ₵40</option>
-                <option value="medium">Medium Bag – ₵50</option>
-                <option value="big">Big Bag – ₵60</option>
-                <option value="fridge">Fridge – ₵70</option>
-                <option value="gas">Gas Cylinder - ₵60</option>
-                <option value="free">Buckets / Small Items – Free</option>
+                <option value="small">👜 Small Bag – ₵40</option>
+                <option value="medium">🎒 Medium Bag – ₵50</option>
+                <option value="big">🧳 Big Bag – ₵60</option>
+                <option value="fridge">❄️ Fridge – ₵70</option>
+                <option value="gas">🔥 Gas Cylinder (Std) – ₵60</option>
+                <option value="microwave">🍿 Microwave – ₵30</option>
+                <option value="duffle_small">🎽 Duffle Bag (Small) – ₵30</option>
+                <option value="duffle_big">🎒 Duffle Bag (Big) – ₵50</option>
+                <option value="jute_small">🌾 Jute Bag (Small) – ₵40</option>
+                <option value="jute_medium">🌾 Jute Bag (Medium) – ₵60</option>
+                <option value="jute_big">🌾 Jute Bag (Big) – ₵80</option>
+                <option value="travel_small">✈️ Travel Bag (Small) – ₵30</option>
+                <option value="travel_medium">✈️ Travel Bag (Medium) – ₵50</option>
+                <option value="travel_big">✈️ Travel Bag (Big) – ₵70</option>
+                <option value="container_small">📦 Container (Small) – ₵30</option>
+                <option value="container_big">📦 Container (Big) – ₵50</option>
+                <option value="gas_small">🔥 Gas Cylinder (Small) – ₵30</option>
+                <option value="gas_medium">🔥 Gas Cylinder (Medium) – ₵35</option>
+                <option value="gas_big">🔥 Gas Cylinder (Big) – ₵40</option>
+                <option value="free">📦 Buckets – Free</option>
               </select>
               <input type="number" class="quantity" min="1" value="1" required>
               <button type="button" class="remove-btn" style="display: none;">✕</button>
@@ -329,8 +561,8 @@
         </div>
 
         <div class="form-group">
-          <label for="description">Special Instructions (optional)</label>
-          <textarea id="description" name="description" rows="4" placeholder="e.g., fragile items, specific pickup instructions..."></textarea>
+          <label for="description">Special Instructions</label>
+          <textarea id="description" rows="3" placeholder="e.g., fragile items, specific pickup instructions..."></textarea>
         </div>
 
         <div class="total-section">
@@ -346,8 +578,8 @@
     <!-- FAQ Section -->
     <section class="faq" id="faq">
       <div class="section-header">
-        <h2>❓ Frequently Asked Questions</h2>
-        <p>Everything you need to know about our storage service</p>
+        <h2>❓ FAQ</h2>
+        <p>Everything you need to know</p>
       </div>
       
       <div class="faq-content">
@@ -355,25 +587,17 @@
           <summary>When do I pay?</summary>
           <p>Payment is made on pickup day. We accept MTN MoMo, Vodafone Cash, and cash.</p>
         </details>
-        
         <details>
           <summary>Is my stuff safe?</summary>
-          <p>Yes! 24/7 monitored facility with security cameras and guards. Your items are insured.</p>
+          <p>Yes! 24/7 monitored facility with security cameras and guards.</p>
         </details>
-        
         <details>
           <summary>Can I get items back early?</summary>
-          <p>Yes, just contact us 24 hours in advance. Early retrieval fee may apply.</p>
+          <p>Yes, just contact us 24 hours in advance.</p>
         </details>
-        
-        <details>
-          <summary>Do you store during all breaks?</summary>
-          <p>Yes! Christmas, Easter, and mid-semester breaks. We're here year-round.</p>
-        </details>
-
         <details>
           <summary>What is the reference ID?</summary>
-          <p>After booking, you'll receive a unique ID (e.g., KDL-000123). Keep it – you'll use it to quickly retrieve your items.</p>
+          <p>You'll receive a unique ID (e.g., KDL-000123) to retrieve your items.</p>
         </details>
       </div>
     </section>
@@ -381,7 +605,7 @@
 
   <footer>
     <div class="footer-content">
-      <div class="footer-logo">KODAK LOGISTICS</div>
+      <div class="footer-logo">KODAK</div>
       <p class="footer-tag">Your Trusted KNUST Storage Partner</p>
       
       <div class="footer-contact">
@@ -392,13 +616,11 @@
         <p class="footer-email">Email: <a href="mailto:Philiptesimbo@gmail.com">Philiptesimbo@gmail.com</a></p>
       </div>
 
-      <p class="footer-copyright">
-        © 2026 Kodak Logistics – Proudly serving KNUST students
-      </p>
+      <p class="footer-copyright">© 2026 Kodak Logistics – KNUST</p>
     </div>
   </footer>
 
-  <!-- Font Awesome for icons -->
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   
   <!-- Scripts -->
