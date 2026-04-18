@@ -43,7 +43,7 @@ body {
     min-height: 100vh;
     line-height: 1.6;
     overflow-x: hidden;
-    font-size: 1rem
+    font-size: 1rem;
 }
 
 /* ========== LOADER ANIMATION ========== */
@@ -619,81 +619,6 @@ section.visible {
     display: inline-block;
 }
 
-/* ========== PRICING CARDS ========== */
-.price-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-.card {
-    padding: 3rem 2rem;
-    border-radius: 30px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-lg);
-    transition: var(--transition-medium);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 179, 71, 0.1), transparent);
-    opacity: 0;
-    transition: var(--transition-medium);
-    transform: rotate(45deg);
-}
-
-.card:hover {
-    transform: translateY(-20px) scale(1.03);
-    border-color: var(--accent-gold);
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
-}
-
-.card:hover::before {
-    opacity: 1;
-    transform: rotate(45deg) scale(1.2);
-}
-
-.card.highlight {
-    border: 3px solid var(--accent-gold);
-    background: rgba(255, 179, 71, 0.1);
-    transform: scale(1.05);
-}
-
-.card.free {
-    background: linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(40, 167, 69, 0.1));
-}
-
-.card h3 {
-    color: var(--accent-gold);
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.price {
-    font-size: 3.5rem;
-    font-weight: 900;
-    color: var(--white);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.price::before {
-  content: "₵";
-  margin-right: 2px;
-}
-
 /* ========== BOOKING FORM ========== */
 .booking-form {
     max-width: 800px;
@@ -784,16 +709,15 @@ section.visible {
     transform: scale(1.1);
 }
 
-    /* Items section spacing - prevents overlap */
-    .items-section {
-      position: relative;
-      margin-bottom: 2rem;
-    }
-    
-    .items-section + .form-group {
-      margin-top: 0.5rem;
-      clear: both;
-    }
+.items-section {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.items-section + .form-group {
+    margin-top: 0.5rem;
+    clear: both;
+}
 
 .add-btn {
     background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
@@ -1020,28 +944,28 @@ footer {
 
 @media (max-width: 768px) {
     html {
-        font-size: 16px;
+        font-size: 18px;
     }
     
     .hero h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
     }
     
     .hero p {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
     
     .btn-primary, .btn-secondary {
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
+        padding: 0.9rem 1.8rem;
+        font-size: 1rem;
     }
     
     .section-header h2 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     
     .section-header p {
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
     
     .gallery-item {
@@ -1049,11 +973,11 @@ footer {
     }
     
     .gallery-item h3 {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
     }
     
     .gallery-item p {
-        font-size: 0.65rem;
+        font-size: 0.75rem;
     }
     
     .gallery-item img {
@@ -1065,41 +989,160 @@ footer {
     }
     
     .form-group label {
-        font-size: 0.9rem;
+        font-size: 1rem;
+        font-weight: 600;
     }
     
     .booking-form input,
     .booking-form select,
     .booking-form textarea {
-        padding: 0.7rem 1rem;
-        font-size: 0.85rem;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
     }
     
     .add-btn {
-        padding: 0.6rem 1.5rem;
-        font-size: 0.9rem;
+        padding: 0.8rem 1.8rem;
+        font-size: 1rem;
     }
     
     .total-section p {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
     }
     
     .faq-content summary {
-        font-size: 0.9rem;
+        font-size: 1rem;
         padding: 1rem 1.5rem;
     }
     
     .footer-logo {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     
     .footer-tag {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
     
     .footer-whatsapp {
-        padding: 0.7rem 1.5rem;
+        padding: 0.8rem 1.8rem;
+        font-size: 1rem;
+    }
+    
+    .custom-select-trigger {
+        padding: 0.8rem 1rem;
+    }
+    
+    .trigger-text {
+        font-size: 1rem;
+    }
+    
+    .custom-option .option-name {
+        font-size: 0.95rem;
+    }
+    
+    .custom-option .option-price {
         font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 16px;
+    }
+    
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero p {
+        font-size: 0.95rem;
+    }
+    
+    .hero-buttons {
+        gap: 0.8rem;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 0.7rem 1.4rem;
+        font-size: 0.9rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.6rem;
+    }
+    
+    .section-header p {
+        font-size: 0.85rem;
+    }
+    
+    .gallery-item {
+        padding: 0.8rem;
+    }
+    
+    .gallery-item h3 {
+        font-size: 0.8rem;
+    }
+    
+    .gallery-item p {
+        font-size: 0.65rem;
+    }
+    
+    .gallery-item img {
+        height: 100px;
+    }
+    
+    .booking-form {
+        padding: 1.2rem;
+    }
+    
+    .form-group label {
+        font-size: 0.95rem;
+    }
+    
+    .booking-form input,
+    .booking-form select,
+    .booking-form textarea,
+    .custom-select-trigger {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .trigger-text {
+        font-size: 0.85rem;
+    }
+    
+    .add-btn {
+        padding: 0.6rem 1.4rem;
+        font-size: 0.9rem;
+    }
+    
+    .total-section p {
+        font-size: 1.3rem;
+    }
+    
+    .faq-content summary {
+        font-size: 0.9rem;
+        padding: 0.8rem 1.2rem;
+    }
+    
+    .footer-logo {
+        font-size: 1.6rem;
+    }
+    
+    .footer-tag {
+        font-size: 0.9rem;
+    }
+    
+    .footer-whatsapp {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .custom-option .option-name {
+        font-size: 0.85rem;
+    }
+    
+    .custom-option .option-price {
+        font-size: 0.8rem;
     }
 }
 
@@ -1125,278 +1168,175 @@ img {
 
 /* Fancy Loader */
 #loading {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(135deg, #8b0000, #b30000);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  transition: opacity 0.8s ease, visibility 0.8s ease;
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #8b0000, #b30000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
 }
 
 #loading.hidden {
-  opacity: 0;
-  visibility: hidden;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .loader {
-  text-align: center;
+    text-align: center;
 }
 
 .logo-loader {
-  font-size: 4rem;
-  animation: bounce 1s ease-in-out infinite;
+    font-size: 4rem;
+    animation: bounce 1s ease-in-out infinite;
 }
 
 .pulse-ring {
-  width: 80px;
-  height: 80px;
-  background: #ffb347;
-  border-radius: 50%;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #8b0000;
-  animation: pulse 1.5s ease-in-out infinite;
+    width: 80px;
+    height: 80px;
+    background: #ffb347;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #8b0000;
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
 .loading-text {
-  margin-top: 20px;
-  font-size: 1.2rem;
-  letter-spacing: 2px;
-  color: #ffb347;
-  font-weight: bold;
+    margin-top: 20px;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    color: #ffb347;
+    font-weight: bold;
 }
 
 .loading-dots {
-  display: inline-block;
-  animation: blink 1.4s step-start infinite;
+    display: inline-block;
+    animation: blink 1.4s step-start infinite;
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(255, 179, 71, 0.7);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 15px rgba(255, 179, 71, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(255, 179, 71, 0);
-  }
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 179, 71, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 15px rgba(255, 179, 71, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 179, 71, 0);
+    }
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
 }
 
-/* Extra small devices (phones under 480px) */
-@media (max-width: 480px) {
-    html {
-        font-size: 14px;
-    }
-
-    @media (max-width: 480px) {
-    html {
-        font-size: 14px;
-    }
-    
-    /* Add these for larger inputs */
-    .booking-form input,
-    .booking-form select,
-    .booking-form textarea,
-    .custom-select-trigger {
-        padding: 0.8rem 1rem !important;
-        font-size: 0.9rem !important;
-    }
-    
-    .form-group label {
-        font-size: 0.95rem !important;
-    }
-    
-    .add-btn {
-        padding: 0.7rem 1.5rem !important;
-        font-size: 0.95rem !important;
-    }
-    
-    .trigger-text {
-        font-size: 0.85rem !important;
-    }
-}
-    
-    .hero h1 {
-        font-size: 1.8rem;
-    }
-    
-    .hero p {
-        font-size: 0.9rem;
-    }
-    
-    .hero-buttons {
-        gap: 0.8rem;
-    }
-    
-    .btn-primary, .btn-secondary {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.8rem;
-    }
-    
-    .section-header h2 {
-        font-size: 1.5rem;
-    }
-    
-    .gallery-item h3 {
-        font-size: 0.7rem;
-    }
-    
-    .gallery-item p {
-        font-size: 0.55rem;
-    }
-    
-    .form-group label {
-        font-size: 0.8rem;
-    }
-    
-    .booking-form input,
-    .booking-form select,
-    .booking-form textarea {
-        padding: 0.6rem 0.8rem;
-        font-size: 0.75rem;
-    }
-    
-    .custom-select-trigger {
-        padding: 0.5rem 0.8rem;
-    }
-    
-    .trigger-text {
-        font-size: 0.7rem;
-    }
-    
-    .add-btn {
-        padding: 0.5rem 1.2rem;
-        font-size: 0.8rem;
-    }
-    
-    .total-section p {
-        font-size: 1.2rem;
-    }
-}
-
-/* ===== OVERRIDE FOR DROPDOWN - NO TRANSPARENCY ===== */
+/* ===== DROPDOWN OVERRIDES - NO TRANSPARENCY ===== */
 .custom-select-dropdown,
 .custom-select-dropdown *,
 .custom-option,
 .custom-option * {
-  background: #3a0000 !important;
-  background-color: #3a0000 !important;
-  backdrop-filter: none !important;
-  opacity: 1 !important;
+    background: #8b0000 !important;
+    background-color: #8b0000 !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
 }
 
 .custom-select-dropdown {
-  background: #3a0000 !important;
-  backdrop-filter: none !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    background: #8b0000 !important;
+    backdrop-filter: none !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    border: 2px solid #ffb347 !important;
 }
 
 .custom-option {
-  background: #3a0000 !important;
-  backdrop-filter: none !important;
+    background: #8b0000 !important;
+    backdrop-filter: none !important;
+    border-bottom: 1px solid rgba(255,179,71,0.3) !important;
 }
 
 .custom-option:hover {
-  background: #8b0000 !important;
+    background: #a52a2a !important;
 }
 
 .custom-option .option-name,
 .custom-option .option-price {
-  background: transparent !important;
-  color: white;
+    background: transparent !important;
+    color: white;
 }
 
 .custom-option .option-price {
-  color: #ffb347 !important;
+    color: #ffb347 !important;
 }
 
 /* Fix cursor */
 .custom-option,
 .custom-option * {
-  cursor: pointer !important;
+    cursor: pointer !important;
 }
 
-/* ===== FIX DROPDOWN OVERLAP ===== */
+/* ===== DROPDOWN POSITIONING FIXES ===== */
 .custom-select-dropdown {
-  position: absolute !important;
-  top: 100% !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 999999 !important;
-  background: #2a0000 !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 999999 !important;
+    max-height: 250px !important;
+    overflow-y: auto !important;
 }
 
-/* Make sure the items section has enough space */
 .items-section {
-  position: relative !important;
-  z-index: 10 !important;
-  margin-bottom: 3rem !important;
+    position: relative !important;
+    z-index: 100 !important;
+    margin-bottom: 3rem !important;
 }
 
-/* Ensure the dropdown doesn't push content */
 .custom-select-wrapper {
-  position: relative !important;
-  z-index: 100 !important;
+    position: relative !important;
+    z-index: 100 !important;
 }
 
-/* Fix for the Special Instructions not appearing inside dropdown */
-.form-group:has(.custom-select-wrapper) {
-  position: relative;
-  z-index: 5;
-}
-
-/* Ensure the dropdown stays above everything when open */
 .custom-select-wrapper.open {
-  z-index: 999999 !important;
+    z-index: 999999 !important;
 }
 
-/* ===== FINAL DROPDOWN FIX ===== */
-.custom-select-dropdown {
-  max-height: 250px !important;
-  overflow-y: auto !important;
-  position: absolute !important;
-  top: 100% !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 999999 !important;
-}
-
-/* Ensure the items section has enough space for dropdown */
-.items-section {
-  position: relative !important;
-  z-index: 100 !important;
-  margin-bottom: 3rem !important;
-}
-
-/* Make sure Special Instructions stays below */
 .form-group:has(textarea) {
-  position: relative !important;
-  z-index: 1 !important;
-  clear: both !important;
-  margin-top: 1rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+    clear: both !important;
+    margin-top: 1rem !important;
 }
 
-/* Close dropdown when scrolling away */
-.custom-select-wrapper {
-  position: relative !important;
+/* Make trigger more visible */
+.custom-select-trigger {
+    background: rgba(255,255,255,0.15) !important;
+    border: 1px solid #ffb347 !important;
+}
+
+.custom-select-trigger:hover {
+    background: rgba(255,255,255,0.25) !important;
+}
+
+.trigger-text {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+.trigger-arrow {
+    color: #ffb347 !important;
 }
