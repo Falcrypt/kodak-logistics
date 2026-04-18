@@ -1020,7 +1020,7 @@ footer {
 
 @media (max-width: 768px) {
     html {
-        font-size: 14px;
+        font-size: 16px;
     }
     
     .hero h1 {
@@ -1205,8 +1205,36 @@ img {
 /* Extra small devices (phones under 480px) */
 @media (max-width: 480px) {
     html {
-        font-size: 12px;
+        font-size: 14px;
     }
+
+    @media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+    
+    /* Add these for larger inputs */
+    .booking-form input,
+    .booking-form select,
+    .booking-form textarea,
+    .custom-select-trigger {
+        padding: 0.8rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .form-group label {
+        font-size: 0.95rem !important;
+    }
+    
+    .add-btn {
+        padding: 0.7rem 1.5rem !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .trigger-text {
+        font-size: 0.85rem !important;
+    }
+}
     
     .hero h1 {
         font-size: 1.8rem;
