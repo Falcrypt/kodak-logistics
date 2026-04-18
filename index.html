@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
   <title>KODAK LOGISTICS | Student Storage & Pickup – KNUST</title>
   <meta name="description" content="Affordable, secure luggage, fridge & student item storage with hostel pickup for KNUST students during vacation."/>
   <meta name="keywords" content="KNUST storage, student luggage Kumasi, fridge storage KNUST, vacation storage Ghana, hostel pickup"/>
@@ -496,48 +499,48 @@
     }
 
     /* ===== BRIGHTER DROPDOWN - MORE VISIBLE ===== */
-.custom-select-dropdown {
-  background: #8b0000 !important;
-  border: 2px solid #ffb347 !important;
-}
+    .custom-select-dropdown {
+      background: #8b0000 !important;
+      border: 2px solid #ffb347 !important;
+    }
 
-.custom-option {
-  background: #8b0000 !important;
-  border-bottom: 1px solid rgba(255,179,71,0.3) !important;
-}
+    .custom-option {
+      background: #8b0000 !important;
+      border-bottom: 1px solid rgba(255,179,71,0.3) !important;
+    }
 
-.custom-option:hover {
-  background: #a52a2a !important;
-}
+    .custom-option:hover {
+      background: #a52a2a !important;
+    }
 
-.custom-option .option-name {
-  color: #ffffff !important;
-  font-weight: 500 !important;
-}
+    .custom-option .option-name {
+      color: #ffffff !important;
+      font-weight: 500 !important;
+    }
 
-.custom-option .option-price {
-  color: #ffb347 !important;
-  font-weight: bold !important;
-}
+    .custom-option .option-price {
+      color: #ffb347 !important;
+      font-weight: bold !important;
+    }
 
-/* Make the trigger/selected item more visible */
-.custom-select-trigger {
-  background: rgba(255,255,255,0.15) !important;
-  border: 1px solid #ffb347 !important;
-}
+    /* Make the trigger/selected item more visible */
+    .custom-select-trigger {
+      background: rgba(255,255,255,0.15) !important;
+      border: 1px solid #ffb347 !important;
+    }
 
-.custom-select-trigger:hover {
-  background: rgba(255,255,255,0.25) !important;
-}
+    .custom-select-trigger:hover {
+      background: rgba(255,255,255,0.25) !important;
+    }
 
-.trigger-text {
-  color: #ffffff !important;
-  font-weight: 500 !important;
-}
+    .trigger-text {
+      color: #ffffff !important;
+      font-weight: 500 !important;
+    }
 
-.trigger-arrow {
-  color: hsl(35, 100%, 64%) !important;
-}
+    .trigger-arrow {
+      color: #ffb347 !important;
+    }
   </style>
 </head>
 <body>
@@ -855,49 +858,49 @@
       });
     }
     
-// ===== DYNAMIC CATEGORY ITEMS - Gets prices from global prices object =====
-function getCategoryItems() {
-  return {
-    duffle: [
-      { name: "Duffle Bag (Small)", key: "duffle_small", price: (typeof prices !== 'undefined' && prices.duffle_small) ? prices.duffle_small : 29.99, image: "images/duffle-small.jpg" },
-      { name: "Duffle Bag (Big)", key: "duffle_big", price: (typeof prices !== 'undefined' && prices.duffle_big) ? prices.duffle_big : 49.99, image: "images/duffle-big.jpg" }
-    ],
-    jute: [
-      { name: "Jute Bag (Small)", key: "jute_small", price: (typeof prices !== 'undefined' && prices.jute_small) ? prices.jute_small : 39.99, image: "images/jute-small.jpg" },
-      { name: "Jute Bag (Medium)", key: "jute_medium", price: (typeof prices !== 'undefined' && prices.jute_medium) ? prices.jute_medium : 59.99, image: "images/jute-medium.jpg" },
-      { name: "Jute Bag (Big)", key: "jute_big", price: (typeof prices !== 'undefined' && prices.jute_big) ? prices.jute_big : 79.99, image: "images/jute-big.jpg" }
-    ],
-    travel: [
-      { name: "Traveling Bag (Small)", key: "travel_small", price: (typeof prices !== 'undefined' && prices.travel_small) ? prices.travel_small : 29.99, image: "images/travel-small.jpg" },
-      { name: "Traveling Bag (Medium)", key: "travel_medium", price: (typeof prices !== 'undefined' && prices.travel_medium) ? prices.travel_medium : 49.99, image: "images/travel-medium.jpg" },
-      { name: "Traveling Bag (Big)", key: "travel_big", price: (typeof prices !== 'undefined' && prices.travel_big) ? prices.travel_big : 69.99, image: "images/travel-big.jpg" }
-    ],
-    microwave: [
-      { name: "Microwave", key: "microwave", price: (typeof prices !== 'undefined' && prices.microwave) ? prices.microwave : 30, image: "images/microwave.jpg" }
-    ],
-    fridge_tabletop: [
-      { name: "Fridge (Table Top)", key: "fridge_tabletop", price: (typeof prices !== 'undefined' && prices.fridge_tabletop) ? prices.fridge_tabletop : 59.99, image: "images/fridge-tabletop.jpg" }
-    ],
-    fridge_doubledoor: [
-      { name: "Fridge (Double Door)", key: "fridge_doubledoor", price: (typeof prices !== 'undefined' && prices.fridge_doubledoor) ? prices.fridge_doubledoor : 79.99, image: "images/fridge-doubledoor.jpg" }
-    ],
-    fridge_small: [
-      { name: "Fridge (Small)", key: "fridge_small", price: (typeof prices !== 'undefined' && prices.fridge_small) ? prices.fridge_small : 39.99, image: "images/fridge-small.jpg" }
-    ],
-    gas: [
-      { name: "Gas Cylinder (Small)", key: "gas_small", price: (typeof prices !== 'undefined' && prices.gas_small) ? prices.gas_small : 29.99, image: "images/gas-small.jpg" },
-      { name: "Gas Cylinder (Medium)", key: "gas_medium", price: (typeof prices !== 'undefined' && prices.gas_medium) ? prices.gas_medium : 34.99, image: "images/gas-medium.jpg" },
-      { name: "Gas Cylinder (Big)", key: "gas_big", price: (typeof prices !== 'undefined' && prices.gas_big) ? prices.gas_big : 39.99, image: "images/gas-big.jpg" }
-    ],
-    container: [
-      { name: "Container (Small)", key: "container_small", price: (typeof prices !== 'undefined' && prices.container_small) ? prices.container_small : 29.99, image: "images/container-small.jpg" },
-      { name: "Container (Big)", key: "container_big", price: (typeof prices !== 'undefined' && prices.container_big) ? prices.container_big : 49.99, image: "images/container-big.jpg" }
-    ],
-    buckets: [
-      { name: "Buckets", key: "buckets", price: (typeof prices !== 'undefined' && prices.buckets) ? prices.buckets : 0, image: "images/buckets.jpg" }
-    ]
-  };
-}
+    // ===== DYNAMIC CATEGORY ITEMS - Gets prices from global prices object =====
+    function getCategoryItems() {
+      return {
+        duffle: [
+          { name: "Duffle Bag (Small)", key: "duffle_small", price: (typeof prices !== 'undefined' && prices.duffle_small) ? prices.duffle_small : 29.99, image: "images/duffle-small.jpg" },
+          { name: "Duffle Bag (Big)", key: "duffle_big", price: (typeof prices !== 'undefined' && prices.duffle_big) ? prices.duffle_big : 49.99, image: "images/duffle-big.jpg" }
+        ],
+        jute: [
+          { name: "Jute Bag (Small)", key: "jute_small", price: (typeof prices !== 'undefined' && prices.jute_small) ? prices.jute_small : 39.99, image: "images/jute-small.jpg" },
+          { name: "Jute Bag (Medium)", key: "jute_medium", price: (typeof prices !== 'undefined' && prices.jute_medium) ? prices.jute_medium : 59.99, image: "images/jute-medium.jpg" },
+          { name: "Jute Bag (Big)", key: "jute_big", price: (typeof prices !== 'undefined' && prices.jute_big) ? prices.jute_big : 79.99, image: "images/jute-big.jpg" }
+        ],
+        travel: [
+          { name: "Traveling Bag (Small)", key: "travel_small", price: (typeof prices !== 'undefined' && prices.travel_small) ? prices.travel_small : 29.99, image: "images/travel-small.jpg" },
+          { name: "Traveling Bag (Medium)", key: "travel_medium", price: (typeof prices !== 'undefined' && prices.travel_medium) ? prices.travel_medium : 49.99, image: "images/travel-medium.jpg" },
+          { name: "Traveling Bag (Big)", key: "travel_big", price: (typeof prices !== 'undefined' && prices.travel_big) ? prices.travel_big : 69.99, image: "images/travel-big.jpg" }
+        ],
+        microwave: [
+          { name: "Microwave", key: "microwave", price: (typeof prices !== 'undefined' && prices.microwave) ? prices.microwave : 30, image: "images/microwave.jpg" }
+        ],
+        fridge_tabletop: [
+          { name: "Fridge (Table Top)", key: "fridge_tabletop", price: (typeof prices !== 'undefined' && prices.fridge_tabletop) ? prices.fridge_tabletop : 59.99, image: "images/fridge-tabletop.jpg" }
+        ],
+        fridge_doubledoor: [
+          { name: "Fridge (Double Door)", key: "fridge_doubledoor", price: (typeof prices !== 'undefined' && prices.fridge_doubledoor) ? prices.fridge_doubledoor : 79.99, image: "images/fridge-doubledoor.jpg" }
+        ],
+        fridge_small: [
+          { name: "Fridge (Small)", key: "fridge_small", price: (typeof prices !== 'undefined' && prices.fridge_small) ? prices.fridge_small : 39.99, image: "images/fridge-small.jpg" }
+        ],
+        gas: [
+          { name: "Gas Cylinder (Small)", key: "gas_small", price: (typeof prices !== 'undefined' && prices.gas_small) ? prices.gas_small : 29.99, image: "images/gas-small.jpg" },
+          { name: "Gas Cylinder (Medium)", key: "gas_medium", price: (typeof prices !== 'undefined' && prices.gas_medium) ? prices.gas_medium : 34.99, image: "images/gas-medium.jpg" },
+          { name: "Gas Cylinder (Big)", key: "gas_big", price: (typeof prices !== 'undefined' && prices.gas_big) ? prices.gas_big : 39.99, image: "images/gas-big.jpg" }
+        ],
+        container: [
+          { name: "Container (Small)", key: "container_small", price: (typeof prices !== 'undefined' && prices.container_small) ? prices.container_small : 29.99, image: "images/container-small.jpg" },
+          { name: "Container (Big)", key: "container_big", price: (typeof prices !== 'undefined' && prices.container_big) ? prices.container_big : 49.99, image: "images/container-big.jpg" }
+        ],
+        buckets: [
+          { name: "Buckets", key: "buckets", price: (typeof prices !== 'undefined' && prices.buckets) ? prices.buckets : 0, image: "images/buckets.jpg" }
+        ]
+      };
+    }
     
     const categoryTitles = {
       duffle: "🎒 Duffle Bags", jute: "🌾 Jute Bags", travel: "✈️ Travel Bags", microwave: "🍿 Microwaves",
@@ -905,20 +908,20 @@ function getCategoryItems() {
       gas: "🔥 Gas Cylinders", container: "📦 Storage Containers", buckets: "🪣 Buckets"
     };
     
-window.openModal = function(category) {
-  const modal = document.getElementById('priceModal');
-  const modalTitle = document.getElementById('modalTitle');
-  const modalContainer = document.getElementById('modalItemsContainer');
-  modalTitle.textContent = categoryTitles[category] || category;
-  
-  // Get fresh prices using the function
-  const items = getCategoryItems()[category];
-  if (!items) return;
-  
-  modalContainer.innerHTML = items.map(item => `<div class="modal-item"><img class="modal-item-img" src="${item.image}" alt="${item.name}"><div class="modal-item-info"><div class="modal-item-name">${item.name}</div><div class="modal-item-price">${item.price}</div></div></div>`).join('');
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
-};
+    window.openModal = function(category) {
+      const modal = document.getElementById('priceModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalContainer = document.getElementById('modalItemsContainer');
+      modalTitle.textContent = categoryTitles[category] || category;
+      
+      // Get fresh prices using the function
+      const items = getCategoryItems()[category];
+      if (!items) return;
+      
+      modalContainer.innerHTML = items.map(item => `<div class="modal-item"><img class="modal-item-img" src="${item.image}" alt="${item.name}"><div class="modal-item-info"><div class="modal-item-name">${item.name}</div><div class="modal-item-price">${item.price}</div></div></div>`).join('');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
     
     window.closeModal = function() {
       const modal = document.getElementById('priceModal');
