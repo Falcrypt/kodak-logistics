@@ -4,7 +4,6 @@ const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 // Global prices object - ALL SPECIFIC ITEMS (no generic items)
 let prices = {
   // BAGS
-  ghana_must_go: 40,
   duffle_small: 29.99,
   duffle_big: 49.99,
   jute_small: 39.99,
@@ -90,7 +89,6 @@ async function loadBusinessSettings() {
 // ===== UPDATE PRICE DISPLAYS - ALL SPECIFIC ITEMS =====
 function updatePriceDisplay() {
   // BAGS
-  const ghanaMustGoDisplay = document.getElementById('priceGhanaMustGoDisplay');
   const duffleSmallDisplay = document.getElementById('priceDuffleSmallDisplay');
   const duffleBigDisplay = document.getElementById('priceDuffleBigDisplay');
   const juteSmallDisplay = document.getElementById('priceJuteSmallDisplay');
@@ -100,7 +98,6 @@ function updatePriceDisplay() {
   const travelMediumDisplay = document.getElementById('priceTravelMediumDisplay');
   const travelBigDisplay = document.getElementById('priceTravelBigDisplay');
   
-  if (ghanaMustGoDisplay) ghanaMustGoDisplay.textContent = prices.ghana_must_go;
   if (duffleSmallDisplay) duffleSmallDisplay.textContent = prices.duffle_small;
   if (duffleBigDisplay) duffleBigDisplay.textContent = prices.duffle_big;
   if (juteSmallDisplay) juteSmallDisplay.textContent = prices.jute_small;
@@ -150,7 +147,6 @@ function updateSelectOptions() {
   const optionsHtml = `
     <option value="">Select item</option>
     <!-- BAGS -->
-    <option value="ghana_must_go">👜 Ghana Must Go Bag – ₵${prices.ghana_must_go}</option>
     <option value="duffle_small">🎽 Duffle Bag (Small) – ₵${prices.duffle_small}</option>
     <option value="duffle_big">🎒 Duffle Bag (Big) – ₵${prices.duffle_big}</option>
     <option value="jute_small">🌾 Jute Bag (Small) – ₵${prices.jute_small}</option>

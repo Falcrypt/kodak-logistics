@@ -77,7 +77,6 @@ router.put('/', authenticateToken, async (req, res) => {
         // ===== ALL SPECIFIC PRICE KEYS (NO generic items) =====
         const priceKeys = [
             // Bags
-            'ghana_must_go',
             'duffle_small', 'duffle_big',
             'jute_small', 'jute_medium', 'jute_big',
             'travel_small', 'travel_medium', 'travel_big',

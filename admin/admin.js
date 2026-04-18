@@ -182,10 +182,7 @@ async function loadAllSettings() {
     if (em) em.value = settings.business_email || '';
 
     // ===== BAGS =====
-    // Ghana Must Go Bag
-    const pGhanaMustGo = document.getElementById('priceGhanaMustGo');
-    if (pGhanaMustGo) pGhanaMustGo.value = settings.price_ghana_must_go || 40;
-    
+  
     // Duffle Bags
     const pDuffleSmall = document.getElementById('priceDuffleSmall');
     const pDuffleBig = document.getElementById('priceDuffleBig');
@@ -621,7 +618,6 @@ window.savePricing = async function() {
   
   const prices = {
     // BAGS
-    price_ghana_must_go: getVal('priceGhanaMustGo', 40),
     price_duffle_small: getVal('priceDuffleSmall', 29.99),
     price_duffle_big: getVal('priceDuffleBig', 49.99),
     price_jute_small: getVal('priceJuteSmall', 39.99),

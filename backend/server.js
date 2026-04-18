@@ -133,8 +133,6 @@ async function setupDatabase() {
             ['business_email', 'Philiptesimbo@gmail.com'],
             
             // ===== BAGS =====
-            // Ghana Must Go Bag
-            ['price_ghana_must_go', '40'],
             
             // Duffle Bags
             ['price_duffle_small', '29.99'],
