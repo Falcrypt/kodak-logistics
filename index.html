@@ -93,12 +93,14 @@
       font-size: 0.9rem;
       color: #ffb347;
       margin-bottom: 0.25rem;
+      font-weight: 700;
     }
     
     .gallery-item p {
       font-size: 0.7rem;
       color: rgba(255,255,255,0.8);
       margin-bottom: 0.5rem;
+      font-weight: 600;
     }
     
     .gallery-item .price-tag {
@@ -107,7 +109,7 @@
       color: #8b0000;
       padding: 0.25rem 0.75rem;
       border-radius: 20px;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 0.75rem;
     }
     
@@ -169,6 +171,7 @@
       text-align: center;
       border-bottom: 2px solid #ffb347;
       padding-bottom: 0.5rem;
+      font-weight: 800;
     }
     
     .modal-items {
@@ -280,6 +283,7 @@
       flex: 1;
       color: white;
       font-size: 0.9rem;
+      font-weight: 500;
     }
     
     .trigger-arrow {
@@ -344,6 +348,7 @@
       flex: 1;
       color: white;
       font-size: 0.85rem;
+      font-weight: 500;
     }
     
     .custom-option .option-price {
@@ -373,6 +378,7 @@
       border: 1px solid rgba(255,255,255,0.3);
       color: white;
       text-align: center;
+      font-weight: 600;
     }
     
     .item-row .remove-btn {
@@ -407,7 +413,7 @@
       border: none;
       padding: 0.8rem 2rem;
       border-radius: 40px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       transition: all 0.3s ease;
       margin-top: 0.5rem;
@@ -427,6 +433,39 @@
       border: 1px solid rgba(255,255,255,0.3);
       color: white;
       resize: vertical;
+      font-weight: 500;
+    }
+    
+    /* ===== MOBILE MENU STYLES ===== */
+    @media (max-width: 992px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(139, 0, 0, 0.98);
+        flex-direction: column;
+        padding: 2rem;
+        text-align: center;
+        gap: 1.5rem;
+        backdrop-filter: blur(10px);
+        border-bottom: 2px solid #ffb347;
+        z-index: 999;
+      }
+      
+      .nav-links.active {
+        display: flex;
+      }
+      
+      .menu-toggle {
+        display: block;
+        font-size: 2rem;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+      }
     }
     
     @media (max-width: 480px) {
@@ -515,7 +554,7 @@
 
     .custom-option .option-name {
       color: #ffffff !important;
-      font-weight: 500 !important;
+      font-weight: 600 !important;
     }
 
     .custom-option .option-price {
@@ -535,7 +574,7 @@
 
     .trigger-text {
       color: #ffffff !important;
-      font-weight: 500 !important;
+      font-weight: 600 !important;
     }
 
     .trigger-arrow {
@@ -559,8 +598,8 @@
         </div>
         <span class="tagline">📍 KNUST Storage</span>
       </div>
-      <button class="menu-toggle">☰</button>
-      <ul class="nav-links">
+      <button class="menu-toggle" id="mobileMenuToggle">☰</button>
+      <ul class="nav-links" id="navLinks">
         <li><a href="#home">Home</a></li>
         <li><a href="#gallery">Items</a></li>
         <li><a href="#book">Book</a></li>
@@ -615,9 +654,9 @@
     <section style="background: rgba(0,0,0,0.2); padding: 2rem 5%; text-align: center;">
       <div class="section-header"><h2>⚡ How It Works</h2><p>Three simple steps</p></div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 800px; margin: 0 auto;">
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">📝</div><h3 style="color: #ffb347; font-size: 1rem;">1. Book Online</h3><p style="font-size: 0.85rem;">Fill the booking form</p></div>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🚚</div><h3 style="color: #ffb347; font-size: 1rem;">2. Free Pickup</h3><p style="font-size: 0.85rem;">From your hostel</p></div>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🔒</div><h3 style="color: #ffb347; font-size: 1rem;">3. Safe Storage</h3><p style="font-size: 0.85rem;">Securely stored</p></div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">📝</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">1. Book Online</h3><p style="font-size: 0.85rem;">Fill the booking form</p></div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🚚</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">2. Free Pickup</h3><p style="font-size: 0.85rem;">From your hostel</p></div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🔒</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">3. Safe Storage</h3><p style="font-size: 0.85rem;">Securely stored</p></div>
       </div>
     </section>
 
@@ -722,6 +761,23 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="script.js"></script>
   <script>
+    // ===== MOBILE MENU TOGGLE =====
+    const menuToggle = document.getElementById('mobileMenuToggle');
+    const navLinks = document.getElementById('navLinks');
+    
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+      });
+      
+      // Close menu when clicking a link
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function() {
+          navLinks.classList.remove('active');
+        });
+      });
+    }
+    
     // ===== CUSTOM DROPDOWN INITIALIZATION =====
     function initCustomDropdowns() {
       document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
@@ -858,7 +914,7 @@
       });
     }
     
-    // ===== DYNAMIC CATEGORY ITEMS - Gets prices from global prices object =====
+    // ===== DYNAMIC CATEGORY ITEMS =====
     function getCategoryItems() {
       return {
         duffle: [
@@ -914,7 +970,6 @@
       const modalContainer = document.getElementById('modalItemsContainer');
       modalTitle.textContent = categoryTitles[category] || category;
       
-      // Get fresh prices using the function
       const items = getCategoryItems()[category];
       if (!items) return;
       
@@ -954,12 +1009,6 @@
       document.getElementById('priceModal').addEventListener('click', function(e) {
         if (e.target === this) closeModal();
       });
-      
-      const menuToggle = document.querySelector('.menu-toggle');
-      const navLinks = document.querySelector('.nav-links');
-      if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
-      }
     });
   </script>
 </body>
