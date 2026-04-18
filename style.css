@@ -782,6 +782,17 @@ section.visible {
     transform: scale(1.1);
 }
 
+    /* Items section spacing - prevents overlap */
+    .items-section {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    
+    .items-section + .form-group {
+      margin-top: 0.5rem;
+      clear: both;
+    }
+
 .add-btn {
     background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
     color: var(--primary-red);
@@ -1138,3 +1149,109 @@ img {
   50% { opacity: 1; }
 }
 
+/* ===== OVERRIDE FOR DROPDOWN - NO TRANSPARENCY ===== */
+.custom-select-dropdown,
+.custom-select-dropdown *,
+.custom-option,
+.custom-option * {
+  background: #3a0000 !important;
+  background-color: #3a0000 !important;
+  backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+.custom-select-dropdown {
+  background: #3a0000 !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+}
+
+.custom-option {
+  background: #3a0000 !important;
+  backdrop-filter: none !important;
+}
+
+.custom-option:hover {
+  background: #8b0000 !important;
+}
+
+.custom-option .option-name,
+.custom-option .option-price {
+  background: transparent !important;
+  color: white;
+}
+
+.custom-option .option-price {
+  color: #ffb347 !important;
+}
+
+/* Fix cursor */
+.custom-option,
+.custom-option * {
+  cursor: pointer !important;
+}
+
+/* ===== FIX DROPDOWN OVERLAP ===== */
+.custom-select-dropdown {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 999999 !important;
+  background: #2a0000 !important;
+}
+
+/* Make sure the items section has enough space */
+.items-section {
+  position: relative !important;
+  z-index: 10 !important;
+  margin-bottom: 3rem !important;
+}
+
+/* Ensure the dropdown doesn't push content */
+.custom-select-wrapper {
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+/* Fix for the Special Instructions not appearing inside dropdown */
+.form-group:has(.custom-select-wrapper) {
+  position: relative;
+  z-index: 5;
+}
+
+/* Ensure the dropdown stays above everything when open */
+.custom-select-wrapper.open {
+  z-index: 999999 !important;
+}
+
+/* ===== FINAL DROPDOWN FIX ===== */
+.custom-select-dropdown {
+  max-height: 250px !important;
+  overflow-y: auto !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 999999 !important;
+}
+
+/* Ensure the items section has enough space for dropdown */
+.items-section {
+  position: relative !important;
+  z-index: 100 !important;
+  margin-bottom: 3rem !important;
+}
+
+/* Make sure Special Instructions stays below */
+.form-group:has(textarea) {
+  position: relative !important;
+  z-index: 1 !important;
+  clear: both !important;
+  margin-top: 1rem !important;
+}
+
+/* Close dropdown when scrolling away */
+.custom-select-wrapper {
+  position: relative !important;
+}

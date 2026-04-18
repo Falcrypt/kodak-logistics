@@ -409,3 +409,4 @@ window.refreshPrices = loadPrices;
 window.updateDisplay = updatePriceDisplay;
 window.refreshBusinessSettings = loadBusinessSettings;
 window.calculateTotal = calculateTotal;
+

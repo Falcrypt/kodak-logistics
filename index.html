@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<html lang="en">>.0, viewport-fit=cover"/>
   <title>KODAK LOGISTICS | Student Storage & Pickup – KNUST</title>
   <meta name="description" content="Affordable, secure luggage, fridge & student item storage with hostel pickup for KNUST students during vacation."/>
   <meta name="keywords" content="KNUST storage, student luggage Kumasi, fridge storage KNUST, vacation storage Ghana, hostel pickup"/>
@@ -16,7 +13,6 @@
       margin-right: 2px;
     }
     
-    /* Ensure images display nicely */
     img {
       max-width: 100%;
       height: auto;
@@ -25,13 +21,11 @@
       border-radius: 10px;
     }
     
-    /* Make all sections visible */
     section {
       opacity: 1 !important;
       transform: none !important;
     }
     
-    /* Hero background image */
     .hero {
       background: linear-gradient(135deg, rgba(139,0,0,0.85), rgba(107,15,26,0.9)),
                   url('https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat fixed;
@@ -44,7 +38,6 @@
       position: relative;
     }
     
-    /* Gallery intro */
     .gallery-intro {
       text-align: center;
       max-width: 800px;
@@ -60,7 +53,6 @@
       margin-right: 8px;
     }
     
-    /* ===== EXPANDED GALLERY SECTION (10 ITEMS) ===== */
     .image-gallery {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -76,11 +68,13 @@
       text-align: center;
       transition: all 0.3s ease;
       border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
     }
     
     .gallery-item:hover {
-      transform: translateY(-5px);
+      transform: translateY(-8px);
       border-color: #ffb347;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3);
     }
     
     .gallery-item img {
@@ -89,6 +83,7 @@
       object-fit: contain;
       border-radius: 12px;
       margin-bottom: 0.5rem;
+      background: rgba(0,0,0,0.2);
     }
     
     .gallery-item h3 {
@@ -113,191 +108,458 @@
       font-size: 0.75rem;
     }
     
-    /* ===== COMPACT PRICING CARDS WITH IMAGES ===== */
-    .price-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem;
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
     }
-
-    .card {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 0.75rem;
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #8b0000, #6b0f1a);
+      border-radius: 30px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+      border: 2px solid #ffb347;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+      transform: scale(1.1);
+      background: #ff4444;
+    }
+    
+    .modal-title {
+      color: #ffb347;
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
       text-align: center;
+      border-bottom: 2px solid #ffb347;
+      padding-bottom: 0.5rem;
+    }
+    
+    .modal-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    
+    .modal-item {
+      background: rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       transition: all 0.3s ease;
       border: 1px solid rgba(255,255,255,0.2);
-      cursor: pointer;
     }
-
-    .card:hover {
-      transform: translateY(-5px);
+    
+    .modal-item:hover {
+      transform: translateX(5px);
       border-color: #ffb347;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
-
-    .card-image {
-      width: 100%;
-      height: 90px;
+    
+    .modal-item-img {
+      width: 60px;
+      height: 60px;
       object-fit: contain;
       border-radius: 10px;
-      margin-bottom: 0.5rem;
-      background: rgba(255,255,255,0.05);
+      background: rgba(0,0,0,0.2);
     }
-
-    .card h3 {
-      font-size: 0.85rem;
-      margin-bottom: 0.25rem;
+    
+    .modal-item-info {
+      flex: 1;
+    }
+    
+    .modal-item-name {
       color: #ffb347;
       font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
     }
-
-    .card .price {
-      font-size: 1.2rem;
-      font-weight: 900;
+    
+    .modal-item-price {
       color: white;
-      margin: 0.25rem 0;
+      font-weight: 900;
+      font-size: 1.2rem;
     }
-
-    .card p {
-      font-size: 0.65rem;
-      color: rgba(255,255,255,0.8);
-      margin: 0;
+    
+    .modal-item-price::before {
+      content: "₵";
+      margin-right: 2px;
     }
-
-    .card.free {
-      background: linear-gradient(135deg, rgba(40,167,69,0.2), rgba(40,167,69,0.1));
+    
+    .book-now-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #ffb347, #ff8c42);
+      color: #8b0000;
+      border: none;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      text-decoration: none;
     }
-
-    /* Mobile: 2 columns */
+    
+    .book-now-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(255,179,71,0.4);
+    }
+    
+    /* ===== CUSTOM IMAGE DROPDOWN - SOLID BACKGROUND ===== */
+    .custom-select-wrapper {
+      position: relative;
+      flex: 2;
+      min-width: 200px;
+    }
+    
+    .custom-select-trigger {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .custom-select-trigger:hover {
+      border-color: #ffb347;
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .trigger-image {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+    
+    .trigger-text {
+      flex: 1;
+      color: white;
+      font-size: 0.9rem;
+    }
+    
+    .trigger-arrow {
+      color: #ffb347;
+      font-size: 12px;
+      transition: transform 0.3s ease;
+    }
+    
+    .custom-select-wrapper.open .trigger-arrow {
+      transform: rotate(180deg);
+    }
+    
+    /* SOLID DROPDOWN - NO TRANSPARENCY */
+    .custom-select-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #3a0000;
+      border: 2px solid #ffb347;
+      border-radius: 12px;
+      margin-top: 5px;
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 99999;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      backdrop-filter: none;
+      opacity: 1;
+    }
+    
+    .custom-select-wrapper.open .custom-select-dropdown {
+      display: block;
+    }
+    
+    /* SOLID OPTIONS - NO TRANSPARENCY */
+    .custom-option {
+      padding: 0.7rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid #ffb347;
+      background: #3a0000;
+      opacity: 1;
+    }
+    
+    .custom-option:hover {
+      background: #8b0000;
+    }
+    
+    .custom-option img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: transparent;
+    }
+    
+    .custom-option .option-name {
+      flex: 1;
+      color: white;
+      font-size: 0.85rem;
+    }
+    
+    .custom-option .option-price {
+      color: #ffb347;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+    
+    /* Hide original select */
+    .item-row select {
+      display: none;
+    }
+    
+    .item-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .item-row .quantity {
+      width: 80px;
+      padding: 0.75rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      text-align: center;
+    }
+    
+    .item-row .remove-btn {
+      background: rgba(220,53,69,0.8);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .item-row .remove-btn:hover {
+      background: rgba(220,53,69,1);
+      transform: scale(1.05);
+    }
+    
+    /* Prevent overlap with Special Instructions */
+    .items-section {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    
+    .add-btn {
+      background: linear-gradient(135deg, #ffb347, #ff8c42);
+      color: #8b0000;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .add-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255,179,71,0.4);
+    }
+    
+    #description {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      resize: vertical;
+    }
+    
     @media (max-width: 480px) {
+      .trigger-image, .custom-option img {
+        width: 24px;
+        height: 24px;
+      }
+      .trigger-text, .custom-option .option-name {
+        font-size: 0.75rem;
+      }
+      .item-row .quantity {
+        width: 70px;
+        padding: 0.6rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .modal-content { padding: 1.5rem; }
+      .modal-title { font-size: 1.3rem; }
+      .modal-item-img { width: 45px; height: 45px; }
       .image-gallery {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
         padding: 0.75rem;
       }
-      
-      .gallery-item img {
-        height: 100px;
-        object-fit: contain;
-      }
-      
-      .gallery-item h3 {
-        font-size: 0.75rem;
-      }
-      
-      .gallery-item p {
-        font-size: 0.6rem;
-      }
-      
-      .price-cards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.5rem;
-        padding: 0.5rem;
-      }
-      
-      .card-image {
-        height: 70px;
-      }
-      
-      .card {
-        padding: 0.5rem;
-      }
-      
-      .card h3 {
-        font-size: 0.7rem;
-      }
-      
-      .card .price {
-        font-size: 0.9rem;
-      }
-      
-      .card p {
-        font-size: 0.55rem;
-      }
+      .gallery-item img { height: 100px; }
     }
-
-    /* Tablet: 3 columns */
+    
     @media (min-width: 481px) and (max-width: 768px) {
-      .image-gallery {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      
-      .gallery-item img {
-        height: 110px;
-        object-fit: contain;
-      }
-      
-      .price-cards {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      
-      .card-image {
-        height: 80px;
-      }
+      .image-gallery { grid-template-columns: repeat(3, 1fr); }
+      .gallery-item img { height: 110px; }
+    }
+    
+    @media (min-width: 769px) {
+      .image-gallery { grid-template-columns: repeat(5, 1fr); }
+      .gallery-item img { height: 130px; }
+    }
+    
+    /* ===== SOLID DROPDOWN - COMPLETE OVERRIDE - NO TRANSPARENCY ===== */
+    .custom-select-dropdown,
+    .custom-select-dropdown *,
+    .custom-option,
+    .custom-option * {
+      background-color: #3a0000 !important;
+      opacity: 1 !important;
+      backdrop-filter: none !important;
+    }
+    
+    .custom-option:hover {
+      background-color: #8b0000 !important;
+    }
+    
+    .custom-option .option-name,
+    .custom-option .option-price {
+      background: transparent !important;
+      color: white;
+    }
+    
+    .custom-option .option-price {
+      color: #ffb347 !important;
+    }
+    
+    /* Fix cursor - always show pointer on dropdown items */
+    .custom-option {
+      cursor: pointer !important;
+    }
+    
+    .custom-option * {
+      cursor: pointer !important;
     }
 
-    /* Desktop: 4 columns for pricing, 5 columns for gallery */
-    @media (min-width: 769px) {
-      .image-gallery {
-        grid-template-columns: repeat(5, 1fr);
-      }
-      
-      .gallery-item img {
-        height: 130px;
-        object-fit: contain;
-      }
-      
-      .price-cards {
-        grid-template-columns: repeat(4, 1fr);
-      }
-      
-      .card-image {
-        height: 90px;
-      }
-    }
+    /* ===== BRIGHTER DROPDOWN - MORE VISIBLE ===== */
+.custom-select-dropdown {
+  background: #8b0000 !important;
+  border: 2px solid #ffb347 !important;
+}
+
+.custom-option {
+  background: #8b0000 !important;
+  border-bottom: 1px solid rgba(255,179,71,0.3) !important;
+}
+
+.custom-option:hover {
+  background: #a52a2a !important;
+}
+
+.custom-option .option-name {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.custom-option .option-price {
+  color: #ffb347 !important;
+  font-weight: bold !important;
+}
+
+/* Make the trigger/selected item more visible */
+.custom-select-trigger {
+  background: rgba(255,255,255,0.15) !important;
+  border: 1px solid #ffb347 !important;
+}
+
+.custom-select-trigger:hover {
+  background: rgba(255,255,255,0.25) !important;
+}
+
+.trigger-text {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.trigger-arrow {
+  color: #ffb347 !important;
+}
   </style>
 </head>
 <body>
-  <!-- Loader -->
   <div id="loading">
-    <div class="loader">
-      <div class="pulse-ring">📦</div>
-      <div class="loading-text">KODAK LOGISTICS<span class="loading-dots">...</span></div>
-    </div>
+    <div class="loader"><div class="pulse-ring">📦</div><div class="loading-text">KODAK LOGISTICS<span class="loading-dots">...</span></div></div>
   </div>
 
-  <!-- WhatsApp Floating Button -->
-  <a href="https://wa.me/233545025296?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage..." 
-     class="whatsapp-btn" target="_blank" rel="noopener noreferrer">
-    <i class="fab fa-whatsapp"></i> Chat
-  </a>
+  <a href="https://wa.me/233545025296?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage..." class="whatsapp-btn" target="_blank"><i class="fab fa-whatsapp"></i> Chat</a>
 
-  <!-- Header / Navigation -->
   <header>
     <nav class="navbar">
       <div class="logo-wrapper">
         <div class="logo">
-          <span class="logo-icons">
-            <span class="icon-box">📦</span>
-            <span class="icon-box">🔐</span>
-            <span class="icon-box">🚚</span>
-          </span>
+          <span class="logo-icons"><span class="icon-box">📦</span><span class="icon-box">🔐</span><span class="icon-box">🚚</span></span>
           <span class="brand-name">KODAK</span>
         </div>
         <span class="tagline">📍 KNUST Storage</span>
       </div>
-
-      <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
-
+      <button class="menu-toggle">☰</button>
       <ul class="nav-links">
         <li><a href="#home">Home</a></li>
         <li><a href="#gallery">Items</a></li>
-        <li><a href="#prices">Prices</a></li>
         <li><a href="#book">Book</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
@@ -305,7 +567,6 @@
   </header>
 
   <main>
-    <!-- Hero Section -->
     <section class="hero" id="home">
       <div class="hero-content">
         <h1>Secure & Affordable<br>Student Storage</h1>
@@ -322,346 +583,99 @@
       </div>
     </section>
 
-    <!-- Image Gallery Section - EXPANDED with 10 items -->
     <section class="image-gallery-section" id="gallery">
-      <div class="section-header">
-        <h2>📦 What We Store</h2>
-        <p>We pick up from your hostel, store safely, return when needed</p>
-      </div>
-      
-      <div class="gallery-intro">
-        <i class="fas fa-info-circle"></i> Examples of items students store with us
-      </div>
-      
+      <div class="section-header"><h2>📦 What We Store</h2><p>Click on any category to see all sizes and prices</p></div>
+      <div class="gallery-intro"><i class="fas fa-info-circle"></i> Click on any item below to see detailed pricing</div>
       <div class="image-gallery">
-        <!-- Duffle Bags -->
-        <div class="gallery-item">
-          <img src="images/gallery-duffle.jpg" alt="Duffle Bags" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Duffle+Bags'">
-          <h3>🎒 Duffle Bags</h3>
-          <p>Small & Large sizes</p>
-          <span class="price-tag">From 30</span>
-        </div>
-
-        <!-- Jute Bags -->
-        <div class="gallery-item">
-          <img src="images/gallery-jute.jpg" alt="Jute Bags" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Jute+Bags'">
-          <h3>🌾 Jute Bags</h3>
-          <p>Small, Medium & Large</p>
-          <span class="price-tag">From 40</span>
-        </div>
-
-        <!-- Travel Suitcases -->
-        <div class="gallery-item">
-          <img src="images/gallery-suitcase.jpg" alt="Travel Suitcases" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Travel+Bags'">
-          <h3>✈️ Travel Bags</h3>
-          <p>Small, Medium & Large</p>
-          <span class="price-tag">From 30</span>
-        </div>
-
-        <!-- Microwave -->
-        <div class="gallery-item">
-          <img src="images/gallery-microwave.jpg" alt="Microwave" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Microwave'">
-          <h3>🍿 Microwaves</h3>
-          <p>Kitchen appliances</p>
-          <span class="price-tag">From 30</span>
-        </div>
-
-        <!-- Fridge Table Top -->
-        <div class="gallery-item">
-          <img src="images/gallery-fridge-table.jpg" alt="Table Top Fridge" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Fridge+Table'">
-          <h3>❄️ Fridge (Table)</h3>
-          <p>Table top refrigerator</p>
-          <span class="price-tag">From 60</span>
-        </div>
-
-        <!-- Fridge Double Door -->
-        <div class="gallery-item">
-          <img src="images/gallery-fridge-double.jpg" alt="Double Door Fridge" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Fridge+Double'">
-          <h3>❄️❄️ Fridge (DD)</h3>
-          <p>Double door refrigerator</p>
-          <span class="price-tag">From 80</span>
-        </div>
-
-        <!-- Fridge Small -->
-        <div class="gallery-item">
-          <img src="images/gallery-fridge-small.jpg" alt="Small Fridge" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Fridge+Small'">
-          <h3>🧊 Fridge (Small)</h3>
-          <p>Mini fridge</p>
-          <span class="price-tag">From 40</span>
-        </div>
-
-        <!-- Gas Cylinders -->
-        <div class="gallery-item">
-          <img src="images/gallery-gas.jpg" alt="Gas Cylinders" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Gas+Cylinders'">
-          <h3>🔥 Gas Cylinders</h3>
-          <p>Small, Medium & Large</p>
-          <span class="price-tag">From 30</span>
-        </div>
-
-        <!-- Storage Containers -->
-        <div class="gallery-item">
-          <img src="images/gallery-container.jpg" alt="Storage Containers" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Containers'">
-          <h3>📦 Storage Containers</h3>
-          <p>Small & Large boxes</p>
-          <span class="price-tag">From 30</span>
-        </div>
-
-        <!-- Buckets -->
-        <div class="gallery-item">
-          <img src="images/gallery-buckets.jpg" alt="Buckets" loading="lazy" onerror="this.src='https://placehold.co/300x300/28a745/white?text=Buckets'">
-          <h3>🪣 Buckets</h3>
-          <p>Free with paid items</p>
-          <span class="price-tag">FREE</span>
-        </div>
+        <div class="gallery-item" data-category="duffle"><img src="images/gallery-duffle.jpg" alt="Duffle Bags"><h3>🎒 Duffle Bags</h3><p>Small & Large sizes</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="jute"><img src="images/gallery-jute.jpg" alt="Jute Bags"><h3>🌾 Jute Bags</h3><p>Small, Medium & Large</p><span class="price-tag">From 40</span></div>
+        <div class="gallery-item" data-category="travel"><img src="images/gallery-suitcase.jpg" alt="Travel Suitcases"><h3>✈️ Travel Bags</h3><p>Small, Medium & Large</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="microwave"><img src="images/gallery-microwave.jpg" alt="Microwave"><h3>🍿 Microwaves</h3><p>Kitchen appliances</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="fridge_tabletop"><img src="images/gallery-fridge-table.jpg" alt="Table Top Fridge"><h3>❄️ Fridge (Table)</h3><p>Table top refrigerator</p><span class="price-tag">From 60</span></div>
+        <div class="gallery-item" data-category="fridge_doubledoor"><img src="images/gallery-fridge-double.jpg" alt="Double Door Fridge"><h3>❄️❄️ Fridge (DD)</h3><p>Double door refrigerator</p><span class="price-tag">From 80</span></div>
+        <div class="gallery-item" data-category="fridge_small"><img src="images/gallery-fridge-small.jpg" alt="Small Fridge"><h3>🧊 Fridge (Small)</h3><p>Mini fridge</p><span class="price-tag">From 40</span></div>
+        <div class="gallery-item" data-category="gas"><img src="images/gallery-gas.jpg" alt="Gas Cylinders"><h3>🔥 Gas Cylinders</h3><p>Small, Medium & Large</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="container"><img src="images/gallery-container.jpg" alt="Storage Containers"><h3>📦 Storage Containers</h3><p>Small & Large boxes</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="buckets"><img src="images/gallery-buckets.jpg" alt="Buckets"><h3>🪣 Buckets</h3><p>Free with paid items</p><span class="price-tag">FREE</span></div>
       </div>
     </section>
 
-    <!-- Pricing Section WITH IMAGES -->
-    <section class="pricing" id="prices">
-      <div class="section-header">
-        <h2>💰 Storage Pricing</h2>
-        <p>Pay only for what you store – no hidden fees</p>
+    <div id="priceModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <h2 class="modal-title" id="modalTitle">Category</h2>
+        <div id="modalItemsContainer" class="modal-items"></div>
+        <a href="#book" class="book-now-btn" onclick="closeModal()">📦 Book Now</a>
       </div>
+    </div>
 
-      <div class="price-cards">
-        <!-- Duffle Bag (Small) -->
-        <div class="card">
-          <img class="card-image" src="images/duffle-small.jpg" alt="Duffle Bag Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Duffle+S'">
-          <h3>Duffle (Small)</h3>
-          <p class="price" id="priceDuffleSmallDisplay">30</p>
-          <p>Small duffle bag</p>
-        </div>
-        
-        <!-- Duffle Bag (Big) -->
-        <div class="card">
-          <img class="card-image" src="images/duffle-big.jpg" alt="Duffle Bag Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Duffle+B'">
-          <h3>Duffle (Big)</h3>
-          <p class="price" id="priceDuffleBigDisplay">50</p>
-          <p>Large duffle bag</p>
-        </div>
-        
-        <!-- Jute Bag (Small) -->
-        <div class="card">
-          <img class="card-image" src="images/jute-small.jpg" alt="Jute Bag Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Jute+S'">
-          <h3>Jute (Small)</h3>
-          <p class="price" id="priceJuteSmallDisplay">40</p>
-          <p>Small jute bag</p>
-        </div>
-        
-        <!-- Jute Bag (Medium) -->
-        <div class="card">
-          <img class="card-image" src="images/jute-medium.jpg" alt="Jute Bag Medium" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Jute+M'">
-          <h3>Jute (Medium)</h3>
-          <p class="price" id="priceJuteMediumDisplay">60</p>
-          <p>Medium jute bag</p>
-        </div>
-        
-        <!-- Jute Bag (Big) -->
-        <div class="card">
-          <img class="card-image" src="images/jute-big.jpg" alt="Jute Bag Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Jute+B'">
-          <h3>Jute (Big)</h3>
-          <p class="price" id="priceJuteBigDisplay">80</p>
-          <p>Large jute bag</p>
-        </div>
-        
-        <!-- Traveling Bag (Small) -->
-        <div class="card">
-          <img class="card-image" src="images/travel-small.jpg" alt="Travel Bag Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Travel+S'">
-          <h3>Travel (Small)</h3>
-          <p class="price" id="priceTravelSmallDisplay">30</p>
-          <p>Small suitcase</p>
-        </div>
-        
-        <!-- Traveling Bag (Medium) -->
-        <div class="card">
-          <img class="card-image" src="images/travel-medium.jpg" alt="Travel Bag Medium" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Travel+M'">
-          <h3>Travel (Medium)</h3>
-          <p class="price" id="priceTravelMediumDisplay">50</p>
-          <p>Medium suitcase</p>
-        </div>
-        
-        <!-- Traveling Bag (Big) -->
-        <div class="card">
-          <img class="card-image" src="images/travel-big.jpg" alt="Travel Bag Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Travel+B'">
-          <h3>Travel (Big)</h3>
-          <p class="price" id="priceTravelBigDisplay">70</p>
-          <p>Large suitcase</p>
-        </div>
-        
-        <!-- Microwave -->
-        <div class="card">
-          <img class="card-image" src="images/microwave.jpg" alt="Microwave" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Microwave'">
-          <h3>Microwave</h3>
-          <p class="price" id="priceMicrowaveDisplay">30</p>
-          <p>Kitchen appliance</p>
-        </div>
-        
-        <!-- Fridge (Table Top) -->
-        <div class="card">
-          <img class="card-image" src="images/fridge-tabletop.jpg" alt="Fridge Table Top" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Fridge+T'">
-          <h3>Fridge (Table)</h3>
-          <p class="price" id="priceFridgeTabletopDisplay">60</p>
-          <p>Table top fridge</p>
-        </div>
-        
-        <!-- Fridge (Double Door) -->
-        <div class="card">
-          <img class="card-image" src="images/fridge-doubledoor.jpg" alt="Fridge Double Door" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Fridge+DD'">
-          <h3>Fridge (DD)</h3>
-          <p class="price" id="priceFridgeDoubledoorDisplay">80</p>
-          <p>Double door fridge</p>
-        </div>
-        
-        <!-- Fridge (Small) -->
-        <div class="card">
-          <img class="card-image" src="images/fridge-small.jpg" alt="Fridge Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Fridge+S'">
-          <h3>Fridge (Small)</h3>
-          <p class="price" id="priceFridgeSmallDisplay">40</p>
-          <p>Mini fridge</p>
-        </div>
-        
-        <!-- Gas Cylinder (Small) -->
-        <div class="card">
-          <img class="card-image" src="images/gas-small.jpg" alt="Gas Cylinder Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Gas+S'">
-          <h3>Gas (Small)</h3>
-          <p class="price" id="priceGasSmallDisplay">30</p>
-          <p>Small cylinder</p>
-        </div>
-        
-        <!-- Gas Cylinder (Medium) -->
-        <div class="card">
-          <img class="card-image" src="images/gas-medium.jpg" alt="Gas Cylinder Medium" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Gas+M'">
-          <h3>Gas (Medium)</h3>
-          <p class="price" id="priceGasMediumDisplay">35</p>
-          <p>Medium cylinder</p>
-        </div>
-        
-        <!-- Gas Cylinder (Big) -->
-        <div class="card">
-          <img class="card-image" src="images/gas-big.jpg" alt="Gas Cylinder Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Gas+B'">
-          <h3>Gas (Big)</h3>
-          <p class="price" id="priceGasBigDisplay">40</p>
-          <p>Large cylinder</p>
-        </div>
-        
-        <!-- Container (Small) -->
-        <div class="card">
-          <img class="card-image" src="images/container-small.jpg" alt="Container Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Box+S'">
-          <h3>Container (S)</h3>
-          <p class="price" id="priceContainerSmallDisplay">30</p>
-          <p>Small container/box</p>
-        </div>
-        
-        <!-- Container (Big) -->
-        <div class="card">
-          <img class="card-image" src="images/container-big.jpg" alt="Container Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Box+B'">
-          <h3>Container (B)</h3>
-          <p class="price" id="priceContainerBigDisplay">50</p>
-          <p>Large container/box</p>
-        </div>
-        
-        <!-- Buckets (Free) -->
-        <div class="card free">
-          <img class="card-image" src="images/buckets.jpg" alt="Buckets" onerror="this.src='https://placehold.co/200x200/28a745/white?text=Buckets'">
-          <h3>Buckets</h3>
-          <p class="price" id="priceBucketsDisplay">0</p>
-          <p>Free with paid item</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- How It Works Section -->
     <section style="background: rgba(0,0,0,0.2); padding: 2rem 5%; text-align: center;">
-      <div class="section-header">
-        <h2>⚡ How It Works</h2>
-        <p>Three simple steps</p>
-      </div>
+      <div class="section-header"><h2>⚡ How It Works</h2><p>Three simple steps</p></div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 800px; margin: 0 auto;">
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;">
-          <div style="font-size: 2rem;">📝</div>
-          <h3 style="color: #ffb347; font-size: 1rem;">1. Book Online</h3>
-          <p style="font-size: 0.85rem;">Fill the booking form</p>
-        </div>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;">
-          <div style="font-size: 2rem;">🚚</div>
-          <h3 style="color: #ffb347; font-size: 1rem;">2. Free Pickup</h3>
-          <p style="font-size: 0.85rem;">From your hostel</p>
-        </div>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;">
-          <div style="font-size: 2rem;">🔒</div>
-          <h3 style="color: #ffb347; font-size: 1rem;">3. Safe Storage</h3>
-          <p style="font-size: 0.85rem;">Securely stored</p>
-        </div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">📝</div><h3 style="color: #ffb347; font-size: 1rem;">1. Book Online</h3><p style="font-size: 0.85rem;">Fill the booking form</p></div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🚚</div><h3 style="color: #ffb347; font-size: 1rem;">2. Free Pickup</h3><p style="font-size: 0.85rem;">From your hostel</p></div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🔒</div><h3 style="color: #ffb347; font-size: 1rem;">3. Safe Storage</h3><p style="font-size: 0.85rem;">Securely stored</p></div>
       </div>
     </section>
 
-    <!-- Booking Section -->
     <section class="booking" id="book">
-      <div class="section-header">
-        <h2>📋 Book Storage</h2>
-        <p>Fill the form — we'll confirm with a reference ID</p>
-      </div>
-
+      <div class="section-header"><h2>📋 Book Storage</h2><p>Fill the form — we'll confirm with a reference ID</p></div>
       <form class="booking-form" id="bookingForm">
-        <div class="form-group">
-          <label for="name">Full Name *</label>
-          <input type="text" id="name" name="name" required placeholder="Enter your full name">
-        </div>
-
-        <div class="form-group">
-          <label for="email">Email *</label>
-          <input type="email" id="email" name="email" required placeholder="your@email.com">
-        </div>
-
-        <div class="form-group">
-          <label for="phone">WhatsApp Number *</label>
-          <input type="tel" id="phone" name="phone" required placeholder="0545025296">
-        </div>
-
-        <div class="form-group">
-          <label for="hostel">Hostel / Location *</label>
-          <input type="text" id="hostel" name="hostel" required placeholder="Hall or Hostel/Location">
-        </div>
-
+        <div class="form-group"><label for="name">Full Name *</label><input type="text" id="name" required placeholder="Enter your full name"></div>
+        <div class="form-group"><label for="email">Email *</label><input type="email" id="email" required placeholder="your@email.com"></div>
+        <div class="form-group"><label for="phone">WhatsApp Number *</label><input type="tel" id="phone" required placeholder="0545025296"></div>
+        <div class="form-group"><label for="hostel">Hostel / Location *</label><input type="text" id="hostel" required placeholder="Hall or Hostel/Location"></div>
+        
         <div class="form-row">
-          <div class="form-group">
-            <label for="date">Pickup Date *</label>
-            <input type="date" id="date" name="date" required>
-          </div>
-          <div class="form-group">
-            <label for="time">Pickup Time *</label>
-            <input type="time" id="time" name="time" required>
-          </div>
+          <div class="form-group"><label for="date">Pickup Date *</label><input type="date" id="date" required></div>
+          <div class="form-group"><label for="time">Pickup Time *</label><input type="time" id="time" required></div>
         </div>
 
         <!-- Items Section -->
         <div class="form-group items-section">
           <label>Items to Store *</label>
           <div id="itemsContainer">
-            <div class="item-row">
-              <select class="itemSelect" required>
+            <div class="item-row" data-row="0">
+              <select class="itemSelect" style="display: none;">
                 <option value="">Select item type</option>
-                <option value="duffle_small">🎽 Duffle Bag (Small) – ₵30</option>
-                <option value="duffle_big">🎒 Duffle Bag (Big) – ₵50</option>
-                <option value="jute_small">🌾 Jute Bag (Small) – ₵40</option>
-                <option value="jute_medium">🌾 Jute Bag (Medium) – ₵60</option>
-                <option value="jute_big">🌾 Jute Bag (Big) – ₵80</option>
-                <option value="travel_small">✈️ Travel Bag (Small) – ₵30</option>
-                <option value="travel_medium">✈️ Travel Bag (Medium) – ₵50</option>
-                <option value="travel_big">✈️ Travel Bag (Big) – ₵70</option>
-                <option value="microwave">🍿 Microwave – ₵30</option>
-                <option value="fridge_tabletop">❄️ Fridge (Table Top) – ₵60</option>
-                <option value="fridge_doubledoor">❄️❄️ Fridge (Double Door) – ₵80</option>
-                <option value="fridge_small">🧊 Fridge (Small) – ₵40</option>
-                <option value="gas_small">🔥 Gas Cylinder (Small) – ₵30</option>
-                <option value="gas_medium">🔥 Gas Cylinder (Medium) – ₵35</option>
-                <option value="gas_big">🔥 Gas Cylinder (Big) – ₵40</option>
-                <option value="container_small">📦 Container (Small) – ₵30</option>
-                <option value="container_big">📦 Container (Big) – ₵50</option>
-                <option value="buckets">🪣 Buckets – Free</option>
+                <option value="duffle_small">Duffle Bag (Small)</option><option value="duffle_big">Duffle Bag (Big)</option>
+                <option value="jute_small">Jute Bag (Small)</option><option value="jute_medium">Jute Bag (Medium)</option><option value="jute_big">Jute Bag (Big)</option>
+                <option value="travel_small">Travel Bag (Small)</option><option value="travel_medium">Travel Bag (Medium)</option><option value="travel_big">Travel Bag (Big)</option>
+                <option value="microwave">Microwave</option><option value="fridge_tabletop">Fridge (Table Top)</option><option value="fridge_doubledoor">Fridge (Double Door)</option><option value="fridge_small">Fridge (Small)</option>
+                <option value="gas_small">Gas Cylinder (Small)</option><option value="gas_medium">Gas Cylinder (Medium)</option><option value="gas_big">Gas Cylinder (Big)</option>
+                <option value="container_small">Container (Small)</option><option value="container_big">Container (Big)</option><option value="buckets">Buckets</option>
               </select>
+              
+              <div class="custom-select-wrapper">
+                <div class="custom-select-trigger">
+                  <img class="trigger-image" src="images/default-item.png" alt="icon" onerror="this.src='https://placehold.co/28x28/ffb347/8b0000?text=?'">
+                  <span class="trigger-text">Select item type</span>
+                  <span class="trigger-arrow">▼</span>
+                </div>
+                <div class="custom-select-dropdown">
+                  <div class="custom-option" data-value="duffle_small" data-price="30" data-img="images/duffle-small.jpg"><img src="images/duffle-small.jpg" alt=""><span class="option-name">Duffle Bag (Small)</span><span class="option-price">₵30</span></div>
+                  <div class="custom-option" data-value="duffle_big" data-price="50" data-img="images/duffle-big.jpg"><img src="images/duffle-big.jpg" alt=""><span class="option-name">Duffle Bag (Big)</span><span class="option-price">₵50</span></div>
+                  <div class="custom-option" data-value="jute_small" data-price="40" data-img="images/jute-small.jpg"><img src="images/jute-small.jpg" alt=""><span class="option-name">Jute Bag (Small)</span><span class="option-price">₵40</span></div>
+                  <div class="custom-option" data-value="jute_medium" data-price="60" data-img="images/jute-medium.jpg"><img src="images/jute-medium.jpg" alt=""><span class="option-name">Jute Bag (Medium)</span><span class="option-price">₵60</span></div>
+                  <div class="custom-option" data-value="jute_big" data-price="80" data-img="images/jute-big.jpg"><img src="images/jute-big.jpg" alt=""><span class="option-name">Jute Bag (Big)</span><span class="option-price">₵80</span></div>
+                  <div class="custom-option" data-value="travel_small" data-price="30" data-img="images/travel-small.jpg"><img src="images/travel-small.jpg" alt=""><span class="option-name">Travel Bag (Small)</span><span class="option-price">₵30</span></div>
+                  <div class="custom-option" data-value="travel_medium" data-price="50" data-img="images/travel-medium.jpg"><img src="images/travel-medium.jpg" alt=""><span class="option-name">Travel Bag (Medium)</span><span class="option-price">₵50</span></div>
+                  <div class="custom-option" data-value="travel_big" data-price="70" data-img="images/travel-big.jpg"><img src="images/travel-big.jpg" alt=""><span class="option-name">Travel Bag (Big)</span><span class="option-price">₵70</span></div>
+                  <div class="custom-option" data-value="microwave" data-price="30" data-img="images/microwave.jpg"><img src="images/microwave.jpg" alt=""><span class="option-name">Microwave</span><span class="option-price">₵30</span></div>
+                  <div class="custom-option" data-value="fridge_tabletop" data-price="60" data-img="images/fridge-tabletop.jpg"><img src="images/fridge-tabletop.jpg" alt=""><span class="option-name">Fridge (Table Top)</span><span class="option-price">₵60</span></div>
+                  <div class="custom-option" data-value="fridge_doubledoor" data-price="80" data-img="images/fridge-doubledoor.jpg"><img src="images/fridge-doubledoor.jpg" alt=""><span class="option-name">Fridge (Double Door)</span><span class="option-price">₵80</span></div>
+                  <div class="custom-option" data-value="fridge_small" data-price="40" data-img="images/fridge-small.jpg"><img src="images/fridge-small.jpg" alt=""><span class="option-name">Fridge (Small)</span><span class="option-price">₵40</span></div>
+                  <div class="custom-option" data-value="gas_small" data-price="30" data-img="images/gas-small.jpg"><img src="images/gas-small.jpg" alt=""><span class="option-name">Gas Cylinder (Small)</span><span class="option-price">₵30</span></div>
+                  <div class="custom-option" data-value="gas_medium" data-price="35" data-img="images/gas-medium.jpg"><img src="images/gas-medium.jpg" alt=""><span class="option-name">Gas Cylinder (Medium)</span><span class="option-price">₵35</span></div>
+                  <div class="custom-option" data-value="gas_big" data-price="40" data-img="images/gas-big.jpg"><img src="images/gas-big.jpg" alt=""><span class="option-name">Gas Cylinder (Big)</span><span class="option-price">₵40</span></div>
+                  <div class="custom-option" data-value="container_small" data-price="30" data-img="images/container-small.jpg"><img src="images/container-small.jpg" alt=""><span class="option-name">Container (Small)</span><span class="option-price">₵30</span></div>
+                  <div class="custom-option" data-value="container_big" data-price="50" data-img="images/container-big.jpg"><img src="images/container-big.jpg" alt=""><span class="option-name">Container (Big)</span><span class="option-price">₵50</span></div>
+                  <div class="custom-option" data-value="buckets" data-price="0" data-img="images/buckets.jpg"><img src="images/buckets.jpg" alt=""><span class="option-name">Buckets</span><span class="option-price">Free</span></div>
+                </div>
+              </div>
+              
               <input type="number" class="quantity" min="1" value="1" required>
-              <button type="button" class="remove-btn" style="display: none;">✕</button>
+              <button type="button" class="remove-btn">✕ Remove</button>
             </div>
           </div>
           <button type="button" id="addItem" class="add-btn">+ Add Another Item</button>
@@ -682,30 +696,13 @@
       </form>
     </section>
 
-    <!-- FAQ Section -->
     <section class="faq" id="faq">
-      <div class="section-header">
-        <h2>❓ FAQ</h2>
-        <p>Everything you need to know</p>
-      </div>
-      
+      <div class="section-header"><h2>❓ FAQ</h2><p>Everything you need to know</p></div>
       <div class="faq-content">
-        <details>
-          <summary>When do I pay?</summary>
-          <p>Payment can be made right after booking until when your items are picked. We accept MTN MoMo, Vodafone Cash, and cash.</p>
-        </details>
-        <details>
-          <summary>Is my stuff safe?</summary>
-          <p>Yes!There is a 24/7 monitored security on the site keeping the warehouse in check.</p>
-        </details>
-        <details>
-          <summary>Can I get items back early?</summary>
-          <p>Yes, just contact us 3 days in advance.</p>
-        </details>
-        <details>
-          <summary>What is the reference ID?</summary>
-          <p>You'll receive a unique ID (e.g., KDL-000123) to retrieve your items.</p>
-        </details>
+        <details><summary>When do I pay?</summary><p>Payment can be made right after booking until when your items are picked. We accept MTN MoMo, Vodafone Cash, and cash.</p></details>
+        <details><summary>Is my stuff safe?</summary><p>Yes! There is 24/7 monitored security on the site keeping the warehouse in check.</p></details>
+        <details><summary>Can I get items back early?</summary><p>Yes, just contact us 3 days in advance.</p></details>
+        <details><summary>What is the reference ID?</summary><p>You'll receive a unique ID (e.g., KDL-000123) to retrieve your items.</p></details>
       </div>
     </section>
   </main>
@@ -714,23 +711,220 @@
     <div class="footer-content">
       <div class="footer-logo">KODAK</div>
       <p class="footer-tag">Your Trusted KNUST Storage Partner</p>
-      
-      <div class="footer-contact">
-        <p><strong>Contact Us</strong></p>
-        <a href="https://wa.me/233545025296" class="footer-whatsapp" target="_blank">
-          <i class="fab fa-whatsapp"></i> +233 545 025 296
-        </a>
-        <p class="footer-email">Email: <a href="mailto:Philiptesimbo@gmail.com">Philiptesimbo@gmail.com</a></p>
-      </div>
-
+      <div class="footer-contact"><p><strong>Contact Us</strong></p><a href="https://wa.me/233545025296" class="footer-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> +233 545 025 296</a><p class="footer-email">Email: <a href="mailto:Philiptesimbo@gmail.com">Philiptesimbo@gmail.com</a></p></div>
       <p class="footer-copyright">© 2026 Kodak Logistics – KNUST</p>
     </div>
   </footer>
 
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
-  <!-- Scripts -->
   <script src="script.js"></script>
+  <script>
+    // ===== CUSTOM DROPDOWN INITIALIZATION =====
+    function initCustomDropdowns() {
+      document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+        if (wrapper.hasAttribute('data-initialized')) return;
+        wrapper.setAttribute('data-initialized', 'true');
+        
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+        const hiddenSelect = wrapper.parentElement.querySelector('.itemSelect');
+        const triggerImg = wrapper.querySelector('.trigger-image');
+        const triggerText = wrapper.querySelector('.trigger-text');
+        
+        if (!trigger) return;
+        
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+            if (w !== wrapper) w.classList.remove('open');
+          });
+          wrapper.classList.toggle('open');
+        });
+        
+        wrapper.querySelectorAll('.custom-option').forEach(opt => {
+          opt.addEventListener('click', () => {
+            const value = opt.getAttribute('data-value');
+            const imgSrc = opt.getAttribute('data-img');
+            const text = opt.querySelector('.option-name').textContent;
+            
+            if (hiddenSelect) {
+              hiddenSelect.value = value;
+              const changeEvent = new Event('change', { bubbles: true });
+              hiddenSelect.dispatchEvent(changeEvent);
+            }
+            
+            if (triggerImg) triggerImg.src = imgSrc;
+            if (triggerText) triggerText.textContent = text;
+            
+            wrapper.classList.remove('open');
+            if (typeof calculateTotal === 'function') calculateTotal();
+          });
+        });
+      });
+    }
+    
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+    });
+    
+    // ===== ADD ITEM FUNCTION =====
+    function enhancedSetupAddItem() {
+      const addBtn = document.getElementById('addItem');
+      const container = document.getElementById('itemsContainer');
+      if (!addBtn || !container) return;
+      
+      const newAddBtn = addBtn.cloneNode(true);
+      addBtn.parentNode.replaceChild(newAddBtn, addBtn);
+      
+      newAddBtn.addEventListener('click', () => {
+        const newRow = document.createElement('div');
+        newRow.className = 'item-row';
+        newRow.setAttribute('data-row', Date.now());
+        
+        newRow.innerHTML = `
+          <select class="itemSelect" style="display: none;">
+            <option value="">Select item type</option>
+            <option value="duffle_small">Duffle Bag (Small)</option>
+            <option value="duffle_big">Duffle Bag (Big)</option>
+            <option value="jute_small">Jute Bag (Small)</option>
+            <option value="jute_medium">Jute Bag (Medium)</option>
+            <option value="jute_big">Jute Bag (Big)</option>
+            <option value="travel_small">Travel Bag (Small)</option>
+            <option value="travel_medium">Travel Bag (Medium)</option>
+            <option value="travel_big">Travel Bag (Big)</option>
+            <option value="microwave">Microwave</option>
+            <option value="fridge_tabletop">Fridge (Table Top)</option>
+            <option value="fridge_doubledoor">Fridge (Double Door)</option>
+            <option value="fridge_small">Fridge (Small)</option>
+            <option value="gas_small">Gas Cylinder (Small)</option>
+            <option value="gas_medium">Gas Cylinder (Medium)</option>
+            <option value="gas_big">Gas Cylinder (Big)</option>
+            <option value="container_small">Container (Small)</option>
+            <option value="container_big">Container (Big)</option>
+            <option value="buckets">Buckets</option>
+          </select>
+          
+          <div class="custom-select-wrapper">
+            <div class="custom-select-trigger">
+              <img class="trigger-image" src="images/default-item.png" alt="icon" onerror="this.src='https://placehold.co/28x28/ffb347/8b0000?text=?'">
+              <span class="trigger-text">Select item type</span>
+              <span class="trigger-arrow">▼</span>
+            </div>
+            <div class="custom-select-dropdown">
+              <div class="custom-option" data-value="duffle_small" data-price="30" data-img="images/duffle-small.jpg"><img src="images/duffle-small.jpg" alt=""><span class="option-name">Duffle Bag (Small)</span><span class="option-price">₵30</span></div>
+              <div class="custom-option" data-value="duffle_big" data-price="50" data-img="images/duffle-big.jpg"><img src="images/duffle-big.jpg" alt=""><span class="option-name">Duffle Bag (Big)</span><span class="option-price">₵50</span></div>
+              <div class="custom-option" data-value="jute_small" data-price="40" data-img="images/jute-small.jpg"><img src="images/jute-small.jpg" alt=""><span class="option-name">Jute Bag (Small)</span><span class="option-price">₵40</span></div>
+              <div class="custom-option" data-value="jute_medium" data-price="60" data-img="images/jute-medium.jpg"><img src="images/jute-medium.jpg" alt=""><span class="option-name">Jute Bag (Medium)</span><span class="option-price">₵60</span></div>
+              <div class="custom-option" data-value="jute_big" data-price="80" data-img="images/jute-big.jpg"><img src="images/jute-big.jpg" alt=""><span class="option-name">Jute Bag (Big)</span><span class="option-price">₵80</span></div>
+              <div class="custom-option" data-value="travel_small" data-price="30" data-img="images/travel-small.jpg"><img src="images/travel-small.jpg" alt=""><span class="option-name">Travel Bag (Small)</span><span class="option-price">₵30</span></div>
+              <div class="custom-option" data-value="travel_medium" data-price="50" data-img="images/travel-medium.jpg"><img src="images/travel-medium.jpg" alt=""><span class="option-name">Travel Bag (Medium)</span><span class="option-price">₵50</span></div>
+              <div class="custom-option" data-value="travel_big" data-price="70" data-img="images/travel-big.jpg"><img src="images/travel-big.jpg" alt=""><span class="option-name">Travel Bag (Big)</span><span class="option-price">₵70</span></div>
+              <div class="custom-option" data-value="microwave" data-price="30" data-img="images/microwave.jpg"><img src="images/microwave.jpg" alt=""><span class="option-name">Microwave</span><span class="option-price">₵30</span></div>
+              <div class="custom-option" data-value="fridge_tabletop" data-price="60" data-img="images/fridge-tabletop.jpg"><img src="images/fridge-tabletop.jpg" alt=""><span class="option-name">Fridge (Table Top)</span><span class="option-price">₵60</span></div>
+              <div class="custom-option" data-value="fridge_doubledoor" data-price="80" data-img="images/fridge-doubledoor.jpg"><img src="images/fridge-doubledoor.jpg" alt=""><span class="option-name">Fridge (Double Door)</span><span class="option-price">₵80</span></div>
+              <div class="custom-option" data-value="fridge_small" data-price="40" data-img="images/fridge-small.jpg"><img src="images/fridge-small.jpg" alt=""><span class="option-name">Fridge (Small)</span><span class="option-price">₵40</span></div>
+              <div class="custom-option" data-value="gas_small" data-price="30" data-img="images/gas-small.jpg"><img src="images/gas-small.jpg" alt=""><span class="option-name">Gas Cylinder (Small)</span><span class="option-price">₵30</span></div>
+              <div class="custom-option" data-value="gas_medium" data-price="35" data-img="images/gas-medium.jpg"><img src="images/gas-medium.jpg" alt=""><span class="option-name">Gas Cylinder (Medium)</span><span class="option-price">₵35</span></div>
+              <div class="custom-option" data-value="gas_big" data-price="40" data-img="images/gas-big.jpg"><img src="images/gas-big.jpg" alt=""><span class="option-name">Gas Cylinder (Big)</span><span class="option-price">₵40</span></div>
+              <div class="custom-option" data-value="container_small" data-price="30" data-img="images/container-small.jpg"><img src="images/container-small.jpg" alt=""><span class="option-name">Container (Small)</span><span class="option-price">₵30</span></div>
+              <div class="custom-option" data-value="container_big" data-price="50" data-img="images/container-big.jpg"><img src="images/container-big.jpg" alt=""><span class="option-name">Container (Big)</span><span class="option-price">₵50</span></div>
+              <div class="custom-option" data-value="buckets" data-price="0" data-img="images/buckets.jpg"><img src="images/buckets.jpg" alt=""><span class="option-name">Buckets</span><span class="option-price">Free</span></div>
+            </div>
+          </div>
+          
+          <input type="number" class="quantity" min="1" value="1" required>
+          <button type="button" class="remove-btn">✕ Remove</button>
+        `;
+        
+        container.appendChild(newRow);
+        
+        const removeBtn = newRow.querySelector('.remove-btn');
+        removeBtn.addEventListener('click', () => {
+          if (document.querySelectorAll('.item-row').length > 1) {
+            newRow.remove();
+            if (typeof calculateTotal === 'function') calculateTotal();
+          }
+        });
+        
+        const quantityInput = newRow.querySelector('.quantity');
+        quantityInput.addEventListener('input', () => {
+          if (typeof calculateTotal === 'function') calculateTotal();
+        });
+        
+        initCustomDropdowns();
+        if (typeof calculateTotal === 'function') calculateTotal();
+      });
+    }
+    
+    // ===== MODAL FUNCTIONS =====
+    const categoryItems = {
+      duffle: [{ name: "Duffle Bag (Small)", price: 29.99, image: "images/duffle-small.jpg" }, { name: "Duffle Bag (Big)", price: 49.99, image: "images/duffle-big.jpg" }],
+      jute: [{ name: "Jute Bag (Small)", price: 39.99, image: "images/jute-small.jpg" }, { name: "Jute Bag (Medium)", price: 59.99, image: "images/jute-medium.jpg" }, { name: "Jute Bag (Big)", price: 79.99, image: "images/jute-big.jpg" }],
+      travel: [{ name: "Traveling Bag (Small)", price: 29.99, image: "images/travel-small.jpg" }, { name: "Traveling Bag (Medium)", price: 49.99, image: "images/travel-medium.jpg" }, { name: "Traveling Bag (Big)", price: 69.99, image: "images/travel-big.jpg" }],
+      microwave: [{ name: "Microwave", price: 30, image: "images/microwave.jpg" }],
+      fridge_tabletop: [{ name: "Fridge (Table Top)", price: 59.99, image: "images/fridge-tabletop.jpg" }],
+      fridge_doubledoor: [{ name: "Fridge (Double Door)", price: 79.99, image: "images/fridge-doubledoor.jpg" }],
+      fridge_small: [{ name: "Fridge (Small)", price: 39.99, image: "images/fridge-small.jpg" }],
+      gas: [{ name: "Gas Cylinder (Small)", price: 29.99, image: "images/gas-small.jpg" }, { name: "Gas Cylinder (Medium)", price: 34.99, image: "images/gas-medium.jpg" }, { name: "Gas Cylinder (Big)", price: 39.99, image: "images/gas-big.jpg" }],
+      container: [{ name: "Container (Small)", price: 29.99, image: "images/container-small.jpg" }, { name: "Container (Big)", price: 49.99, image: "images/container-big.jpg" }],
+      buckets: [{ name: "Buckets", price: 0, image: "images/buckets.jpg" }]
+    };
+    
+    const categoryTitles = {
+      duffle: "🎒 Duffle Bags", jute: "🌾 Jute Bags", travel: "✈️ Travel Bags", microwave: "🍿 Microwaves",
+      fridge_tabletop: "❄️ Fridge (Table Top)", fridge_doubledoor: "❄️❄️ Fridge (Double Door)", fridge_small: "🧊 Fridge (Small)",
+      gas: "🔥 Gas Cylinders", container: "📦 Storage Containers", buckets: "🪣 Buckets"
+    };
+    
+    window.openModal = function(category) {
+      const modal = document.getElementById('priceModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalContainer = document.getElementById('modalItemsContainer');
+      modalTitle.textContent = categoryTitles[category] || category;
+      const items = categoryItems[category];
+      if (!items) return;
+      modalContainer.innerHTML = items.map(item => `<div class="modal-item"><img class="modal-item-img" src="${item.image}" alt="${item.name}"><div class="modal-item-info"><div class="modal-item-name">${item.name}</div><div class="modal-item-price">${item.price}</div></div></div>`).join('');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+    
+    window.closeModal = function() {
+      const modal = document.getElementById('priceModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+    
+    // ===== INITIALIZE =====
+    document.addEventListener('DOMContentLoaded', function() {
+      initCustomDropdowns();
+      window.setupAddItem = enhancedSetupAddItem;
+      enhancedSetupAddItem();
+      
+      document.querySelectorAll('.item-row .remove-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (document.querySelectorAll('.item-row').length > 1) {
+            this.closest('.item-row').remove();
+            if (typeof calculateTotal === 'function') calculateTotal();
+          }
+        });
+      });
+      
+      document.querySelectorAll('.gallery-item').forEach(item => {
+        item.addEventListener('click', function() {
+          const category = this.getAttribute('data-category');
+          if (category) openModal(category);
+        });
+      });
+      
+      document.getElementById('priceModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+      });
+      
+      const menuToggle = document.querySelector('.menu-toggle');
+      const navLinks = document.querySelector('.nav-links');
+      if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+      }
+    });
+  </script>
 </body>
 </html>
