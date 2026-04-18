@@ -60,11 +60,11 @@
       margin-right: 8px;
     }
     
-    /* ===== MOBILE-FRIENDLY GALLERY SECTION ===== */
+    /* ===== EXPANDED GALLERY SECTION (10 ITEMS) ===== */
     .image-gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
       padding: 1rem;
     }
     
@@ -78,10 +78,15 @@
       border: 1px solid rgba(255,255,255,0.2);
     }
     
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      border-color: #ffb347;
+    }
+    
     .gallery-item img {
       width: 100%;
-      height: 120px;
-      object-fit: cover;
+      height: 140px;
+      object-fit: contain;
       border-radius: 12px;
       margin-bottom: 0.5rem;
     }
@@ -108,7 +113,7 @@
       font-size: 0.75rem;
     }
     
-    /* ===== MOBILE-FRIENDLY PRICING CARDS ===== */
+    /* ===== COMPACT PRICING CARDS WITH IMAGES ===== */
     .price-cards {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -117,46 +122,57 @@
       margin: 0 auto;
       padding: 1rem;
     }
-    
+
     .card {
       background: rgba(255,255,255,0.1);
       backdrop-filter: blur(10px);
       border-radius: 16px;
-      padding: 1rem;
+      padding: 0.75rem;
       text-align: center;
       transition: all 0.3s ease;
       border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
     }
-    
-    .card h3 {
-      font-size: 1rem;
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #ffb347;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    .card-image {
+      width: 100%;
+      height: 90px;
+      object-fit: contain;
+      border-radius: 10px;
       margin-bottom: 0.5rem;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .card h3 {
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
       color: #ffb347;
       font-weight: 700;
     }
-    
+
     .card .price {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       font-weight: 900;
       color: white;
-      margin: 0.5rem 0;
+      margin: 0.25rem 0;
     }
-    
+
     .card p {
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       color: rgba(255,255,255,0.8);
       margin: 0;
     }
-    
-    .card.highlight {
-      border: 2px solid #ffb347;
-      background: rgba(255,179,71,0.15);
-    }
-    
+
     .card.free {
       background: linear-gradient(135deg, rgba(40,167,69,0.2), rgba(40,167,69,0.1));
     }
-    
+
     /* Mobile: 2 columns */
     @media (max-width: 480px) {
       .image-gallery {
@@ -167,44 +183,44 @@
       
       .gallery-item img {
         height: 100px;
+        object-fit: contain;
       }
       
       .gallery-item h3 {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
       }
       
       .gallery-item p {
-        font-size: 0.65rem;
-      }
-      
-      .gallery-item .price-tag {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.6rem;
+        font-size: 0.6rem;
       }
       
       .price-cards {
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-        padding: 0.75rem;
+        gap: 0.5rem;
+        padding: 0.5rem;
+      }
+      
+      .card-image {
+        height: 70px;
       }
       
       .card {
-        padding: 0.75rem;
+        padding: 0.5rem;
       }
       
       .card h3 {
-        font-size: 0.85rem;
+        font-size: 0.7rem;
       }
       
       .card .price {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
       }
       
       .card p {
-        font-size: 0.65rem;
+        font-size: 0.55rem;
       }
     }
-    
+
     /* Tablet: 3 columns */
     @media (min-width: 481px) and (max-width: 768px) {
       .image-gallery {
@@ -213,25 +229,35 @@
       
       .gallery-item img {
         height: 110px;
+        object-fit: contain;
       }
       
       .price-cards {
         grid-template-columns: repeat(3, 1fr);
       }
+      
+      .card-image {
+        height: 80px;
+      }
     }
-    
-    /* Desktop: 4 columns */
+
+    /* Desktop: 4 columns for pricing, 5 columns for gallery */
     @media (min-width: 769px) {
       .image-gallery {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
       }
       
       .gallery-item img {
-        height: 140px;
+        height: 130px;
+        object-fit: contain;
       }
       
       .price-cards {
         grid-template-columns: repeat(4, 1fr);
+      }
+      
+      .card-image {
+        height: 90px;
       }
     }
   </style>
@@ -289,14 +315,14 @@
           <a href="#gallery" class="btn-secondary">📸 See Items</a>
         </div>
         <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
-          <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">✅ 500+ Students</span>
+          <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">✅ 5,000+ Students</span>
           <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">🔒 24/7 Security</span>
           <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">🚚 Free Pickup</span>
         </div>
       </div>
     </section>
 
-    <!-- Image Gallery Section -->
+    <!-- Image Gallery Section - EXPANDED with 10 items -->
     <section class="image-gallery-section" id="gallery">
       <div class="section-header">
         <h2>📦 What We Store</h2>
@@ -308,34 +334,89 @@
       </div>
       
       <div class="image-gallery">
+        <!-- Duffle Bags -->
         <div class="gallery-item">
-          <img src="https://i.pinimg.com/1200x/2a/3f/28/2a3f281be65a174cd98936b0087f1cfa.jpg" alt="Fridge" loading="lazy">
-          <h3>❄️ Fridges</h3>
-          <p>Table Top, Double Door, Small</p>
+          <img src="images/gallery-duffle.jpg" alt="Duffle Bags" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Duffle+Bags'">
+          <h3>🎒 Duffle Bags</h3>
+          <p>Small & Large sizes</p>
+          <span class="price-tag">From 30</span>
+        </div>
+
+        <!-- Jute Bags -->
+        <div class="gallery-item">
+          <img src="images/gallery-jute.jpg" alt="Jute Bags" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Jute+Bags'">
+          <h3>🌾 Jute Bags</h3>
+          <p>Small, Medium & Large</p>
           <span class="price-tag">From 40</span>
         </div>
+
+        <!-- Travel Suitcases -->
         <div class="gallery-item">
-          <img src="https://i.pinimg.com/736x/53/75/14/5375146956d91b6c351b5ba88316834b.jpg" alt="Gas Cylinder" loading="lazy">
+          <img src="images/gallery-suitcase.jpg" alt="Travel Suitcases" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Travel+Bags'">
+          <h3>✈️ Travel Bags</h3>
+          <p>Small, Medium & Large</p>
+          <span class="price-tag">From 30</span>
+        </div>
+
+        <!-- Microwave -->
+        <div class="gallery-item">
+          <img src="images/gallery-microwave.jpg" alt="Microwave" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Microwave'">
+          <h3>🍿 Microwaves</h3>
+          <p>Kitchen appliances</p>
+          <span class="price-tag">From 30</span>
+        </div>
+
+        <!-- Fridge Table Top -->
+        <div class="gallery-item">
+          <img src="images/gallery-fridge-table.jpg" alt="Table Top Fridge" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Fridge+Table'">
+          <h3>❄️ Fridge (Table)</h3>
+          <p>Table top refrigerator</p>
+          <span class="price-tag">From 60</span>
+        </div>
+
+        <!-- Fridge Double Door -->
+        <div class="gallery-item">
+          <img src="images/gallery-fridge-double.jpg" alt="Double Door Fridge" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Fridge+Double'">
+          <h3>❄️❄️ Fridge (DD)</h3>
+          <p>Double door refrigerator</p>
+          <span class="price-tag">From 80</span>
+        </div>
+
+        <!-- Fridge Small -->
+        <div class="gallery-item">
+          <img src="images/gallery-fridge-small.jpg" alt="Small Fridge" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Fridge+Small'">
+          <h3>🧊 Fridge (Small)</h3>
+          <p>Mini fridge</p>
+          <span class="price-tag">From 40</span>
+        </div>
+
+        <!-- Gas Cylinders -->
+        <div class="gallery-item">
+          <img src="images/gallery-gas.jpg" alt="Gas Cylinders" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Gas+Cylinders'">
           <h3>🔥 Gas Cylinders</h3>
-          <p>Small, Medium, Large</p>
+          <p>Small, Medium & Large</p>
           <span class="price-tag">From 30</span>
         </div>
+
+        <!-- Storage Containers -->
         <div class="gallery-item">
-          <img src="https://i.pinimg.com/736x/9a/a9/dc/9aa9dcde3c05b876119695e4b224050b.jpg" alt="Bags" loading="lazy">
-          <h3>👜 All Bag Types</h3>
-          <p>Ghana Must Go, Duffle, Jute, Travel</p>
+          <img src="images/gallery-container.jpg" alt="Storage Containers" loading="lazy" onerror="this.src='https://placehold.co/300x300/ffb347/8b0000?text=Containers'">
+          <h3>📦 Storage Containers</h3>
+          <p>Small & Large boxes</p>
           <span class="price-tag">From 30</span>
         </div>
+
+        <!-- Buckets -->
         <div class="gallery-item">
-          <img src="https://i.pinimg.com/1200x/f8/ae/91/f8ae91357c119f73993c667fc6082d77.jpg" alt="Small Items" loading="lazy">
-          <h3>📦 Other Items</h3>
-          <p>Microwave, Containers, Buckets</p>
-          <span class="price-tag">From 30</span>
+          <img src="images/gallery-buckets.jpg" alt="Buckets" loading="lazy" onerror="this.src='https://placehold.co/300x300/28a745/white?text=Buckets'">
+          <h3>🪣 Buckets</h3>
+          <p>Free with paid items</p>
+          <span class="price-tag">FREE</span>
         </div>
       </div>
     </section>
 
-    <!-- Pricing Section - UPGRADED with SPECIFIC ITEMS ONLY -->
+    <!-- Pricing Section WITH IMAGES -->
     <section class="pricing" id="prices">
       <div class="section-header">
         <h2>💰 Storage Pricing</h2>
@@ -343,133 +424,146 @@
       </div>
 
       <div class="price-cards">
-        <!-- ===== BAGS ===== -->    
         <!-- Duffle Bag (Small) -->
         <div class="card">
-          <h3>🎽 Duffle (Small)</h3>
+          <img class="card-image" src="images/duffle-small.jpg" alt="Duffle Bag Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Duffle+S'">
+          <h3>Duffle (Small)</h3>
           <p class="price" id="priceDuffleSmallDisplay">30</p>
           <p>Small duffle bag</p>
         </div>
         
         <!-- Duffle Bag (Big) -->
         <div class="card">
-          <h3>🎒 Duffle (Big)</h3>
+          <img class="card-image" src="images/duffle-big.jpg" alt="Duffle Bag Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Duffle+B'">
+          <h3>Duffle (Big)</h3>
           <p class="price" id="priceDuffleBigDisplay">50</p>
           <p>Large duffle bag</p>
         </div>
         
         <!-- Jute Bag (Small) -->
         <div class="card">
-          <h3>🌾 Jute (Small)</h3>
+          <img class="card-image" src="images/jute-small.jpg" alt="Jute Bag Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Jute+S'">
+          <h3>Jute (Small)</h3>
           <p class="price" id="priceJuteSmallDisplay">40</p>
           <p>Small jute bag</p>
         </div>
         
         <!-- Jute Bag (Medium) -->
         <div class="card">
-          <h3>🌾 Jute (Medium)</h3>
+          <img class="card-image" src="images/jute-medium.jpg" alt="Jute Bag Medium" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Jute+M'">
+          <h3>Jute (Medium)</h3>
           <p class="price" id="priceJuteMediumDisplay">60</p>
           <p>Medium jute bag</p>
         </div>
         
         <!-- Jute Bag (Big) -->
         <div class="card">
-          <h3>🌾 Jute (Big)</h3>
+          <img class="card-image" src="images/jute-big.jpg" alt="Jute Bag Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Jute+B'">
+          <h3>Jute (Big)</h3>
           <p class="price" id="priceJuteBigDisplay">80</p>
           <p>Large jute bag</p>
         </div>
         
         <!-- Traveling Bag (Small) -->
         <div class="card">
-          <h3>✈️ Travel (Small)</h3>
+          <img class="card-image" src="images/travel-small.jpg" alt="Travel Bag Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Travel+S'">
+          <h3>Travel (Small)</h3>
           <p class="price" id="priceTravelSmallDisplay">30</p>
           <p>Small suitcase</p>
         </div>
         
         <!-- Traveling Bag (Medium) -->
         <div class="card">
-          <h3>✈️ Travel (Medium)</h3>
+          <img class="card-image" src="images/travel-medium.jpg" alt="Travel Bag Medium" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Travel+M'">
+          <h3>Travel (Medium)</h3>
           <p class="price" id="priceTravelMediumDisplay">50</p>
           <p>Medium suitcase</p>
         </div>
         
         <!-- Traveling Bag (Big) -->
         <div class="card">
-          <h3>✈️ Travel (Big)</h3>
+          <img class="card-image" src="images/travel-big.jpg" alt="Travel Bag Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Travel+B'">
+          <h3>Travel (Big)</h3>
           <p class="price" id="priceTravelBigDisplay">70</p>
           <p>Large suitcase</p>
         </div>
         
-        <!-- ===== APPLIANCES ===== -->
         <!-- Microwave -->
         <div class="card">
-          <h3>🍿 Microwave</h3>
+          <img class="card-image" src="images/microwave.jpg" alt="Microwave" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Microwave'">
+          <h3>Microwave</h3>
           <p class="price" id="priceMicrowaveDisplay">30</p>
           <p>Kitchen appliance</p>
         </div>
         
         <!-- Fridge (Table Top) -->
         <div class="card">
-          <h3>❄️ Fridge (Table)</h3>
+          <img class="card-image" src="images/fridge-tabletop.jpg" alt="Fridge Table Top" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Fridge+T'">
+          <h3>Fridge (Table)</h3>
           <p class="price" id="priceFridgeTabletopDisplay">60</p>
           <p>Table top fridge</p>
         </div>
         
         <!-- Fridge (Double Door) -->
         <div class="card">
-          <h3>❄️❄️ Fridge (DD)</h3>
+          <img class="card-image" src="images/fridge-doubledoor.jpg" alt="Fridge Double Door" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Fridge+DD'">
+          <h3>Fridge (DD)</h3>
           <p class="price" id="priceFridgeDoubledoorDisplay">80</p>
           <p>Double door fridge</p>
         </div>
         
         <!-- Fridge (Small) -->
         <div class="card">
-          <h3>🧊 Fridge (Small)</h3>
+          <img class="card-image" src="images/fridge-small.jpg" alt="Fridge Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Fridge+S'">
+          <h3>Fridge (Small)</h3>
           <p class="price" id="priceFridgeSmallDisplay">40</p>
           <p>Mini fridge</p>
         </div>
         
-        <!-- ===== GAS CYLINDERS ===== -->
         <!-- Gas Cylinder (Small) -->
         <div class="card">
-          <h3>🔥 Gas (Small)</h3>
+          <img class="card-image" src="images/gas-small.jpg" alt="Gas Cylinder Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Gas+S'">
+          <h3>Gas (Small)</h3>
           <p class="price" id="priceGasSmallDisplay">30</p>
           <p>Small cylinder</p>
         </div>
         
         <!-- Gas Cylinder (Medium) -->
         <div class="card">
-          <h3>🔥 Gas (Medium)</h3>
+          <img class="card-image" src="images/gas-medium.jpg" alt="Gas Cylinder Medium" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Gas+M'">
+          <h3>Gas (Medium)</h3>
           <p class="price" id="priceGasMediumDisplay">35</p>
           <p>Medium cylinder</p>
         </div>
         
         <!-- Gas Cylinder (Big) -->
         <div class="card">
-          <h3>🔥 Gas (Big)</h3>
+          <img class="card-image" src="images/gas-big.jpg" alt="Gas Cylinder Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Gas+B'">
+          <h3>Gas (Big)</h3>
           <p class="price" id="priceGasBigDisplay">40</p>
           <p>Large cylinder</p>
         </div>
         
-        <!-- ===== CONTAINERS ===== -->
-        <!-- Other Container (Small) -->
+        <!-- Container (Small) -->
         <div class="card">
-          <h3>📦 Container (S)</h3>
+          <img class="card-image" src="images/container-small.jpg" alt="Container Small" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Box+S'">
+          <h3>Container (S)</h3>
           <p class="price" id="priceContainerSmallDisplay">30</p>
           <p>Small container/box</p>
         </div>
         
-        <!-- Other Container (Big) -->
+        <!-- Container (Big) -->
         <div class="card">
-          <h3>📦 Container (B)</h3>
+          <img class="card-image" src="images/container-big.jpg" alt="Container Big" onerror="this.src='https://placehold.co/200x200/ffb347/8b0000?text=Box+B'">
+          <h3>Container (B)</h3>
           <p class="price" id="priceContainerBigDisplay">50</p>
           <p>Large container/box</p>
         </div>
         
-        <!-- ===== FREE ITEMS ===== -->
         <!-- Buckets (Free) -->
         <div class="card free">
-          <h3>🪣 Buckets</h3>
+          <img class="card-image" src="images/buckets.jpg" alt="Buckets" onerror="this.src='https://placehold.co/200x200/28a745/white?text=Buckets'">
+          <h3>Buckets</h3>
           <p class="price" id="priceBucketsDisplay">0</p>
           <p>Free with paid item</p>
         </div>
@@ -540,14 +634,13 @@
           </div>
         </div>
 
-        <!-- Items Section - UPGRADED with SPECIFIC ITEMS -->
+        <!-- Items Section -->
         <div class="form-group items-section">
           <label>Items to Store *</label>
           <div id="itemsContainer">
             <div class="item-row">
               <select class="itemSelect" required>
                 <option value="">Select item type</option>
-                <!-- BAGS -->
                 <option value="duffle_small">🎽 Duffle Bag (Small) – ₵30</option>
                 <option value="duffle_big">🎒 Duffle Bag (Big) – ₵50</option>
                 <option value="jute_small">🌾 Jute Bag (Small) – ₵40</option>
@@ -556,19 +649,15 @@
                 <option value="travel_small">✈️ Travel Bag (Small) – ₵30</option>
                 <option value="travel_medium">✈️ Travel Bag (Medium) – ₵50</option>
                 <option value="travel_big">✈️ Travel Bag (Big) – ₵70</option>
-                <!-- APPLIANCES -->
                 <option value="microwave">🍿 Microwave – ₵30</option>
                 <option value="fridge_tabletop">❄️ Fridge (Table Top) – ₵60</option>
                 <option value="fridge_doubledoor">❄️❄️ Fridge (Double Door) – ₵80</option>
                 <option value="fridge_small">🧊 Fridge (Small) – ₵40</option>
-                <!-- GAS CYLINDERS -->
                 <option value="gas_small">🔥 Gas Cylinder (Small) – ₵30</option>
                 <option value="gas_medium">🔥 Gas Cylinder (Medium) – ₵35</option>
                 <option value="gas_big">🔥 Gas Cylinder (Big) – ₵40</option>
-                <!-- CONTAINERS -->
                 <option value="container_small">📦 Container (Small) – ₵30</option>
                 <option value="container_big">📦 Container (Big) – ₵50</option>
-                <!-- FREE -->
                 <option value="buckets">🪣 Buckets – Free</option>
               </select>
               <input type="number" class="quantity" min="1" value="1" required>
