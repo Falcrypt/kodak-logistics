@@ -34,6 +34,7 @@
 
 html {
     scroll-behavior: smooth;
+    font-size: 16px;
 }
 
 body {
@@ -42,6 +43,7 @@ body {
     min-height: 100vh;
     line-height: 1.6;
     overflow-x: hidden;
+    font-size: 1rem
 }
 
 /* ========== LOADER ANIMATION ========== */
@@ -1017,36 +1019,87 @@ footer {
 }
 
 @media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+    
     .hero h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
     
     .hero p {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     
     .btn-primary, .btn-secondary {
-        padding: 1rem 2rem;
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .section-header p {
+        font-size: 0.9rem;
     }
     
     .gallery-item {
-        padding: 1.5rem;
+        padding: 1rem;
+    }
+    
+    .gallery-item h3 {
+        font-size: 0.8rem;
+    }
+    
+    .gallery-item p {
+        font-size: 0.65rem;
     }
     
     .gallery-item img {
-        height: 200px;
-    }
-    
-    .price-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .card.highlight {
-        transform: none;
+        height: 120px;
     }
     
     .booking-form {
-        padding: 2rem;
+        padding: 1.5rem;
+    }
+    
+    .form-group label {
+        font-size: 0.9rem;
+    }
+    
+    .booking-form input,
+    .booking-form select,
+    .booking-form textarea {
+        padding: 0.7rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .add-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .total-section p {
+        font-size: 1.5rem;
+    }
+    
+    .faq-content summary {
+        font-size: 0.9rem;
+        padding: 1rem 1.5rem;
+    }
+    
+    .footer-logo {
+        font-size: 1.8rem;
+    }
+    
+    .footer-tag {
+        font-size: 1rem;
+    }
+    
+    .footer-whatsapp {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.9rem;
     }
 }
 
@@ -1147,6 +1200,70 @@ img {
 @keyframes blink {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
+}
+
+/* Extra small devices (phones under 480px) */
+@media (max-width: 480px) {
+    html {
+        font-size: 12px;
+    }
+    
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero p {
+        font-size: 0.9rem;
+    }
+    
+    .hero-buttons {
+        gap: 0.8rem;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.8rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .gallery-item h3 {
+        font-size: 0.7rem;
+    }
+    
+    .gallery-item p {
+        font-size: 0.55rem;
+    }
+    
+    .form-group label {
+        font-size: 0.8rem;
+    }
+    
+    .booking-form input,
+    .booking-form select,
+    .booking-form textarea {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.75rem;
+    }
+    
+    .custom-select-trigger {
+        padding: 0.5rem 0.8rem;
+    }
+    
+    .trigger-text {
+        font-size: 0.7rem;
+    }
+    
+    .add-btn {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.8rem;
+    }
+    
+    .total-section p {
+        font-size: 1.2rem;
+    }
 }
 
 /* ===== OVERRIDE FOR DROPDOWN - NO TRANSPARENCY ===== */
