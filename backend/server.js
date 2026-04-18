@@ -1,4 +1,4 @@
-// backend/server.js - MAIN SERVER FILE (UPDATED WITH NEW ITEMS)
+// backend/server.js - UPGRADED VERSION (No more generic items)
 // This starts everything and connects all the pieces
 
 // ===== STEP 1: LOAD ENVIRONMENT VARIABLES =====
@@ -38,13 +38,12 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function(origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl)
         if (!origin) return callback(null, true);
         if (allowedOrigins.some(allowed => origin === allowed || (allowed.includes('*') && origin.includes('onrender.com')))) {
             callback(null, true);
         } else {
             console.log('❌ CORS blocked for origin:', origin);
-            callback(null, true); // Still allow but log it
+            callback(null, true);
         }
     },
     credentials: true,
@@ -127,44 +126,50 @@ async function setupDatabase() {
         `);
         console.log('✅ settings table ready');
         
-        // ===== UPDATED: ALL DEFAULT SETTINGS WITH NEW ITEMS =====
+        // ===== ALL NEW SPECIFIC ITEMS (No more generic items) =====
         const defaultSettings = [
             // Contact settings
             ['whatsapp_number', '233545025296'],
             ['business_email', 'Philiptesimbo@gmail.com'],
             
-            // Original Items
-            ['price_small', '40'],
-            ['price_medium', '50'],
-            ['price_big', '60'],
-            ['price_fridge', '70'],
-            ['price_gas', '60'],
+            // ===== BAGS =====
+            // Ghana Must Go Bag
+            ['price_ghana_must_go', '40'],
             
-            // NEW: Microwave
-            ['price_microwave', '30'],
-            
-            // NEW: Duffle Bags
+            // Duffle Bags
             ['price_duffle_small', '29.99'],
             ['price_duffle_big', '49.99'],
             
-            // NEW: Jute Bags
+            // Jute Bags
             ['price_jute_small', '39.99'],
             ['price_jute_medium', '59.99'],
             ['price_jute_big', '79.99'],
             
-            // NEW: Traveling Bags
+            // Traveling Bags / Suitcases
             ['price_travel_small', '29.99'],
             ['price_travel_medium', '49.99'],
             ['price_travel_big', '69.99'],
             
-            // NEW: Other Containers
+            // ===== APPLIANCES =====
+            // Microwave
+            ['price_microwave', '30'],
+            
+            // Fridges (specific sizes)
+            ['price_fridge_tabletop', '59.99'],
+            ['price_fridge_doubledoor', '79.99'],
+            ['price_fridge_small', '39.99'],
+            
+            // ===== GAS CYLINDERS =====
+            ['price_gas_small', '29.99'],
+            ['price_gas_medium', '34.99'],
+            ['price_gas_big', '39.99'],
+            
+            // ===== CONTAINERS =====
             ['price_container_small', '29.99'],
             ['price_container_big', '49.99'],
             
-            // NEW: Gas Cylinder sizes
-            ['price_gas_small', '29.99'],
-            ['price_gas_medium', '34.99'],
-            ['price_gas_big', '39.99']
+            // ===== FREE ITEMS =====
+            ['price_buckets', '0']
         ];
         
         for (const [key, value] of defaultSettings) {
@@ -173,7 +178,14 @@ async function setupDatabase() {
                 [key, value]
             );
         }
-        console.log('✅ default settings inserted (including new items)');
+        
+        // Optional: Delete old generic settings if they exist (comment out if you want to keep them)
+        const oldSettings = ['price_small', 'price_medium', 'price_big', 'price_fridge', 'price_gas'];
+        for (const oldKey of oldSettings) {
+            await db.query('DELETE FROM settings WHERE setting_key = $1', [oldKey]);
+        }
+        
+        console.log('✅ Default settings inserted (specific items only, old generic items removed)');
         console.log('✅ All database tables are ready!');
         
     } catch (error) {

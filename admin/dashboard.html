@@ -72,8 +72,8 @@
         </div>
         <div class="table-responsive">
           <table class="data-table">
-            <thead><td><th>Reference</th><th>ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Hostel</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="allBookingsBody"><tr><td colspan="10">Loading...<\/td><\/tr></td></tbody>
+            <thead><tr><th>Reference</th><th>ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Hostel</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="allBookingsBody"><tr><td colspan="10">Loading...<\/td><\/tr></tr></tbody>
           </table>
           <div id="pagination" class="pagination"></div>
         </div>
@@ -85,12 +85,12 @@
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Bookings</th><th>Last Booking</th><th>Action</th></tr></thead>
-            <tbody id="customersBody"><td><td colspan="6">Loading...<\/td><\/tr></td></tbody>
+            <tbody id="customersBody"><td><td colspan="6">Loading...<\/td><\/tr></tr></tbody>
           </table>
         </div>
       </section>
       
-      <!-- Pricing Section - Modern Styling (UPDATED WITH NEW ITEMS) -->
+      <!-- Pricing Section - UPGRADED with SPECIFIC ITEMS ONLY -->
       <section id="pricing-section" class="content-section">
         <div class="section-header">
           <h2>💰 Pricing Management</h2>
@@ -98,86 +98,27 @@
         </div>
         
         <div class="pricing-grid-modern">
-          <!-- ===== ORIGINAL ITEMS ===== -->
+          <!-- ===== BAGS ===== -->
+          
+          <!-- Ghana Must Go Bag -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">👜</div>
             <div class="pricing-info">
-              <h3>Small Bag</h3>
-              <p>Perfect for clothes, books, shoes</p>
+              <h3>Ghana Must Go Bag</h3>
+              <p>Durable woven bag for clothes & books</p>
             </div>
             <div class="pricing-input-group">
               <span class="currency">₵</span>
-              <input type="number" id="priceSmall" min="0" step="0.5" value="40" class="pricing-input">
+              <input type="number" id="priceGhanaMustGo" min="0" step="0.5" value="40" class="pricing-input">
             </div>
           </div>
           
-          <div class="pricing-card-modern">
-            <div class="pricing-icon">🎒</div>
-            <div class="pricing-info">
-              <h3>Medium Bag</h3>
-              <p>Ideal for larger loads</p>
-            </div>
-            <div class="pricing-input-group">
-              <span class="currency">₵</span>
-              <input type="number" id="priceMedium" min="0" step="0.5" value="50" class="pricing-input">
-            </div>
-          </div>
-          
-          <div class="pricing-card-modern">
-            <div class="pricing-icon">🧳</div>
-            <div class="pricing-info">
-              <h3>Big Bag</h3>
-              <p>Maximum storage capacity</p>
-            </div>
-            <div class="pricing-input-group">
-              <span class="currency">₵</span>
-              <input type="number" id="priceBig" min="0" step="0.5" value="60" class="pricing-input">
-            </div>
-          </div>
-          
-          <div class="pricing-card-modern">
-            <div class="pricing-icon">❄️</div>
-            <div class="pricing-info">
-              <h3>Fridge</h3>
-              <p>Temperature controlled storage</p>
-            </div>
-            <div class="pricing-input-group">
-              <span class="currency">₵</span>
-              <input type="number" id="priceFridge" min="0" step="0.5" value="70" class="pricing-input">
-            </div>
-          </div>
-          
-          <div class="pricing-card-modern">
-            <div class="pricing-icon">🔥</div>
-            <div class="pricing-info">
-              <h3>Gas Cylinder (Standard)</h3>
-              <p>Safe storage for cooking gas</p>
-            </div>
-            <div class="pricing-input-group">
-              <span class="currency">₵</span>
-              <input type="number" id="priceGas" min="0" step="0.5" value="60" class="pricing-input">
-            </div>
-          </div>
-
-          <!-- ===== NEW: MICROWAVE ===== -->
-          <div class="pricing-card-modern">
-            <div class="pricing-icon">🍿</div>
-            <div class="pricing-info">
-              <h3>Microwave</h3>
-              <p>Kitchen appliance storage</p>
-            </div>
-            <div class="pricing-input-group">
-              <span class="currency">₵</span>
-              <input type="number" id="priceMicrowave" min="0" step="0.5" value="30" class="pricing-input">
-            </div>
-          </div>
-
-          <!-- ===== NEW: DUFFLE BAGS ===== -->
+          <!-- Duffle Bag (Small) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🎽</div>
             <div class="pricing-info">
               <h3>Duffle Bag (Small)</h3>
-              <p>Sports/travel duffle bag</p>
+              <p>Sports/travel duffle bag - small size</p>
             </div>
             <div class="pricing-input-group">
               <span class="currency">₵</span>
@@ -185,6 +126,7 @@
             </div>
           </div>
 
+          <!-- Duffle Bag (Big) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🎒</div>
             <div class="pricing-info">
@@ -197,12 +139,12 @@
             </div>
           </div>
 
-          <!-- ===== NEW: JUTE BAGS ===== -->
+          <!-- Jute Bag (Small) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🌾</div>
             <div class="pricing-info">
               <h3>Jute Bag (Small)</h3>
-              <p>Eco-friendly woven bag</p>
+              <p>Eco-friendly woven bag - small</p>
             </div>
             <div class="pricing-input-group">
               <span class="currency">₵</span>
@@ -210,11 +152,12 @@
             </div>
           </div>
 
+          <!-- Jute Bag (Medium) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🌾</div>
             <div class="pricing-info">
               <h3>Jute Bag (Medium)</h3>
-              <p>Medium jute storage bag</p>
+              <p>Eco-friendly woven bag - medium</p>
             </div>
             <div class="pricing-input-group">
               <span class="currency">₵</span>
@@ -222,11 +165,12 @@
             </div>
           </div>
 
+          <!-- Jute Bag (Big) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🌾</div>
             <div class="pricing-info">
               <h3>Jute Bag (Big)</h3>
-              <p>Large jute storage bag</p>
+              <p>Eco-friendly woven bag - large</p>
             </div>
             <div class="pricing-input-group">
               <span class="currency">₵</span>
@@ -234,7 +178,7 @@
             </div>
           </div>
 
-          <!-- ===== NEW: TRAVELING BAGS ===== -->
+          <!-- Traveling Bag (Small) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">✈️</div>
             <div class="pricing-info">
@@ -247,6 +191,7 @@
             </div>
           </div>
 
+          <!-- Traveling Bag (Medium) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">✈️</div>
             <div class="pricing-info">
@@ -259,6 +204,7 @@
             </div>
           </div>
 
+          <!-- Traveling Bag (Big) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">✈️</div>
             <div class="pricing-info">
@@ -271,32 +217,63 @@
             </div>
           </div>
 
-          <!-- ===== NEW: OTHER CONTAINERS ===== -->
+          <!-- ===== APPLIANCES ===== -->
+          
+          <!-- Microwave -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">📦</div>
+            <div class="pricing-icon">🍿</div>
             <div class="pricing-info">
-              <h3>Other Container (Small)</h3>
-              <p>Small plastic container/box</p>
+              <h3>Microwave</h3>
+              <p>Kitchen appliance storage</p>
             </div>
             <div class="pricing-input-group">
               <span class="currency">₵</span>
-              <input type="number" id="priceContainerSmall" min="0" step="0.5" value="29.99" class="pricing-input">
+              <input type="number" id="priceMicrowave" min="0" step="0.5" value="30" class="pricing-input">
             </div>
           </div>
 
+          <!-- Fridge (Table Top) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">📦</div>
+            <div class="pricing-icon">❄️</div>
             <div class="pricing-info">
-              <h3>Other Container (Big)</h3>
-              <p>Large plastic container/box</p>
+              <h3>Fridge (Table Top)</h3>
+              <p>Standard table top fridge</p>
             </div>
             <div class="pricing-input-group">
               <span class="currency">₵</span>
-              <input type="number" id="priceContainerBig" min="0" step="0.5" value="49.99" class="pricing-input">
+              <input type="number" id="priceFridgeTabletop" min="0" step="0.5" value="59.99" class="pricing-input">
             </div>
           </div>
 
-          <!-- ===== NEW: GAS CYLINDER SIZES ===== -->
+          <!-- Fridge (Double Door) -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">❄️❄️</div>
+            <div class="pricing-info">
+              <h3>Fridge (Double Door)</h3>
+              <p>Large double door fridge</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceFridgeDoubledoor" min="0" step="0.5" value="79.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- Fridge (Small) -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">🧊</div>
+            <div class="pricing-info">
+              <h3>Fridge (Small)</h3>
+              <p>Compact mini fridge</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceFridgeSmall" min="0" step="0.5" value="39.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- ===== GAS CYLINDERS ===== -->
+          
+          <!-- Gas Cylinder (Small) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🔥</div>
             <div class="pricing-info">
@@ -309,6 +286,7 @@
             </div>
           </div>
 
+          <!-- Gas Cylinder (Medium) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🔥</div>
             <div class="pricing-info">
@@ -321,6 +299,7 @@
             </div>
           </div>
 
+          <!-- Gas Cylinder (Big) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🔥</div>
             <div class="pricing-info">
@@ -330,6 +309,49 @@
             <div class="pricing-input-group">
               <span class="currency">₵</span>
               <input type="number" id="priceGasBig" min="0" step="0.5" value="39.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- ===== CONTAINERS ===== -->
+          
+          <!-- Other Container (Small) -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">📦</div>
+            <div class="pricing-info">
+              <h3>Other Container (Small)</h3>
+              <p>Small plastic container/box</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceContainerSmall" min="0" step="0.5" value="29.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- Other Container (Big) -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">📦</div>
+            <div class="pricing-info">
+              <h3>Other Container (Big)</h3>
+              <p>Large plastic container/box</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceContainerBig" min="0" step="0.5" value="49.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- ===== FREE ITEMS ===== -->
+          
+          <!-- Buckets (Free) -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon">🪣</div>
+            <div class="pricing-info">
+              <h3>Buckets</h3>
+              <p>Free when stored with paid items</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceBuckets" min="0" step="0.5" value="0" class="pricing-input" readonly style="background:#f0f0f0;">
             </div>
           </div>
         </div>

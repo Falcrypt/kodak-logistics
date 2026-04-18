@@ -1,6 +1,6 @@
-// admin/admin.js - REFINED & FIXED VERSION
+// admin/admin.js - UPGRADED VERSION (Specific items only)
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
-console.log('🚀 Admin JS loaded - Refined Version');
+console.log('🚀 Admin JS loaded - Upgraded Version');
 
 let currentUser = null;
 let sessionCheckInterval = null;
@@ -114,14 +114,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ========== MOBILE MENU FUNCTIONALITY (MOVED OUTSIDE) ==========
+// ========== MOBILE MENU FUNCTIONALITY ==========
 function setupMobileMenu() {
     const mobileToggle = document.getElementById('mobileMenuToggle');
     const sidebar = document.querySelector('.sidebar');
     
     if (!mobileToggle || !sidebar) return;
     
-    // Create overlay element
     let overlay = document.querySelector('.menu-overlay');
     if (!overlay) {
         overlay = document.createElement('div');
@@ -129,28 +128,23 @@ function setupMobileMenu() {
         document.body.appendChild(overlay);
     }
     
-    // Toggle menu function
     function toggleMenu() {
         sidebar.classList.toggle('open');
         overlay.classList.toggle('active');
         document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
     }
     
-    // Close menu function
     function closeMenu() {
         sidebar.classList.remove('open');
         overlay.classList.remove('active');
         document.body.style.overflow = '';
     }
     
-    // Make toggleMenu available globally for the button's onclick
     window.toggleMobileMenu = toggleMenu;
     
-    // Event listeners
     mobileToggle.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', closeMenu);
     
-    // Close menu when a nav link is clicked (on mobile)
     const navLinks = document.querySelectorAll('.sidebar-nav a');
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
@@ -160,7 +154,6 @@ function setupMobileMenu() {
         });
     });
     
-    // Close menu on window resize if open
     window.addEventListener('resize', function() {
         if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
             closeMenu();
@@ -168,7 +161,7 @@ function setupMobileMenu() {
     });
 }
 
-// ========== LOAD ALL SETTINGS (UPDATED WITH NEW ITEMS) ==========
+// ========== LOAD ALL SETTINGS (UPGRADED - Specific items only) ==========
 async function loadAllSettings() {
   console.log('⚙️ Loading settings and pricing...');
   try {
@@ -182,29 +175,16 @@ async function loadAllSettings() {
     const settings = await response.json();
     console.log('Settings received:', settings);
 
-    // Settings section
+    // Contact settings
     const ws = document.getElementById('whatsappNumber');
     const em = document.getElementById('businessEmail');
     if (ws) ws.value = settings.whatsapp_number || '';
     if (em) em.value = settings.business_email || '';
 
-    // ===== ORIGINAL PRICING SECTION =====
-    const ps = document.getElementById('priceSmall');
-    const pm = document.getElementById('priceMedium');
-    const pb = document.getElementById('priceBig');
-    const pf = document.getElementById('priceFridge');
-    const pg = document.getElementById('priceGas');
-
-    if (ps) ps.value = settings.price_small || 40;
-    if (pm) pm.value = settings.price_medium || 50;
-    if (pb) pb.value = settings.price_big || 60;
-    if (pf) pf.value = settings.price_fridge || 70;
-    if (pg) pg.value = settings.price_gas || 60;
-
-    // ===== NEW PRICING SECTION =====
-    // Microwave
-    const pMicrowave = document.getElementById('priceMicrowave');
-    if (pMicrowave) pMicrowave.value = settings.price_microwave || 30;
+    // ===== BAGS =====
+    // Ghana Must Go Bag
+    const pGhanaMustGo = document.getElementById('priceGhanaMustGo');
+    if (pGhanaMustGo) pGhanaMustGo.value = settings.price_ghana_must_go || 40;
     
     // Duffle Bags
     const pDuffleSmall = document.getElementById('priceDuffleSmall');
@@ -228,19 +208,36 @@ async function loadAllSettings() {
     if (pTravelMedium) pTravelMedium.value = settings.price_travel_medium || 49.99;
     if (pTravelBig) pTravelBig.value = settings.price_travel_big || 69.99;
     
-    // Other Containers
-    const pContainerSmall = document.getElementById('priceContainerSmall');
-    const pContainerBig = document.getElementById('priceContainerBig');
-    if (pContainerSmall) pContainerSmall.value = settings.price_container_small || 29.99;
-    if (pContainerBig) pContainerBig.value = settings.price_container_big || 49.99;
+    // ===== APPLIANCES =====
+    // Microwave
+    const pMicrowave = document.getElementById('priceMicrowave');
+    if (pMicrowave) pMicrowave.value = settings.price_microwave || 30;
     
-    // Gas Cylinder Sizes
+    // Fridges
+    const pFridgeTabletop = document.getElementById('priceFridgeTabletop');
+    const pFridgeDoubledoor = document.getElementById('priceFridgeDoubledoor');
+    const pFridgeSmall = document.getElementById('priceFridgeSmall');
+    if (pFridgeTabletop) pFridgeTabletop.value = settings.price_fridge_tabletop || 59.99;
+    if (pFridgeDoubledoor) pFridgeDoubledoor.value = settings.price_fridge_doubledoor || 79.99;
+    if (pFridgeSmall) pFridgeSmall.value = settings.price_fridge_small || 39.99;
+    
+    // ===== GAS CYLINDERS =====
     const pGasSmall = document.getElementById('priceGasSmall');
     const pGasMedium = document.getElementById('priceGasMedium');
     const pGasBig = document.getElementById('priceGasBig');
     if (pGasSmall) pGasSmall.value = settings.price_gas_small || 29.99;
     if (pGasMedium) pGasMedium.value = settings.price_gas_medium || 34.99;
     if (pGasBig) pGasBig.value = settings.price_gas_big || 39.99;
+    
+    // ===== CONTAINERS =====
+    const pContainerSmall = document.getElementById('priceContainerSmall');
+    const pContainerBig = document.getElementById('priceContainerBig');
+    if (pContainerSmall) pContainerSmall.value = settings.price_container_small || 29.99;
+    if (pContainerBig) pContainerBig.value = settings.price_container_big || 49.99;
+    
+    // ===== FREE ITEMS =====
+    const pBuckets = document.getElementById('priceBuckets');
+    if (pBuckets) pBuckets.value = settings.price_buckets || 0;
 
     console.log('✅ Settings and pricing loaded successfully');
   } catch (error) {
@@ -260,29 +257,24 @@ function setupNavigation() {
       const sectionId = this.dataset.section;
       console.log('📌 Navigation clicked:', sectionId);
       
-      // Hide all sections
       document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active-section');
       });
       
-      // Show selected section
       const targetSection = document.getElementById(sectionId + '-section');
       if (targetSection) {
         targetSection.classList.add('active-section');
         console.log('✅ Section activated:', sectionId + '-section');
       }
       
-      // Update active nav link
       navLinks.forEach(link => link.classList.remove('active'));
       this.classList.add('active');
       
-      // Update page title
       const titleEl = document.getElementById('pageTitle');
       if (titleEl) {
         titleEl.textContent = sectionId === 'dashboard' ? 'Dashboard' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
       }
       
-      // Load data for the section
       if (sectionId === 'bookings') {
         loadAllBookings();
       } else if (sectionId === 'customers') {
@@ -398,7 +390,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<td><td colspan="6">No recent bookings缓解</td>';
+    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -424,7 +416,6 @@ async function loadFilteredBookings() {
     try {
         console.log(`🔍 Searching: "${currentSearchTerm}", Filter: ${currentStatusFilter}`);
         
-        const token = localStorage.getItem('adminToken');
         const params = new URLSearchParams();
         
         if (currentSearchTerm) {
@@ -445,7 +436,6 @@ async function loadFilteredBookings() {
     }
 }
 
-// ========== LOAD ALL BOOKINGS (resets search) ==========
 async function loadAllBookings() {
     currentSearchTerm = '';
     currentStatusFilter = 'all';
@@ -463,7 +453,7 @@ function displayAllBookings(bookings) {
   const tbody = document.getElementById('allBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<td><td colspan="10">No bookings found缓解</td>';
+    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -492,7 +482,7 @@ function displayAllBookings(bookings) {
           <option value="confirmed" ${status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
           <option value="completed" ${status === 'completed' ? 'selected' : ''}>Completed</option>
         </select>
-      </td>
+       </td>
       <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button></td>
     </tr>`;
   }).join('');
@@ -526,7 +516,7 @@ function displayCustomers(customers) {
   if (!tbody) return;
   
   if (!customers || customers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No customers found缓解</table>';
+    tbody.innerHTML = '<tr><td colspan="6">No customers found</td></tr>';
     return;
   }
   
@@ -622,42 +612,45 @@ window.resetAllBookings = async function() {
   }
 };
 
-// ========== SAVE PRICING (UPDATED WITH NEW ITEMS) ==========
+// ========== SAVE PRICING (UPGRADED - Specific items only) ==========
 window.savePricing = async function() {
-  const prices = {
-    // Original items
-    price_small: parseFloat(document.getElementById('priceSmall')?.value) || 40,
-    price_medium: parseFloat(document.getElementById('priceMedium')?.value) || 50,
-    price_big: parseFloat(document.getElementById('priceBig')?.value) || 60,
-    price_fridge: parseFloat(document.getElementById('priceFridge')?.value) || 70,
-    price_gas: parseFloat(document.getElementById('priceGas')?.value) || 60,
-    
-    // New: Microwave
-    price_microwave: parseFloat(document.getElementById('priceMicrowave')?.value) || 30,
-    
-    // New: Duffle Bags
-    price_duffle_small: parseFloat(document.getElementById('priceDuffleSmall')?.value) || 29.99,
-    price_duffle_big: parseFloat(document.getElementById('priceDuffleBig')?.value) || 49.99,
-    
-    // New: Jute Bags
-    price_jute_small: parseFloat(document.getElementById('priceJuteSmall')?.value) || 39.99,
-    price_jute_medium: parseFloat(document.getElementById('priceJuteMedium')?.value) || 59.99,
-    price_jute_big: parseFloat(document.getElementById('priceJuteBig')?.value) || 79.99,
-    
-    // New: Traveling Bags
-    price_travel_small: parseFloat(document.getElementById('priceTravelSmall')?.value) || 29.99,
-    price_travel_medium: parseFloat(document.getElementById('priceTravelMedium')?.value) || 49.99,
-    price_travel_big: parseFloat(document.getElementById('priceTravelBig')?.value) || 69.99,
-    
-    // New: Other Containers
-    price_container_small: parseFloat(document.getElementById('priceContainerSmall')?.value) || 29.99,
-    price_container_big: parseFloat(document.getElementById('priceContainerBig')?.value) || 49.99,
-    
-    // New: Gas Cylinder Sizes
-    price_gas_small: parseFloat(document.getElementById('priceGasSmall')?.value) || 29.99,
-    price_gas_medium: parseFloat(document.getElementById('priceGasMedium')?.value) || 34.99,
-    price_gas_big: parseFloat(document.getElementById('priceGasBig')?.value) || 39.99
+  const getVal = (id, defaultVal) => {
+    const el = document.getElementById(id);
+    return el ? parseFloat(el.value) : defaultVal;
   };
+  
+  const prices = {
+    // BAGS
+    price_ghana_must_go: getVal('priceGhanaMustGo', 40),
+    price_duffle_small: getVal('priceDuffleSmall', 29.99),
+    price_duffle_big: getVal('priceDuffleBig', 49.99),
+    price_jute_small: getVal('priceJuteSmall', 39.99),
+    price_jute_medium: getVal('priceJuteMedium', 59.99),
+    price_jute_big: getVal('priceJuteBig', 79.99),
+    price_travel_small: getVal('priceTravelSmall', 29.99),
+    price_travel_medium: getVal('priceTravelMedium', 49.99),
+    price_travel_big: getVal('priceTravelBig', 69.99),
+    
+    // APPLIANCES
+    price_microwave: getVal('priceMicrowave', 30),
+    price_fridge_tabletop: getVal('priceFridgeTabletop', 59.99),
+    price_fridge_doubledoor: getVal('priceFridgeDoubledoor', 79.99),
+    price_fridge_small: getVal('priceFridgeSmall', 39.99),
+    
+    // GAS CYLINDERS
+    price_gas_small: getVal('priceGasSmall', 29.99),
+    price_gas_medium: getVal('priceGasMedium', 34.99),
+    price_gas_big: getVal('priceGasBig', 39.99),
+    
+    // CONTAINERS
+    price_container_small: getVal('priceContainerSmall', 29.99),
+    price_container_big: getVal('priceContainerBig', 49.99),
+    
+    // FREE ITEMS
+    price_buckets: getVal('priceBuckets', 0)
+  };
+
+  console.log('📤 Saving prices:', prices);
 
   const saveButton = document.querySelector('#pricing-section .btn-save-modern');
   if (saveButton) {
@@ -674,6 +667,7 @@ window.savePricing = async function() {
       throw new Error(result?.error || 'Save failed');
     }
   } catch (error) {
+    console.error('Save error:', error);
     showMessage('pricingMessage', `❌ Error: ${error.message}`, 'error');
   } finally {
     if (saveButton) {
@@ -824,8 +818,7 @@ window.loadAllBookings = loadAllBookings;
 window.closeCustomerModal = closeCustomerModal;
 window.viewCustomerDetails = viewCustomerDetails;
 
-// ========== SIMPLE STANDALONE MOBILE MENU TOGGLE ==========
-// This ensures the mobile menu button works even if other functions fail
+// ========== MOBILE MENU TOGGLE ==========
 window.toggleMobileMenu = function() {
     console.log('toggleMobileMenu called');
     const sidebar = document.querySelector('.sidebar');
@@ -837,13 +830,11 @@ window.toggleMobileMenu = function() {
     }
 };
 
-// Also ensure the button is visible on mobile and close menu when clicking outside
 document.addEventListener('DOMContentLoaded', function() {
     const menuBtn = document.getElementById('mobileMenuToggle');
     const sidebar = document.querySelector('.sidebar');
     
     if (menuBtn && sidebar) {
-        // Show button on mobile
         function checkWidth() {
             if (window.innerWidth <= 768) {
                 menuBtn.style.display = 'flex';
@@ -856,7 +847,6 @@ document.addEventListener('DOMContentLoaded', function() {
         checkWidth();
         window.addEventListener('resize', checkWidth);
         
-        // Also make sure clicking on nav links closes the menu on mobile
         document.querySelectorAll('.sidebar-nav a').forEach(link => {
             link.addEventListener('click', function() {
                 if (window.innerWidth <= 768) {
@@ -865,7 +855,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Close menu when clicking outside (on the main content)
         document.addEventListener('click', function(event) {
             if (window.innerWidth <= 768) {
                 const isClickInside = sidebar.contains(event.target) || menuBtn.contains(event.target);

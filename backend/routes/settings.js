@@ -1,4 +1,4 @@
-// backend/routes/settings.js - FIXED VERSION (actually saves prices)
+// backend/routes/settings.js - UPGRADED VERSION (All specific items, no generic)
 const express = require('express');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
@@ -49,7 +49,7 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
-// PUT /api/settings - Update settings (FIXED - actually saves!)
+// PUT /api/settings - Update settings (UPGRADED with all specific items)
 router.put('/', authenticateToken, async (req, res) => {
     try {
         const updates = req.body;
@@ -74,23 +74,34 @@ router.put('/', authenticateToken, async (req, res) => {
             );
         }
         
-        // ===== ALL PRICE KEYS (without price_ prefix for easier handling) =====
+        // ===== ALL SPECIFIC PRICE KEYS (NO generic items) =====
         const priceKeys = [
-            'small', 'medium', 'big', 'fridge', 'gas',
-            'microwave',
+            // Bags
+            'ghana_must_go',
             'duffle_small', 'duffle_big',
             'jute_small', 'jute_medium', 'jute_big',
             'travel_small', 'travel_medium', 'travel_big',
+            
+            // Appliances
+            'microwave',
+            'fridge_tabletop', 'fridge_doubledoor', 'fridge_small',
+            
+            // Gas Cylinders
+            'gas_small', 'gas_medium', 'gas_big',
+            
+            // Containers
             'container_small', 'container_big',
-            'gas_small', 'gas_medium', 'gas_big'
+            
+            // Free items
+            'buckets'
         ];
         
-        // Save each price - check for both with and without 'price_' prefix
+        // Save each price
         let savedCount = 0;
         for (const key of priceKeys) {
             const fullKey = `price_${key}`;
-            // Check if update was sent with 'price_' prefix
             let value = updates[fullKey];
+            
             // Also check without prefix (just in case)
             if (value === undefined && updates[key] !== undefined) {
                 value = updates[key];
