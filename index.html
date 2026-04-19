@@ -436,7 +436,7 @@
       font-weight: 500;
     }
     
-    /* ===== MOBILE MENU STYLES ===== */
+    /* ===== MOBILE MENU STYLES - FIXED ===== */
     @media (max-width: 992px) {
       .nav-links {
         display: none;
@@ -444,18 +444,18 @@
         top: 100%;
         left: 0;
         right: 0;
-        background: rgba(139, 0, 0, 0.98);
+        background: #8b0000;
         flex-direction: column;
-        padding: 2rem;
+        padding: 1.5rem;
         text-align: center;
-        gap: 1.5rem;
-        backdrop-filter: blur(10px);
+        gap: 1rem;
         border-bottom: 2px solid #ffb347;
         z-index: 999;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
       }
       
       .nav-links.active {
-        display: flex;
+        display: flex !important;
       }
       
       .menu-toggle {
@@ -465,6 +465,27 @@
         border: none;
         color: white;
         cursor: pointer;
+        z-index: 1000;
+      }
+      
+      .nav-links li {
+        margin: 0;
+        width: 100%;
+      }
+      
+      .nav-links a {
+        display: block;
+        padding: 12px;
+        font-size: 1.1rem;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+      
+      .nav-links a:hover {
+        background: #ffb347;
+        color: #8b0000;
       }
     }
     
@@ -626,19 +647,19 @@
     </section>
 
     <section class="image-gallery-section" id="gallery">
-      <div class="section-header"><h2>📦 What We Store</h2><p>Click on any category to see all sizes and prices</p></div>
+      <div class="section-header"><h2>What We Store</h2><p>Click on any category to see all sizes and prices</p></div>
       <div class="gallery-intro"><i class="fas fa-info-circle"></i> Click on any item below to see detailed pricing</div>
       <div class="image-gallery">
-        <div class="gallery-item" data-category="duffle"><img src="images/gallery-duffle.jpg" alt="Duffle Bags"><h3>🎒 Duffle Bags</h3><p>Small & Large sizes</p><span class="price-tag">From 30</span></div>
-        <div class="gallery-item" data-category="jute"><img src="images/gallery-jute.jpg" alt="Jute Bags"><h3>🌾 Jute Bags</h3><p>Small, Medium & Large</p><span class="price-tag">From 40</span></div>
-        <div class="gallery-item" data-category="travel"><img src="images/gallery-suitcase.jpg" alt="Travel Suitcases"><h3>✈️ Travel Bags</h3><p>Small, Medium & Large</p><span class="price-tag">From 30</span></div>
-        <div class="gallery-item" data-category="microwave"><img src="images/gallery-microwave.jpg" alt="Microwave"><h3>🍿 Microwaves</h3><p>Kitchen appliances</p><span class="price-tag">From 30</span></div>
-        <div class="gallery-item" data-category="fridge_tabletop"><img src="images/gallery-fridge-table.jpg" alt="Table Top Fridge"><h3>❄️ Fridge (Table)</h3><p>Table top refrigerator</p><span class="price-tag">From 60</span></div>
-        <div class="gallery-item" data-category="fridge_doubledoor"><img src="images/gallery-fridge-double.jpg" alt="Double Door Fridge"><h3>❄️❄️ Fridge (DD)</h3><p>Double door refrigerator</p><span class="price-tag">From 80</span></div>
-        <div class="gallery-item" data-category="fridge_small"><img src="images/gallery-fridge-small.jpg" alt="Small Fridge"><h3>🧊 Fridge (Small)</h3><p>Mini fridge</p><span class="price-tag">From 40</span></div>
-        <div class="gallery-item" data-category="gas"><img src="images/gallery-gas.jpg" alt="Gas Cylinders"><h3>🔥 Gas Cylinders</h3><p>Small, Medium & Large</p><span class="price-tag">From 30</span></div>
-        <div class="gallery-item" data-category="container"><img src="images/gallery-container.jpg" alt="Storage Containers"><h3>📦 Storage Containers</h3><p>Small & Large boxes</p><span class="price-tag">From 30</span></div>
-        <div class="gallery-item" data-category="buckets"><img src="images/gallery-buckets.jpg" alt="Buckets"><h3>🪣 Buckets</h3><p>Free with paid items</p><span class="price-tag">FREE</span></div>
+        <div class="gallery-item" data-category="duffle"><img src="images/gallery-duffle.jpg" alt="Duffle Bags"><h3>Duffle Bags</h3><p>Small & Large sizes</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="jute"><img src="images/gallery-jute.jpg" alt="Jute Bags"><h3>Jute Bags</h3><p>Small, Medium & Large</p><span class="price-tag">From 40</span></div>
+        <div class="gallery-item" data-category="travel"><img src="images/gallery-suitcase.jpg" alt="Travel Suitcases"><h3>Travel Bags</h3><p>Small, Medium & Large</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="microwave"><img src="images/gallery-microwave.jpg" alt="Microwave"><h3>Microwaves</h3><p>Kitchen appliances</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="fridge_tabletop"><img src="images/gallery-fridge-table.jpg" alt="Table Top Fridge"><h3>Fridge (Table)</h3><p>Table top refrigerator</p><span class="price-tag">From 60</span></div>
+        <div class="gallery-item" data-category="fridge_doubledoor"><img src="images/gallery-fridge-double.jpg" alt="Double Door Fridge"><h3>Fridge (DD)</h3><p>Double door refrigerator</p><span class="price-tag">From 80</span></div>
+        <div class="gallery-item" data-category="fridge_small"><img src="images/gallery-fridge-small.jpg" alt="Small Fridge"><h3>Fridge (Small)</h3><p>Mini fridge</p><span class="price-tag">From 40</span></div>
+        <div class="gallery-item" data-category="gas"><img src="images/gallery-gas.jpg" alt="Gas Cylinders"><h3>Gas Cylinders</h3><p>Small, Medium & Large</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="container"><img src="images/gallery-container.jpg" alt="Storage Containers"><h3>Storage Containers</h3><p>Small & Large boxes</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="buckets"><img src="images/gallery-buckets.jpg" alt="Buckets"><h3>Buckets</h3><p>Free with paid items</p><span class="price-tag">FREE</span></div>
       </div>
     </section>
 
@@ -652,7 +673,7 @@
     </div>
 
     <section style="background: rgba(0,0,0,0.2); padding: 2rem 5%; text-align: center;">
-      <div class="section-header"><h2>⚡ How It Works</h2><p>Three simple steps</p></div>
+      <div class="section-header"><h2>How It Works</h2><p>Three simple steps</p></div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 800px; margin: 0 auto;">
         <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">📝</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">1. Book Online</h3><p style="font-size: 0.85rem;">Fill the booking form</p></div>
         <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🚚</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">2. Free Pickup</h3><p style="font-size: 0.85rem;">From your hostel</p></div>
@@ -661,7 +682,7 @@
     </section>
 
     <section class="booking" id="book">
-      <div class="section-header"><h2>📋 Book Storage</h2><p>Fill the form — we'll confirm with a reference ID</p></div>
+      <div class="section-header"><h2>Book Storage</h2><p>Fill the form — we'll confirm with a reference ID</p></div>
       <form class="booking-form" id="bookingForm">
         <div class="form-group"><label for="name">Full Name *</label><input type="text" id="name" required placeholder="Enter your full name"></div>
         <div class="form-group"><label for="email">Email *</label><input type="email" id="email" required placeholder="your@email.com"></div>
@@ -739,7 +760,7 @@
     </section>
 
     <section class="faq" id="faq">
-      <div class="section-header"><h2>❓ FAQ</h2><p>Everything you need to know</p></div>
+      <div class="section-header"><h2>FAQ</h2><p>Everything you need to know</p></div>
       <div class="faq-content">
         <details><summary>When do I pay?</summary><p>Payment can be made right after booking until when your items are picked. We accept MTN MoMo, Vodafone Cash, and cash.</p></details>
         <details><summary>Is my stuff safe?</summary><p>Yes! There is 24/7 monitored security on the site keeping the warehouse in check.</p></details>
@@ -753,7 +774,7 @@
     <div class="footer-content">
       <div class="footer-logo">KODAK</div>
       <p class="footer-tag">Your Trusted KNUST Storage Partner</p>
-      <div class="footer-contact"><p><strong>Contact Us</strong></p><a href="https://wa.me/233545025296" class="footer-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> +233 545 025 296</a><p class="footer-email">Email: <a href="mailto:Philiptesimbo@gmail.com">Philiptesimbo@gmail.com</a></p></div>
+      <div class="footer-contact"><p><strong>Contact Us</strong></p><a href="https://wa.me/233545025296" class="footer-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> +233 545 025 296</a><p class="footer-email">Email: <a href="mailto:Kodaklogisticsservices@gmail.com">Kodaklogisticsservices@gmail.com</a></p></div>
       <p class="footer-copyright">© 2026 Kodak Logistics – KNUST</p>
     </div>
   </footer>
@@ -761,23 +782,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="script.js"></script>
   <script>
-    // ===== MOBILE MENU TOGGLE =====
-    const menuToggle = document.getElementById('mobileMenuToggle');
-    const navLinks = document.getElementById('navLinks');
-    
-    if (menuToggle && navLinks) {
-      menuToggle.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-      });
-      
-      // Close menu when clicking a link
-      navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function() {
-          navLinks.classList.remove('active');
-        });
-      });
-    }
-    
+ 
     // ===== CUSTOM DROPDOWN INITIALIZATION =====
     function initCustomDropdowns() {
       document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
@@ -959,9 +964,9 @@
     }
     
     const categoryTitles = {
-      duffle: "🎒 Duffle Bags", jute: "🌾 Jute Bags", travel: "✈️ Travel Bags", microwave: "🍿 Microwaves",
-      fridge_tabletop: "❄️ Fridge (Table Top)", fridge_doubledoor: "❄️❄️ Fridge (Double Door)", fridge_small: "🧊 Fridge (Small)",
-      gas: "🔥 Gas Cylinders", container: "📦 Storage Containers", buckets: "🪣 Buckets"
+      duffle: "Duffle Bags", jute: "Jute Bags", travel: "Travel Bags", microwave: "Microwaves",
+      fridge_tabletop: "Fridge (Table Top)", fridge_doubledoor: "Fridge (Double Door)", fridge_small: "Fridge (Small)",
+      gas: "Gas Cylinders", container: "Storage Containers", buckets: "Buckets"
     };
     
     window.openModal = function(category) {
