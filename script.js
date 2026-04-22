@@ -471,7 +471,14 @@ function setupAutoSave() {
 async function submitBooking(event) {
     if (event) event.preventDefault();
     
+    // ✅ NEW: Check if payment method is selected
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    
+    if (!paymentMethod) {
+        showToastMessage('Please select a payment method (Pay on Pickup or Mobile Money)', 'error');
+        return;
+    }
+    
     const transactionId = document.getElementById('transactionId')?.value;
     
     if (paymentMethod === 'momo' && !transactionId) {

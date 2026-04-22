@@ -436,6 +436,12 @@
       font-weight: 500;
     }
     
+    /* Required field indicator */
+    .required-star {
+      color: #ff6b6b;
+      margin-left: 4px;
+    }
+    
     /* ===== MOBILE MENU STYLES - FIXED ===== */
     @media (max-width: 992px) {
       .nav-links {
@@ -754,13 +760,13 @@
           <small>Final Amount</small>
         </div>
 
-        <!-- ========== PAYMENT SECTION - ADD THIS ========== -->
+        <!-- ========== PAYMENT SECTION - FIXED (no checked attribute) ========== -->
         <div class="payment-section" style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px; border: 1px solid rgba(255,179,71,0.3);">
-            <h3 style="margin-bottom: 15px; color: #ffb347;">💰 Payment Method</h3>
+            <h3 style="margin-bottom: 15px; color: #ffb347;">💰 Payment Method <span style="color: #ff6b6b;">*</span></h3>
             
             <div class="payment-options" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 20px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 2px solid #ffb347; flex: 1;">
-                    <input type="radio" name="paymentMethod" value="pickup" checked style="width: 18px; height: 18px;">
+                    <input type="radio" name="paymentMethod" value="pickup" style="width: 18px; height: 18px;">
                     <div>
                         <strong style="color: white;">💵 Pay on Pickup</strong>
                         <small style="display: block; color: #ccc;">Pay when we collect your items</small>
