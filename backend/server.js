@@ -1,4 +1,4 @@
-// backend/server.js - UPGRADED VERSION (No more generic items)
+// backend/server.js - UPGRADED VERSION with Payment Columns Auto-Creation
 // This starts everything and connects all the pieces
 
 // ===== STEP 1: LOAD ENVIRONMENT VARIABLES =====
@@ -9,6 +9,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const db = require('./database/db');
+
+// ===== IMPORT THE ensurePaymentColumns FUNCTION =====
+const { ensurePaymentColumns } = require('./database/db');
 
 // ===== STEP 3: IMPORT ROUTES =====
 const authRoutes = require('./routes/auth');
@@ -129,8 +132,8 @@ async function setupDatabase() {
         // ===== ALL NEW SPECIFIC ITEMS (No more generic items) =====
         const defaultSettings = [
             // Contact settings
-            ['whatsapp_number', '233545025296'],
-            ['business_email', 'Philiptesimbo@gmail.com'],
+            ['whatsapp_number', '233541249742'],
+            ['business_email', 'Kodaklogisticsservices@gmail.com'],
             
             // ===== BAGS =====
             
@@ -177,7 +180,7 @@ async function setupDatabase() {
             );
         }
         
-        // Optional: Delete old generic settings if they exist (comment out if you want to keep them)
+        // Optional: Delete old generic settings if they exist
         const oldSettings = ['price_small', 'price_medium', 'price_big', 'price_fridge', 'price_gas'];
         for (const oldKey of oldSettings) {
             await db.query('DELETE FROM settings WHERE setting_key = $1', [oldKey]);
@@ -188,6 +191,17 @@ async function setupDatabase() {
         
     } catch (error) {
         console.error('❌ Database setup error:', error);
+    }
+}
+
+// ===== STEP 6.5: ADD PAYMENT COLUMNS (NEW) =====
+async function addPaymentColumns() {
+    try {
+        console.log('💰 Checking payment columns...');
+        await ensurePaymentColumns();
+        console.log('✅ Payment columns check complete');
+    } catch (error) {
+        console.log('⚠️ Payment columns check warning:', error.message);
     }
 }
 
@@ -228,6 +242,9 @@ async function startServer() {
     }
     
     await setupDatabase();
+    
+    // ADD PAYMENT COLUMNS HERE 👇 (AFTER database setup)
+    await addPaymentColumns();
     
     app.listen(PORT, () => {
         console.log('✅ ==================================');

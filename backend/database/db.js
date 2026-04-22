@@ -1,11 +1,10 @@
-// backend/database/db.js - PostgreSQL Version (COMPLETE)
+// backend/database/db.js - PostgreSQL Version (COMPLETE) with Payment Columns
 const { Pool } = require('pg');
 
 // Create a connection pool for PostgreSQL
-// 🔧 FIX: Always use SSL with rejectUnauthorized: false for Render
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/kodak_logistics',
-    ssl: { rejectUnauthorized: false }  // ✅ THIS IS THE ONLY CHANGE
+    ssl: { rejectUnauthorized: false }
 });
 
 // Test the connection
@@ -24,12 +23,11 @@ async function testConnection() {
 // Helper function to run SQL queries
 async function query(sql, params = []) {
     try {
-        // Ensure params is always an array
         if (!Array.isArray(params)) {
             params = [params];
         }
         
-        console.log('🔍 Executing query:', sql);
+        console.log('🔍 Executing query:', sql.substring(0, 100));
         console.log('📦 With params:', params);
         
         const result = await pool.query(sql, params);
@@ -61,10 +59,9 @@ async function insert(sql, params = []) {
             params = [params];
         }
         
-        console.log('🔍 Insert query:', sql);
+        console.log('🔍 Insert query:', sql.substring(0, 100));
         console.log('📦 Insert params:', params);
         
-        // PostgreSQL needs RETURNING id to get the inserted ID
         const result = await pool.query(sql + ' RETURNING id', params);
         console.log('✅ Insert result:', result.rows[0]);
         return result.rows[0].id;
@@ -91,7 +88,7 @@ async function update(sql, params = []) {
     }
 }
 
-// Helper to check if a table exists (PostgreSQL version)
+// Helper to check if a table exists
 async function tableExists(tableName) {
     try {
         const result = await query(
@@ -106,12 +103,95 @@ async function tableExists(tableName) {
     }
 }
 
-// ✅✅✅ EXPORT ALL FUNCTIONS ✅✅✅
+// ========== NEW: AUTO-CREATE PAYMENT COLUMNS ==========
+async function ensurePaymentColumns() {
+    try {
+        console.log('🔧 Checking/Adding payment columns to bookings table...');
+        
+        // Check if bookings table exists
+        const tableExists = await query(`
+            SELECT COUNT(*) as count FROM information_schema.tables 
+            WHERE table_schema = 'public' AND table_name = 'bookings'
+        `);
+        
+        if (parseInt(tableExists[0].count) === 0) {
+            console.log('⚠️ Bookings table does not exist yet. Skipping column check.');
+            return;
+        }
+        
+        // Add payment_method column
+        await query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                    WHERE table_name='bookings' AND column_name='payment_method') THEN
+                    ALTER TABLE bookings ADD COLUMN payment_method VARCHAR(20) DEFAULT 'pickup';
+                    RAISE NOTICE 'Added payment_method column';
+                END IF;
+            END $$;
+        `);
+        
+        // Add transaction_id column
+        await query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                    WHERE table_name='bookings' AND column_name='transaction_id') THEN
+                    ALTER TABLE bookings ADD COLUMN transaction_id VARCHAR(100);
+                    RAISE NOTICE 'Added transaction_id column';
+                END IF;
+            END $$;
+        `);
+        
+        // Add payment_status column
+        await query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                    WHERE table_name='bookings' AND column_name='payment_status') THEN
+                    ALTER TABLE bookings ADD COLUMN payment_status VARCHAR(30) DEFAULT 'unpaid';
+                    RAISE NOTICE 'Added payment_status column';
+                END IF;
+            END $$;
+        `);
+        
+        // Add payment_verified_at column
+        await query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                    WHERE table_name='bookings' AND column_name='payment_verified_at') THEN
+                    ALTER TABLE bookings ADD COLUMN payment_verified_at TIMESTAMP;
+                    RAISE NOTICE 'Added payment_verified_at column';
+                END IF;
+            END $$;
+        `);
+        
+        // Add payment_verified_by column
+        await query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                    WHERE table_name='bookings' AND column_name='payment_verified_by') THEN
+                    ALTER TABLE bookings ADD COLUMN payment_verified_by VARCHAR(100);
+                    RAISE NOTICE 'Added payment_verified_by column';
+                END IF;
+            END $$;
+        `);
+        
+        console.log('✅ Payment columns verified/added successfully!');
+    } catch (error) {
+        console.log('⚠️ Note: Could not add columns:', error.message);
+    }
+}
+
+// ========== EXPORT ALL FUNCTIONS ==========
 module.exports = {
-    testConnection: testConnection,
-    query: query,
-    getOne: getOne,
-    insert: insert,
-    update: update,
-    tableExists: tableExists
+    testConnection,
+    query,
+    getOne,
+    insert,
+    update,
+    tableExists,
+    ensurePaymentColumns  // ADD THIS
 };
