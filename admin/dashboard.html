@@ -45,7 +45,7 @@
           <div class="table-responsive">
             <table class="data-table">
               <thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
-              <tbody id="recentBookingsBody"><tr><td colspan="6">Loading...<\/td><\/tr></td></tbody>
+              <tbody id="recentBookingsBody"><td><td colspan="6">Loading...</td></tr></tr></tbody>
             </table>
           </div>
         </div>
@@ -72,8 +72,20 @@
         </div>
         <div class="table-responsive">
           <table class="data-table">
-            <thead><tr><th>Reference</th><th>ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Hostel</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="allBookingsBody"><tr><td colspan="10">Loading...<\/td><\/tr></tr></tbody>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ref</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="allBookingsBody"><tr><td colspan="9">Loading...</td></tr></td></tbody>
           </table>
           <div id="pagination" class="pagination"></div>
         </div>
@@ -85,12 +97,12 @@
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Bookings</th><th>Last Booking</th><th>Action</th></tr></thead>
-            <tbody id="customersBody"><td><td colspan="6">Loading...<\/td><\/tr></tr></tbody>
+            <tbody id="customersBody"><td><td colspan="6">Loading...</td></tr></tr></tbody>
           </table>
         </div>
       </section>
       
-      <!-- Pricing Section - UPGRADED with SPECIFIC ITEMS ONLY -->
+      <!-- Pricing Section -->
       <section id="pricing-section" class="content-section">
         <div class="section-header">
           <h2>💰 Pricing Management</h2>
@@ -98,8 +110,6 @@
         </div>
         
         <div class="pricing-grid-modern">
-          <!-- ===== BAGS ===== -->
-          
           <!-- Duffle Bag (Small) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🎽</div>
@@ -204,8 +214,6 @@
             </div>
           </div>
 
-          <!-- ===== APPLIANCES ===== -->
-          
           <!-- Microwave -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🍿</div>
@@ -258,8 +266,6 @@
             </div>
           </div>
 
-          <!-- ===== GAS CYLINDERS ===== -->
-          
           <!-- Gas Cylinder (Small) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🔥</div>
@@ -299,8 +305,6 @@
             </div>
           </div>
 
-          <!-- ===== CONTAINERS ===== -->
-          
           <!-- Other Container (Small) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">📦</div>
@@ -327,8 +331,6 @@
             </div>
           </div>
 
-          <!-- ===== FREE ITEMS ===== -->
-          
           <!-- Buckets (Free) -->
           <div class="pricing-card-modern">
             <div class="pricing-icon">🪣</div>
@@ -351,7 +353,7 @@
         </div>
       </section>
       
-      <!-- Settings Section - Modern Styling -->
+      <!-- Settings Section -->
       <section id="settings-section" class="content-section">
         <div class="section-header">
           <h2>⚙️ Business Settings</h2>
@@ -428,7 +430,7 @@
           <div id="settingsMessage" class="form-message"></div>
         </div>
         
-        <!-- Danger Zone - Modern Styling -->
+        <!-- Danger Zone -->
         <div class="danger-zone-modern">
           <div class="danger-zone-header">
             <i class="fas fa-exclamation-triangle"></i>

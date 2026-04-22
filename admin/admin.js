@@ -1,6 +1,6 @@
-// admin/admin.js - UPGRADED VERSION (Specific items only)
+// admin/admin.js - UPGRADED VERSION with DELETE BOOKING & PAYMENT VERIFICATION
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
-console.log('🚀 Admin JS loaded - Upgraded Version');
+console.log('🚀 Admin JS loaded - Upgraded Version with Payment Verification');
 
 let currentUser = null;
 let sessionCheckInterval = null;
@@ -161,7 +161,7 @@ function setupMobileMenu() {
     });
 }
 
-// ========== LOAD ALL SETTINGS (UPGRADED - Specific items only) ==========
+// ========== LOAD ALL SETTINGS ==========
 async function loadAllSettings() {
   console.log('⚙️ Loading settings and pricing...');
   try {
@@ -182,14 +182,11 @@ async function loadAllSettings() {
     if (em) em.value = settings.business_email || '';
 
     // ===== BAGS =====
-  
-    // Duffle Bags
     const pDuffleSmall = document.getElementById('priceDuffleSmall');
     const pDuffleBig = document.getElementById('priceDuffleBig');
     if (pDuffleSmall) pDuffleSmall.value = settings.price_duffle_small || 29.99;
     if (pDuffleBig) pDuffleBig.value = settings.price_duffle_big || 49.99;
     
-    // Jute Bags
     const pJuteSmall = document.getElementById('priceJuteSmall');
     const pJuteMedium = document.getElementById('priceJuteMedium');
     const pJuteBig = document.getElementById('priceJuteBig');
@@ -197,7 +194,6 @@ async function loadAllSettings() {
     if (pJuteMedium) pJuteMedium.value = settings.price_jute_medium || 59.99;
     if (pJuteBig) pJuteBig.value = settings.price_jute_big || 79.99;
     
-    // Traveling Bags
     const pTravelSmall = document.getElementById('priceTravelSmall');
     const pTravelMedium = document.getElementById('priceTravelMedium');
     const pTravelBig = document.getElementById('priceTravelBig');
@@ -206,11 +202,9 @@ async function loadAllSettings() {
     if (pTravelBig) pTravelBig.value = settings.price_travel_big || 69.99;
     
     // ===== APPLIANCES =====
-    // Microwave
     const pMicrowave = document.getElementById('priceMicrowave');
     if (pMicrowave) pMicrowave.value = settings.price_microwave || 30;
     
-    // Fridges
     const pFridgeTabletop = document.getElementById('priceFridgeTabletop');
     const pFridgeDoubledoor = document.getElementById('priceFridgeDoubledoor');
     const pFridgeSmall = document.getElementById('priceFridgeSmall');
@@ -365,6 +359,7 @@ async function loadDashboardData() {
         <div class="stat-card"><i class="fas fa-clock stat-icon"></i><div class="stat-info"><h3>Pending</h3><p>${stats.pending || 0}</p></div></div>
         <div class="stat-card"><i class="fas fa-check-circle stat-icon"></i><div class="stat-info"><h3>Confirmed</h3><p>${stats.confirmed || 0}</p></div></div>
         <div class="stat-card"><i class="fas fa-money-bill-wave stat-icon"></i><div class="stat-info"><h3>Revenue (₵)</h3><p>${revenue.toFixed(2)}</p></div></div>
+        <div class="stat-card"><i class="fas fa-spinner stat-icon"></i><div class="stat-info"><h3>Pending Payments</h3><p>${stats.pending_payments || 0}</p></div></div>
       `;
     }
     await loadRecentBookings();
@@ -387,7 +382,7 @@ function displayRecentBookings(bookings) {
   const tbody = document.getElementById('recentBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">No recent bookings</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7">No recent bookings</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -397,14 +392,31 @@ function displayRecentBookings(bookings) {
     const total = booking.total_amount || booking.total || '0';
     const status = booking.status || 'pending';
     const phone = booking.customer_phone || booking.phone || '';
+    const id = booking.id || '';
+    const ref = booking.booking_ref || '';
+    const paymentStatus = booking.payment_status || 'unpaid';
+    
+    let paymentBadge = '';
+    if (paymentStatus === 'pending_verification') {
+      paymentBadge = '<span class="payment-badge pending">🟡 Pending</span>';
+    } else if (paymentStatus === 'verified') {
+      paymentBadge = '<span class="payment-badge verified">🟢 Verified</span>';
+    } else {
+      paymentBadge = '<span class="payment-badge unpaid">⚪ Unpaid</span>';
+    }
+    
     return `<tr>
       <td>${escapeHtml(date)}</td>
       <td>${escapeHtml(name)}</td>
       <td>${escapeHtml(items)}</td>
       <td>₵${escapeHtml(total)}</td>
+      <td>${paymentBadge}</td>
       <td><span class="status-badge status-${escapeHtml(status)}">${escapeHtml(status)}</span></td>
-      <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button></td>
-    </tr>`;
+      <td>
+        <button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button>
+        <button class="action-btn btn-delete" onclick="deleteSingleBooking(${id}, '${escapeHtml(ref)}')" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 5px;"><i class="fas fa-trash"></i></button>
+       </td>
+     </tr>`;
   }).join('');
 }
 
@@ -446,11 +458,24 @@ async function loadAllBookings() {
     await loadFilteredBookings();
 }
 
+function getPaymentStatusBadge(paymentStatus) {
+    switch(paymentStatus) {
+        case 'pending_verification':
+            return '<span class="payment-badge pending" style="background: #fff3e0; color: #e67e22; padding: 4px 8px; border-radius: 12px; font-size: 11px;">🟡 Pending Verification</span>';
+        case 'verified':
+            return '<span class="payment-badge verified" style="background: #d4edda; color: #28a745; padding: 4px 8px; border-radius: 12px; font-size: 11px;">🟢 Verified</span>';
+        case 'rejected':
+            return '<span class="payment-badge rejected" style="background: #f8d7da; color: #dc3545; padding: 4px 8px; border-radius: 12px; font-size: 11px;">🔴 Rejected</span>';
+        default:
+            return '<span class="payment-badge unpaid" style="background: #e9ecef; color: #6c757d; padding: 4px 8px; border-radius: 12px; font-size: 11px;">⚪ Unpaid</span>';
+    }
+}
+
 function displayAllBookings(bookings) {
   const tbody = document.getElementById('allBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10">No bookings found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11">No bookings found</td></tr>';
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -463,14 +488,21 @@ function displayAllBookings(bookings) {
     const items = booking.items_summary || booking.items || '';
     const total = booking.total_amount || booking.total || '0';
     const status = booking.status || 'pending';
-
+    const paymentMethod = booking.payment_method || 'pickup';
+    const paymentStatus = booking.payment_status || 'unpaid';
+    const transactionId = booking.transaction_id || '';
+    
+    const paymentMethodIcon = paymentMethod === 'momo' ? '📱' : '💵';
+    const paymentMethodText = paymentMethod === 'momo' ? 'MoMo' : 'Pickup';
+    
+    const showVerifyButton = paymentMethod === 'momo' && paymentStatus === 'pending_verification';
+    
     return `<tr>
+      <td>${escapeHtml(id)}</td>
       <td>${escapeHtml(ref)}</td>
-      <td>#${escapeHtml(id)}</td>
-      <td>${escapeHtml(date)}</td>
       <td>${escapeHtml(name)}</td>
       <td>${escapeHtml(phone)}</td>
-      <td>${escapeHtml(hostel)}</td>
+      <td>${escapeHtml(date)}</td>
       <td>${escapeHtml(items.substring(0, 20))}</td>
       <td>₵${escapeHtml(total)}</td>
       <td>
@@ -480,10 +512,97 @@ function displayAllBookings(bookings) {
           <option value="completed" ${status === 'completed' ? 'selected' : ''}>Completed</option>
         </select>
        </td>
-      <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button></td>
-    </tr>`;
+      <td>
+        <span title="${paymentMethodText}">${paymentMethodIcon}</span> ${getPaymentStatusBadge(paymentStatus)}
+        ${transactionId ? `<br><small style="font-size: 10px;">TX: ${escapeHtml(transactionId)}</small>` : ''}
+       </td>
+      <td>
+        ${showVerifyButton ? `<button class="action-btn btn-verify" onclick="verifyPayment(${id}, '${escapeHtml(booking.customer_email)}', '${escapeHtml(ref)}', ${total})" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;"><i class="fas fa-check-circle"></i> Verify</button>` : ''}
+        <button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')" style="margin-right: 5px;"><i class="fab fa-whatsapp"></i></button>
+        <button class="action-btn btn-delete" onclick="deleteSingleBooking(${id}, '${escapeHtml(ref)}')" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"><i class="fas fa-trash"></i> Delete</button>
+       </td>
+     </tr>`;
   }).join('');
 }
+
+// ========== VERIFY PAYMENT (NEW) ==========
+window.verifyPayment = async function(bookingId, customerEmail, bookingRef, amount) {
+  if (!confirm(`✅ Verify payment for booking ${bookingRef}?\n\nAmount: GH₵${amount}\nCustomer: ${customerEmail}\n\nMake sure you have confirmed the money in your mobile money statement before verifying.`)) {
+    return;
+  }
+  
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/bookings/${bookingId}/verify-payment`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        payment_status: 'verified',
+        verified_by: currentUser?.username || 'admin'
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to verify payment');
+    }
+    
+    const result = await response.json();
+    showNotification(`✅ Payment verified for ${bookingRef}! Email sent to customer.`, 'success');
+    
+    // Refresh the current view
+    await loadFilteredBookings();
+    loadDashboardData();
+    
+  } catch (error) {
+    console.error('Error verifying payment:', error);
+    showNotification(`❌ Failed to verify payment: ${error.message}`, 'error');
+  }
+};
+
+// ========== DELETE SINGLE BOOKING ==========
+window.deleteSingleBooking = async function(bookingId, bookingRef) {
+  if (!confirm(`⚠️ Are you sure you want to delete booking ${bookingRef}?\n\nThis action CANNOT be undone!`)) {
+    return;
+  }
+  
+  if (!confirm(`🔴 FINAL WARNING: Are you ABSOLUTELY sure you want to delete ${bookingRef}?\n\nThis will permanently remove this booking from the database.`)) {
+    return;
+  }
+  
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/bookings/${bookingId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete booking');
+    }
+    
+    const result = await response.json();
+    
+    showNotification(`✅ Booking ${result.booking_ref} has been deleted successfully!`, 'success');
+    await loadFilteredBookings();
+    loadDashboardData();
+    
+    if (document.getElementById('customers-section')?.classList.contains('active-section')) {
+      loadCustomers();
+    }
+    
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    showNotification(`❌ Failed to delete booking: ${error.message}`, 'error');
+  }
+};
 
 async function updateBookingStatus(bookingId, status) {
   if (!confirm('Update booking status?')) return;
@@ -609,7 +728,7 @@ window.resetAllBookings = async function() {
   }
 };
 
-// ========== SAVE PRICING (UPGRADED - Specific items only) ==========
+// ========== SAVE PRICING ==========
 window.savePricing = async function() {
   const getVal = (id, defaultVal) => {
     const el = document.getElementById(id);
@@ -617,7 +736,6 @@ window.savePricing = async function() {
   };
   
   const prices = {
-    // BAGS
     price_duffle_small: getVal('priceDuffleSmall', 29.99),
     price_duffle_big: getVal('priceDuffleBig', 49.99),
     price_jute_small: getVal('priceJuteSmall', 39.99),
@@ -626,23 +744,15 @@ window.savePricing = async function() {
     price_travel_small: getVal('priceTravelSmall', 29.99),
     price_travel_medium: getVal('priceTravelMedium', 49.99),
     price_travel_big: getVal('priceTravelBig', 69.99),
-    
-    // APPLIANCES
     price_microwave: getVal('priceMicrowave', 30),
     price_fridge_tabletop: getVal('priceFridgeTabletop', 59.99),
     price_fridge_doubledoor: getVal('priceFridgeDoubledoor', 79.99),
     price_fridge_small: getVal('priceFridgeSmall', 39.99),
-    
-    // GAS CYLINDERS
     price_gas_small: getVal('priceGasSmall', 29.99),
     price_gas_medium: getVal('priceGasMedium', 34.99),
     price_gas_big: getVal('priceGasBig', 39.99),
-    
-    // CONTAINERS
     price_container_small: getVal('priceContainerSmall', 29.99),
     price_container_big: getVal('priceContainerBig', 49.99),
-    
-    // FREE ITEMS
     price_buckets: getVal('priceBuckets', 0)
   };
 
@@ -764,11 +874,12 @@ async function exportBookings() {
     const data = await apiCall('/bookings/export');
     if (!data) return;
     
-    const headers = ['Reference', 'Date', 'Name', 'Phone', 'Hostel', 'Items', 'Total', 'Status'];
+    const headers = ['Reference', 'Date', 'Name', 'Phone', 'Hostel', 'Items', 'Total', 'Status', 'Payment Method', 'Payment Status', 'Transaction ID'];
     const rows = data.map(b => [
       b.booking_ref || '', b.booking_date || '', b.customer_name || '',
       b.customer_phone || '', b.hostel_name || '',
-      b.items_summary || '', b.total_amount || '0', b.status || ''
+      b.items_summary || '', b.total_amount || '0', b.status || '',
+      b.payment_method || 'pickup', b.payment_status || 'unpaid', b.transaction_id || ''
     ]);
 
     const csv = [headers, ...rows].map(row => 
@@ -813,6 +924,8 @@ window.resetAllBookings = resetAllBookings;
 window.loadAllBookings = loadAllBookings;
 window.closeCustomerModal = closeCustomerModal;
 window.viewCustomerDetails = viewCustomerDetails;
+window.deleteSingleBooking = deleteSingleBooking;
+window.verifyPayment = verifyPayment;
 
 // ========== MOBILE MENU TOGGLE ==========
 window.toggleMobileMenu = function() {

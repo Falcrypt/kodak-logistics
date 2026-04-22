@@ -1,7 +1,7 @@
-// script.js - UPGRADED VERSION (Specific items only - Ghana Must Go, Duffle, Jute, Travel, Fridge sizes, Gas sizes, Containers, Buckets)
+// script.js - UPGRADED VERSION with PAYMENT SYSTEM (WORKING)
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 
-// Global prices object - ALL SPECIFIC ITEMS (no generic items)
+// Global prices object - ALL SPECIFIC ITEMS
 let prices = {
   // BAGS
   duffle_small: 29.99,
@@ -48,7 +48,7 @@ setTimeout(function() {
   if (loader) loader.classList.add('hidden');
 }, 2000);
 
-// ===== LOAD BUSINESS SETTINGS (WhatsApp, Email) from PUBLIC endpoint =====
+// ===== LOAD BUSINESS SETTINGS =====
 async function loadBusinessSettings() {
     try {
         const timestamp = Date.now();
@@ -86,7 +86,7 @@ async function loadBusinessSettings() {
     }
 }
 
-// ===== UPDATE PRICE DISPLAYS - ALL SPECIFIC ITEMS =====
+// ===== UPDATE PRICE DISPLAYS =====
 function updatePriceDisplay() {
   // BAGS
   const duffleSmallDisplay = document.getElementById('priceDuffleSmallDisplay');
@@ -141,7 +141,7 @@ function updatePriceDisplay() {
   updateSelectOptions();
 }
 
-// ===== UPDATE SELECT OPTIONS - ALL SPECIFIC ITEMS =====
+// ===== UPDATE SELECT OPTIONS =====
 function updateSelectOptions() {
   const selects = document.querySelectorAll('.itemSelect');
   const optionsHtml = `
@@ -199,7 +199,7 @@ async function loadPrices() {
   }
 }
 
-// ===== CALCULATE TOTAL =====
+// ===== CALCULATE TOTAL (UPDATED to update MoMo display) =====
 function calculateTotal() {
   let total = 0;
   document.querySelectorAll(".item-row").forEach(row => {
@@ -213,10 +213,14 @@ function calculateTotal() {
   });
   const totalEl = document.getElementById("totalPrice");
   if (totalEl) totalEl.textContent = total.toFixed(2);
+  
+  // Update MoMo amount display
+  updateMomoAmountDisplay();
+  
   return total;
 }
 
-// ===== SETUP ADD ITEM BUTTON =====
+// ===== SETUP ADD ITEM BUTTON (FIXED - removed ghana_must_go) =====
 function setupAddItem() {
   const addBtn = document.getElementById("addItem");
   const container = document.getElementById("itemsContainer");
@@ -228,7 +232,6 @@ function setupAddItem() {
     newRow.innerHTML = `
       <select class="itemSelect" required>
         <option value="">Select item</option>
-        <option value="ghana_must_go">👜 Ghana Must Go Bag – ₵${prices.ghana_must_go}</option>
         <option value="duffle_small">🎽 Duffle Bag (Small) – ₵${prices.duffle_small}</option>
         <option value="duffle_big">🎒 Duffle Bag (Big) – ₵${prices.duffle_big}</option>
         <option value="jute_small">🌾 Jute Bag (Small) – ₵${prices.jute_small}</option>
@@ -284,99 +287,319 @@ function setupExistingRows() {
   });
 }
 
-// ===== SETUP FORM SUBMISSION =====
-function setupForm() {
-  const form = document.getElementById("bookingForm");
-  if (!form) return;
-  
-  form.addEventListener("submit", async function(e) {
-    e.preventDefault();
-    const submitBtn = document.getElementById("submitBtn");
-    if (!submitBtn) return;
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Sending...";
+// ========== PAYMENT SYSTEM FUNCTIONS ==========
 
-    const items = [];
-    document.querySelectorAll(".item-row").forEach(row => {
-      const select = row.querySelector(".itemSelect");
-      const qty = row.querySelector(".quantity");
-      if (select && select.value && qty && qty.value) {
-        items.push({
-          type: select.value,
-          quantity: parseInt(qty.value),
-          price: prices[select.value] || 0
-        });
-      }
-    });
-
-    if (items.length === 0) {
-      alert("Please select at least one item");
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Confirm Booking";
-      return;
-    }
-
-    const formData = {
-      name: document.getElementById("name")?.value || "",
-      email: document.getElementById("email")?.value || "",
-      phone: document.getElementById("phone")?.value || "",
-      hostel: document.getElementById("hostel")?.value || "",
-      date: document.getElementById("date")?.value || "",
-      time: document.getElementById("time")?.value || "",
-      description: document.getElementById("description")?.value || "",
-      items: items,
-      total: parseFloat(document.getElementById("totalPrice")?.textContent) || 0
-    };
-
-    try {
-      const response = await fetch(`${API_URL}/bookings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(`✅ Booking sent!\n\nReference: ${result.bookingRef}\nKeep this for pickup.`);
-        form.reset();
-        const allRows = document.querySelectorAll(".item-row");
-        for (let i = 1; i < allRows.length; i++) allRows[i].remove();
-        const firstRow = document.querySelector(".item-row");
-        if (firstRow) {
-          firstRow.querySelector(".itemSelect").value = "";
-          firstRow.querySelector(".quantity").value = "1";
+// Toggle MoMo fields visibility
+function toggleMomoFields() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const momoFields = document.getElementById('momoFields');
+    const transactionIdInput = document.getElementById('transactionId');
+    
+    if (paymentMethod === 'momo') {
+        if (momoFields) momoFields.style.display = 'block';
+        if (transactionIdInput) transactionIdInput.required = true;
+    } else {
+        if (momoFields) momoFields.style.display = 'none';
+        if (transactionIdInput) {
+            transactionIdInput.required = false;
+            transactionIdInput.value = '';
         }
-        calculateTotal();
-        
-        const contactResponse = await fetch(`${API_URL}/settings/contact?t=${Date.now()}`);
-        if (contactResponse.ok) {
-          const contactInfo = await contactResponse.json();
-          const whatsappNumber = contactInfo.whatsapp_number || '233545025296';
-          const cleanNumber = whatsappNumber.replace(/\D/g, '');
-          if (confirm("Open WhatsApp?")) {
-            const msg = encodeURIComponent(`Hi Kodak Logistics!\n\nBooking confirmed.\nReference: ${result.bookingRef}\nName: ${formData.name}\nDate: ${formData.date}\nTotal: ₵${formData.total}`);
-            window.open(`https://wa.me/${cleanNumber}?text=${msg}`, "_blank");
-          }
-        } else {
-          if (confirm("Open WhatsApp?")) {
-            const msg = encodeURIComponent(`Hi Kodak Logistics!\n\nBooking confirmed.\nReference: ${result.bookingRef}\nName: ${formData.name}\nDate: ${formData.date}\nTotal: ₵${formData.total}`);
-            window.open(`https://wa.me/233545025296?text=${msg}`, "_blank");
-          }
-        }
-      } else {
-        alert("❌ Failed to send booking.");
-      }
-    } catch (error) {
-      console.error("Booking error:", error);
-      alert("Network error. Please use WhatsApp.");
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Confirm Booking";
     }
-  });
 }
 
-// ===== INITIALIZE EVERYTHING =====
+// Copy MoMo number to clipboard
+async function copyMomoNumber() {
+    const momoNumber = '0544705397';
+    
+    try {
+        await navigator.clipboard.writeText(momoNumber);
+        
+        const copyBtn = document.getElementById('copyMomoBtn');
+        if (copyBtn) {
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '✅ Copied!';
+            copyBtn.style.background = '#2ecc71';
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+                copyBtn.style.background = '#25D366';
+            }, 2000);
+        }
+        
+        showToastMessage('📱 MoMo number copied!', 'success');
+        
+    } catch (err) {
+        const textarea = document.createElement('textarea');
+        textarea.value = momoNumber;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToastMessage('📱 Number copied!', 'success');
+    }
+}
+
+// Show toast notification
+function showToastMessage(message, type = 'info') {
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#2ecc71' : '#e74c3c'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease;
+        font-weight: bold;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Update amount display in MoMo section
+function updateMomoAmountDisplay() {
+    const totalElement = document.getElementById('totalPrice');
+    const displayAmountElement = document.getElementById('displayAmount');
+    
+    if (totalElement && displayAmountElement) {
+        const total = totalElement.textContent;
+        displayAmountElement.textContent = `GH₵${total}`;
+    }
+}
+
+// ========== AUTO-SAVE FORM DATA ==========
+const STORAGE_KEY = 'kodak_booking_form';
+
+function autoSaveFormData() {
+    const formData = {
+        name: document.getElementById('name')?.value || '',
+        email: document.getElementById('email')?.value || '',
+        phone: document.getElementById('phone')?.value || '',
+        hostel: document.getElementById('hostel')?.value || '',
+        date: document.getElementById('date')?.value || '',
+        time: document.getElementById('time')?.value || '',
+        description: document.getElementById('description')?.value || '',
+        paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value || 'pickup',
+        transactionId: document.getElementById('transactionId')?.value || ''
+    };
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+    
+    const notice = document.getElementById('autoSaveNotice');
+    if (notice) {
+        notice.style.display = 'block';
+        setTimeout(() => {
+            notice.style.opacity = '0';
+            setTimeout(() => {
+                notice.style.display = 'none';
+                notice.style.opacity = '1';
+            }, 2000);
+        }, 2000);
+    }
+}
+
+function restoreSavedFormData() {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (!savedData) return false;
+    
+    try {
+        const data = JSON.parse(savedData);
+        
+        if (data.name || data.email || data.phone) {
+            if (confirm('🔄 We found a partially filled booking form. Would you like to restore it?')) {
+                if (document.getElementById('name')) document.getElementById('name').value = data.name || '';
+                if (document.getElementById('email')) document.getElementById('email').value = data.email || '';
+                if (document.getElementById('phone')) document.getElementById('phone').value = data.phone || '';
+                if (document.getElementById('hostel')) document.getElementById('hostel').value = data.hostel || '';
+                if (document.getElementById('date')) document.getElementById('date').value = data.date || '';
+                if (document.getElementById('time')) document.getElementById('time').value = data.time || '';
+                if (document.getElementById('description')) document.getElementById('description').value = data.description || '';
+                if (document.getElementById('transactionId')) document.getElementById('transactionId').value = data.transactionId || '';
+                
+                const paymentRadio = document.querySelector(`input[name="paymentMethod"][value="${data.paymentMethod}"]`);
+                if (paymentRadio) {
+                    paymentRadio.checked = true;
+                    toggleMomoFields();
+                }
+                
+                calculateTotal();
+                return true;
+            }
+        }
+    } catch (error) {
+        console.error('Error restoring saved data:', error);
+    }
+    return false;
+}
+
+function clearSavedFormData() {
+    localStorage.removeItem(STORAGE_KEY);
+}
+
+function setupAutoSave() {
+    const formInputs = ['name', 'email', 'phone', 'hostel', 'date', 'time', 'description', 'transactionId'];
+    
+    formInputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', () => autoSaveFormData());
+            element.addEventListener('change', () => autoSaveFormData());
+        }
+    });
+    
+    const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            autoSaveFormData();
+            toggleMomoFields();
+        });
+    });
+}
+
+// ========== MAIN SUBMIT FUNCTION (WITH PAYMENT) ==========
+async function submitBooking(event) {
+    if (event) event.preventDefault();
+    
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const transactionId = document.getElementById('transactionId')?.value;
+    
+    if (paymentMethod === 'momo' && !transactionId) {
+        showToastMessage('Please enter your transaction ID after sending the payment', 'error');
+        return;
+    }
+    
+    const items = [];
+    document.querySelectorAll('.item-row').forEach(row => {
+        const select = row.querySelector('.itemSelect');
+        const quantity = row.querySelector('.quantity')?.value;
+        if (select && select.value && quantity > 0) {
+            items.push({
+                type: select.value,
+                quantity: parseInt(quantity)
+            });
+        }
+    });
+    
+    if (items.length === 0) {
+        showToastMessage('Please add at least one item to store', 'error');
+        return;
+    }
+    
+    const bookingData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        hostel: document.getElementById('hostel').value,
+        date: document.getElementById('date').value,
+        time: document.getElementById('time').value,
+        description: document.getElementById('description').value,
+        items: items,
+        total: parseFloat(document.getElementById('totalPrice').textContent) || 0,
+        payment_method: paymentMethod,
+        transaction_id: paymentMethod === 'momo' ? transactionId : null
+    };
+    
+    if (!bookingData.name || !bookingData.email || !bookingData.phone || !bookingData.hostel || !bookingData.date || !bookingData.time) {
+        showToastMessage('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing...';
+    
+    try {
+        const response = await fetch(`${API_URL}/bookings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            clearSavedFormData();
+            
+            let successMessage = `✅ Booking confirmed!\nReference: ${result.bookingRef}\n\n`;
+            if (paymentMethod === 'momo') {
+                successMessage += `We've received your payment information. You will receive an email once we verify your payment.\n\n`;
+            } else {
+                successMessage += `You will pay when we pick up your items.\n\n`;
+            }
+            successMessage += `Check your email for confirmation.`;
+            
+            alert(successMessage);
+            
+            document.getElementById('bookingForm').reset();
+            document.querySelectorAll('.item-row').forEach((row, index) => {
+                if (index > 0) row.remove();
+            });
+            
+            const firstRow = document.querySelector('.item-row');
+            if (firstRow) {
+                const firstSelect = firstRow.querySelector('.itemSelect');
+                const firstQuantity = firstRow.querySelector('.quantity');
+                if (firstSelect) firstSelect.value = '';
+                if (firstQuantity) firstQuantity.value = '1';
+            }
+            
+            const pickupRadio = document.querySelector('input[name="paymentMethod"][value="pickup"]');
+            if (pickupRadio) pickupRadio.checked = true;
+            toggleMomoFields();
+            
+            calculateTotal();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            showToastMessage(result.error || 'Booking failed. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('Booking error:', error);
+        showToastMessage('Network error. Please check your connection.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '✅ Confirm Booking';
+    }
+}
+
+// ========== INITIALIZE PAYMENT SYSTEM ==========
+function initPaymentSystem() {
+    const copyBtn = document.getElementById('copyMomoBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', copyMomoNumber);
+    }
+    
+    const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', toggleMomoFields);
+    });
+    
+    toggleMomoFields();
+    setupAutoSave();
+    restoreSavedFormData();
+}
+
+// Add CSS animation for toast
+const toastStyle = document.createElement('style');
+toastStyle.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+`;
+document.head.appendChild(toastStyle);
+
+// ===== SINGLE DOMContentLoaded EVENT (MERGED) =====
 document.addEventListener("DOMContentLoaded", function() {
   console.log("🚀 Kodak Logistics - Page loaded");
   
@@ -385,7 +608,7 @@ document.addEventListener("DOMContentLoaded", function() {
     dateInput.min = new Date().toISOString().split("T")[0];
   }
   
-  // ===== FIXED: Mobile menu toggle using IDs =====
+  // Mobile menu toggle
   const menuToggle = document.getElementById('mobileMenuToggle');
   const navLinks = document.getElementById('navLinks');
   if (menuToggle && navLinks) {
@@ -393,7 +616,6 @@ document.addEventListener("DOMContentLoaded", function() {
       navLinks.classList.toggle('active');
     });
     
-    // Close menu when clicking a link
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', function() {
         navLinks.classList.remove('active');
@@ -403,7 +625,6 @@ document.addEventListener("DOMContentLoaded", function() {
   
   setupAddItem();
   setupExistingRows();
-  setupForm();
   
   loadPrices().then(() => {
     calculateTotal();
@@ -411,6 +632,15 @@ document.addEventListener("DOMContentLoaded", function() {
   });
   
   loadBusinessSettings();
+  
+  // Initialize payment system
+  initPaymentSystem();
+  
+  // Set up form submission (ONE handler only)
+  const form = document.getElementById("bookingForm");
+  if (form) {
+    form.addEventListener("submit", submitBooking);
+  }
 });
 
 // Make functions available in console for testing
@@ -419,4 +649,3 @@ window.refreshPrices = loadPrices;
 window.updateDisplay = updatePriceDisplay;
 window.refreshBusinessSettings = loadBusinessSettings;
 window.calculateTotal = calculateTotal;
-
