@@ -1,7 +1,7 @@
 const express = require('express');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
-const { sendAdminNotification, sendCustomerConfirmation } = require('../utils/email');
+const { sendAdminNotification, sendCustomerConfirmation, sendPaymentVerificationEmail } = require('../utils/email');
 const router = express.Router();
 
 // ========== PUBLIC ENDPOINT ==========
@@ -21,20 +21,18 @@ router.post('/', async (req, res) => {
         
         // Set payment status based on method
         let paymentStatus = 'unpaid';
-        if (payment_method === 'momo' && transaction_id) {
+        if (payment_method === 'momo') {
             paymentStatus = 'pending_verification';
-        } else if (payment_method === 'momo' && !transaction_id) {
-            paymentStatus = 'pending_verification'; // They intend to pay but no ID yet
         } else {
-            paymentStatus = 'unpaid'; // Pay on pickup
+            paymentStatus = 'unpaid';
         }
         
-        // PostgreSQL INSERT with payment fields
+        // ✅ REMOVED "RETURNING id" - db.insert adds it automatically
         const sql = `INSERT INTO bookings 
             (customer_name, customer_email, customer_phone, hostel_name, 
              booking_date, booking_time, items, items_summary, total_amount, status, description,
              payment_method, transaction_id, payment_status) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`;
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`;
         
         const params = [ 
             name, email, phone, hostel, date, time,
@@ -44,8 +42,8 @@ router.post('/', async (req, res) => {
             paymentStatus
         ];
         
-        const result = await db.insert(sql, params);
-        const insertId = result;
+        // ✅ db.insert already adds RETURNING id, so we just get the ID back
+        const insertId = await db.insert(sql, params);
         const bookingRef = 'KDL-' + String(insertId).padStart(6, '0');
         
         await db.update('UPDATE bookings SET booking_ref = $1 WHERE id = $2', [bookingRef, insertId]);
@@ -148,6 +146,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         const todayResult = await db.getOne('SELECT COUNT(*) as count FROM bookings WHERE DATE(booking_date) = $1', [today]);
         const pendingResult = await db.getOne("SELECT COUNT(*) as count FROM bookings WHERE status = 'pending'");
         const confirmedResult = await db.getOne("SELECT COUNT(*) as count FROM bookings WHERE status = 'confirmed'");
+        const completedResult = await db.getOne("SELECT COUNT(*) as count FROM bookings WHERE status = 'completed'");
         const revenueResult = await db.getOne("SELECT SUM(total_amount) as total FROM bookings WHERE status IN ('confirmed', 'completed') AND payment_status = 'verified'");
         
         // Payment stats
@@ -158,6 +157,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
             today: todayResult?.count || 0,
             pending: pendingResult?.count || 0,
             confirmed: confirmedResult?.count || 0,
+            completed: completedResult?.count || 0,
             revenue: revenueResult?.total || 0,
             pending_payments: pendingPaymentResult?.count || 0,
             verified_revenue: verifiedPaymentResult?.total || 0
@@ -179,7 +179,7 @@ router.get('/export', authenticateToken, async (req, res) => {
     }
 });
 
-// PUT /api/bookings/:id – update status (UPDATED to handle payment status)
+// PUT /api/bookings/:id – update status
 router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
@@ -193,7 +193,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// ========== VERIFY PAYMENT ENDPOINT (NEW) ==========
+// ========== VERIFY PAYMENT ENDPOINT ==========
 router.put('/:id/verify-payment', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
@@ -232,7 +232,6 @@ router.put('/:id/verify-payment', authenticateToken, async (req, res) => {
         booking.payment_verified_by = verified_by;
         
         // Send verification email to customer
-        const { sendPaymentVerificationEmail } = require('../utils/email');
         sendPaymentVerificationEmail(booking).catch(console.error);
         
         res.json({ 
@@ -252,10 +251,7 @@ router.delete('/reset', authenticateToken, async (req, res) => {
     try {
         console.log('🗑️ Resetting all bookings...');
         
-        // Delete all bookings
         await db.query('DELETE FROM bookings');
-        
-        // Reset the sequence so IDs start from 1 again
         await db.query('ALTER SEQUENCE bookings_id_seq RESTART WITH 1');
         
         console.log('✅ All bookings deleted and sequence reset');
@@ -272,11 +268,9 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     
     try {
-        // First, check if booking exists
         const checkResult = await db.query('SELECT booking_ref FROM bookings WHERE id = $1', [id]);
         
         let bookingRef = null;
-        
         if (Array.isArray(checkResult) && checkResult.length > 0) {
             bookingRef = checkResult[0].booking_ref;
         } else if (checkResult && checkResult.rows && checkResult.rows.length > 0) {
@@ -287,7 +281,6 @@ router.delete('/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ error: 'Booking not found' });
         }
         
-        // Delete the booking
         await db.query('DELETE FROM bookings WHERE id = $1', [id]);
         
         res.json({ 
