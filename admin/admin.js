@@ -872,7 +872,22 @@ function showNotification(message, type = 'success') {
 
 function contactCustomer(phone) {
   if (!phone) return;
-  const cleanPhone = phone.replace(/\D/g, '');
+  
+  // Remove all non-digit characters
+  let cleanPhone = phone.replace(/\D/g, '');
+  
+  // Ensure it starts with 233 (Ghana code)
+  if (cleanPhone.startsWith('0')) {
+    cleanPhone = '233' + cleanPhone.substring(1);
+  }
+  if (!cleanPhone.startsWith('233')) {
+    cleanPhone = '233' + cleanPhone;
+  }
+  
+  // Remove any leading 00 or +
+  cleanPhone = cleanPhone.replace(/^00/, '').replace(/^\+/, '');
+  
+  // Open WhatsApp chat
   window.open(`https://wa.me/${cleanPhone}`, '_blank', 'noopener,noreferrer');
 }
 
