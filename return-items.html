@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Request Items Back | Kodak Logistics - KNUST</title>
+    <meta name="description" content="Request your stored items back from Kodak Logistics. Fast delivery to your KNUST hostel.">
+    <link rel="stylesheet" href="return-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Additional styles for return page */
+        .history-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #ffb347;
+            color: #ffb347;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            background: #ffb347;
+            color: #8b0000;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        
+        .hero-mini {
+            background: linear-gradient(135deg, rgba(139,0,0,0.9), rgba(107,15,26,0.95));
+            padding: 3rem 5%;
+            text-align: center;
+        }
+        
+        .hero-mini h1 {
+            font-size: 2.5rem;
+            color: #ffb347;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .step {
+            text-align: center;
+            flex: 1;
+            max-width: 150px;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: bold;
+            color: #ffb347;
+        }
+        
+        .step.active .step-number {
+            background: #ffb347;
+            color: #8b0000;
+        }
+        
+        .step.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .step.active .step-label {
+            color: #ffb347;
+            font-weight: bold;
+        }
+        
+        .info-box {
+            background: rgba(255,179,71,0.1);
+            border-left: 4px solid #ffb347;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/233541249742?text=Hi%20Kodak%20Logistics%2C%20I%20need%20help%20with%20my%20return%20request..." class="whatsapp-btn" target="_blank" style="position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); text-decoration: none;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Header -->
+    <header>
+        <nav class="navbar">
+            <div class="logo-wrapper">
+                <div class="logo">
+                    <span class="logo-icons">
+                        <span class="icon-box">📦</span>
+                        <span class="icon-box">🔐</span>
+                        <span class="icon-box">🚚</span>
+                    </span>
+                    <span class="brand-name">KODAK</span>
+                </div>
+                <span class="tagline">📍 KNUST Storage</span>
+            </div>
+            <button class="menu-toggle" id="mobileMenuToggle">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#gallery">Items</a></li>
+                <li><a href="index.html#book">Book Storage</a></li>
+                <li><a href="return-items.html" class="active">Request Return</a></li>
+                <li><a href="index.html#faq">FAQ</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-mini">
+        <h1>📦 Request Your Items Back</h1>
+        <p>Need your stored items? Let us deliver them to your hostel.</p>
+        <div style="margin-top: 1rem;">
+            <span style="background: rgba(255,179,71,0.2); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.8rem;">💰 Delivery Fee: ₵30</span>
+            <span style="background: rgba(255,179,71,0.2); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.8rem; margin-left: 0.5rem;">⏰ 24hr Notice Required</span>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <div class="return-container">
+        
+        <!-- Daily Limit Notice -->
+        <div id="dailyLimitNotice" class="limit-notice">
+            📊 Loading available slots...
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-label">Verify Booking</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-label">Select Return Date</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-label">Payment & Submit</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Verify Booking -->
+        <div id="verifySection" class="verification-card">
+            <h3><i class="fas fa-search"></i> Step 1: Find Your Booking</h3>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem;">Enter your booking reference (e.g., KDL-001234) from your confirmation email.</p>
+            <div class="input-group">
+                <input type="text" id="bookingRef" placeholder="Enter Booking Reference (e.g., KDL-001234)" autocomplete="off">
+                <button id="verifyBtn"><i class="fas fa-check"></i> Verify Booking</button>
+            </div>
+            <div class="info-box" style="margin-top: 1rem;">
+                <small><i class="fas fa-info-circle"></i> Don't have a booking reference? <a href="index.html#book" style="color: #ffb347;">Book storage first</a></small>
+            </div>
+        </div>
+
+        <!-- Step 2: Booking Information (Hidden until verified) -->
+        <div id="bookingInfoSection" class="booking-info" style="display: none;">
+            <h3><i class="fas fa-check-circle"></i> Verified Booking</h3>
+            <div class="booking-details">
+                <div class="detail-item">
+                    <div class="detail-label">Booking Reference</div>
+                    <div class="detail-value" id="displayBookingRef">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Customer Name</div>
+                    <div class="detail-value" id="displayCustomerName">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Storage Date</div>
+                    <div class="detail-value" id="displayStorageDate">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Available for Return From</div>
+                    <div class="detail-value" id="displayAvailableDate">-</div>
+                </div>
+            </div>
+            <div class="items-list">
+                <div class="detail-label">Items Stored</div>
+                <div class="detail-value" id="displayItems">-</div>
+                <div class="detail-label" style="margin-top: 0.5rem;">Total Items</div>
+                <div class="detail-value" id="displayTotalItems">-</div>
+            </div>
+        </div>
+
+        <!-- Step 3: Return Request Form (Hidden until verified) -->
+        <div id="returnFormSection" class="form-card" style="display: none;">
+            <h3><i class="fas fa-calendar-alt"></i> Step 2: Schedule Your Return</h3>
+            
+            <form id="returnForm">
+                <!-- Hidden Fields -->
+                <input type="hidden" id="bookingId">
+                <input type="hidden" id="bookingRefHidden">
+                <input type="hidden" id="returnCustomerName">
+                <input type="hidden" id="returnCustomerEmail">
+                <input type="hidden" id="returnCustomerPhone">
+                <input type="hidden" id="returnHostel">
+                <input type="hidden" id="itemsSummary">
+                <input type="hidden" id="totalItems">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Return Date *</label>
+                        <input type="date" id="returnDate" required>
+                        <small>Minimum 24 hours notice required</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Return Time *</label>
+                        <select id="returnTime" required>
+                            <option value="">Select time</option>
+                            <option value="09:00">09:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">01:00 PM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="15:00">03:00 PM</option>
+                            <option value="16:00">04:00 PM</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Special Instructions (Optional)</label>
+                    <textarea id="specialInstructions" placeholder="e.g., Call before arrival, specific delivery spot..."></textarea>
+                </div>
+                
+                <!-- Payment Section -->
+                <div class="payment-section">
+                    <h4 style="color: #ffb347; margin-bottom: 1rem;">Step 3: Payment Method</h4>
+                    
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="delivery">
+                            <div class="payment-option-content">
+                                <strong>💵 Pay on Delivery</strong>
+                                <small>Pay ₵30 when items arrive (Cash or MoMo)</small>
+                            </div>
+                        </label>
+                        
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="momo">
+                            <div class="payment-option-content">
+                                <strong>📱 Mobile Money</strong>
+                                <small>Pay ₵30 now to speed up delivery</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div id="momoFields" class="momo-fields" style="display: none;">
+                        <p><strong>📱 Send payment to:</strong></p>
+                        <div class="momo-number">
+                            <div class="momo-number-code">054 470 5397</div>
+                            <button type="button" id="copyMomoBtn" class="copy-btn">
+                                <i class="fas fa-copy"></i> Copy Number
+                            </button>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Transaction ID (from your SMS)</label>
+                            <input type="text" id="transactionId" placeholder="e.g., MTN123456789">
+                            <small>Enter the transaction ID from your mobile money message</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="total-section">
+                    <p>Total Delivery Fee: ₵30.00</p>
+                    <small>Payable upon delivery or via MoMo</small>
+                </div>
+                
+                <button type="submit" id="submitReturnBtn" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Return Request
+                </button>
+            </form>
+        </div>
+
+        <!-- Success Section (Hidden until submitted) -->
+        <div id="successSection" class="success-message" style="display: none; background: #d4edda; color: #155724;">
+            <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h3>✅ Return Request Submitted!</h3>
+            <p>Your request reference: <strong id="successRef">-</strong></p>
+            <p>We will deliver your items on <strong id="successDate">-</strong></p>
+            <div class="info-box" style="background: #15572420; margin-top: 1rem;">
+                <small>📧 A confirmation email has been sent to your email address.</small>
+            </div>
+            <button onclick="resetForm()" class="btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-plus"></i> Submit Another Request
+            </button>
+            <a href="index.html" class="btn-secondary" style="display: inline-block; margin-top: 1rem; margin-left: 0.5rem; text-decoration: none;">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+
+        <!-- View History Button -->
+        <div style="text-align: center; margin: 2rem 0;">
+            <button id="viewHistoryBtn" class="btn-outline">
+                <i class="fas fa-history"></i> View My Return Requests
+            </button>
+        </div>
+
+        <!-- Return History Section -->
+        <div id="historySection" class="form-card" style="display: none;">
+            <h3><i class="fas fa-history"></i> Your Return Requests</h3>
+            <div id="historyContent"></div>
+            <button onclick="document.getElementById('historySection').style.display='none'" class="btn-outline" style="margin-top: 1rem; width: 100%;">
+                Close
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KODAK</div>
+            <p class="footer-tag">Your Trusted KNUST Storage Partner</p>
+            <div class="footer-contact">
+                <p><strong>Contact Us</strong></p>
+                <a href="https://wa.me/233541249742" class="footer-whatsapp" target="_blank">
+                    <i class="fab fa-whatsapp"></i> +233 54 124 9742
+                </a>
+                <p class="footer-email">Email: <a href="mailto:Kodaklogisticsservices@gmail.com">Kodaklogisticsservices@gmail.com</a></p>
+            </div>
+            <p class="footer-copyright">© 2026 Kodak Logistics – KNUST</p>
+        </div>
+    </footer>
+
+    <script src="return-script.js"></script>
+</body>
+</html>

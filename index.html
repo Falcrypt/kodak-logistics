@@ -607,6 +607,23 @@
     .trigger-arrow {
       color: #ffb347 !important;
     }
+        /* Return Button Style */
+    .btn-return {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+        color: white;
+        padding: 12px 28px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .btn-return:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.4);
+    }
+
   </style>
 </head>
 <body>
@@ -627,10 +644,11 @@
       </div>
       <button class="menu-toggle" id="mobileMenuToggle">☰</button>
       <ul class="nav-links" id="navLinks">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#gallery">Items</a></li>
-        <li><a href="#book">Book</a></li>
-        <li><a href="#faq">FAQ</a></li>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#gallery">Items</a></li>
+          <li><a href="#book">Book Storage</a></li>
+          <li><a href="return-items.html">Request Return</a></li>
+          <li><a href="#faq">FAQ</a></li>
       </ul>
     </nav>
   </header>
@@ -641,8 +659,9 @@
         <h1>Secure & Affordable<br>Student Storage</h1>
         <p>Store your items safely during vacation — with <strong>free pickup</strong> from your KNUST hostel.</p>
         <div class="hero-buttons">
-          <a href="#book" class="btn-primary">📦 Book Now</a>
-          <a href="#gallery" class="btn-secondary">📸 See Items</a>
+            <a href="#book" class="btn-primary">📦 Book Storage</a>
+            <a href="return-items.html" class="btn-return" style="background: linear-gradient(135deg, #28a745, #1e7e34); color: white; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; display: inline-block;">📦 Request Return</a>
+            <a href="#gallery" class="btn-secondary">📸 See Items</a>
         </div>
         <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
           <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">✅ 5,000+ Students</span>
@@ -686,6 +705,21 @@
         <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🔒</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">3. Safe Storage</h3><p style="font-size: 0.85rem;">Securely stored</p></div>
       </div>
     </section>
+
+    <section style="background: rgba(0,0,0,0.3); padding: 2rem 5%; text-align: center;">
+    <div class="section-header">
+        <h2>Need Your Items Back?</h2>
+        <p>Fast delivery to your hostel</p>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <a href="return-items.html" style="background: linear-gradient(135deg, #28a745, #1e7e34); color: white; padding: 15px 40px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease;">
+            📦 Request Your Items Back
+        </a>
+    </div>
+    <p style="margin-top: 1rem; font-size: 0.85rem; color: rgba(255,255,255,0.7);">
+        Delivery fee: ₵30 | 24-hour notice required | Same location delivery
+    </p>
+</section>
 
     <section class="booking" id="book">
       <div class="section-header"><h2>Book Storage</h2><p>Fill the form — we'll confirm with a reference ID</p></div>
