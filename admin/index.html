@@ -63,5 +63,10 @@
     }
   </script>
   <script src="admin.js"></script>
+  <script>
+    // Clear any existing token when visiting login page
+    localStorage.removeItem('adminToken');
+    console.log('🔒 Session cleared. Please login to continue.');
+</script>
 </body>
 </html>

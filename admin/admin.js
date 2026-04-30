@@ -76,6 +76,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (response.ok && data.token) {
           localStorage.setItem('adminToken', data.token);
           window.location.href = 'dashboard.html';
+
+                    // Clear session when browser/tab is closed (optional)
+          window.addEventListener('beforeunload', function() {
+              // Commented out - session will expire naturally
+              // localStorage.removeItem('adminToken');
+          });
         } else {
           if (errorDiv) {
             errorDiv.textContent = data.error || 'Invalid credentials';
@@ -95,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  if (window.location.pathname.includes('dashboard.html')) {
+if (window.location.pathname.includes('dashboard.html')) {
     checkAuth().then(isAuthed => {
       if (isAuthed) {
         loadDashboardData();
@@ -105,6 +111,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setupNavigation();
         setupEventListeners();
         setupMobileMenu();
+      } else {
+        // Redirect to login page if not authenticated
+        window.location.href = 'index.html';
       }
     });
   }
