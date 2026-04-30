@@ -1,4 +1,4 @@
-// backend/server.js - UPGRADED VERSION with Payment Columns Auto-Creation
+// backend/server.js - UPGRADED VERSION with Payment Columns Auto-Creation & Return Tables
 // This starts everything and connects all the pieces
 
 // ===== STEP 1: LOAD ENVIRONMENT VARIABLES =====
@@ -10,14 +10,15 @@ const cors = require('cors');
 const helmet = require('helmet');
 const db = require('./database/db');
 
-// ===== IMPORT THE ensurePaymentColumns FUNCTION =====
-const { ensurePaymentColumns } = require('./database/db');
+// ===== IMPORT THE FUNCTIONS FROM db.js =====
+const { ensurePaymentColumns, ensureReturnTables } = require('./database/db');
 
 // ===== STEP 3: IMPORT ROUTES =====
 const authRoutes = require('./routes/auth');
 const bookingRoutes = require('./routes/bookings');
 const settingsRoutes = require('./routes/settings');
 const customersRoutes = require('./routes/customers');
+const returnsRoutes = require('./routes/returns');  // ADD THIS LINE
 
 // ===== STEP 4: CREATE EXPRESS APP =====
 const app = express();
@@ -136,26 +137,17 @@ async function setupDatabase() {
             ['business_email', 'Kodaklogisticsservices@gmail.com'],
             
             // ===== BAGS =====
-            
-            // Duffle Bags
             ['price_duffle_small', '29.99'],
             ['price_duffle_big', '49.99'],
-            
-            // Jute Bags
             ['price_jute_small', '39.99'],
             ['price_jute_medium', '59.99'],
             ['price_jute_big', '79.99'],
-            
-            // Traveling Bags / Suitcases
             ['price_travel_small', '29.99'],
             ['price_travel_medium', '49.99'],
             ['price_travel_big', '69.99'],
             
             // ===== APPLIANCES =====
-            // Microwave
             ['price_microwave', '30'],
-            
-            // Fridges (specific sizes)
             ['price_fridge_tabletop', '59.99'],
             ['price_fridge_doubledoor', '79.99'],
             ['price_fridge_small', '39.99'],
@@ -194,7 +186,7 @@ async function setupDatabase() {
     }
 }
 
-// ===== STEP 6.5: ADD PAYMENT COLUMNS (NEW) =====
+// ===== STEP 6.5: ADD PAYMENT COLUMNS & RETURN TABLES =====
 async function addPaymentColumns() {
     try {
         console.log('💰 Checking payment columns...');
@@ -202,6 +194,16 @@ async function addPaymentColumns() {
         console.log('✅ Payment columns check complete');
     } catch (error) {
         console.log('⚠️ Payment columns check warning:', error.message);
+    }
+}
+
+async function addReturnTables() {
+    try {
+        console.log('📦 Checking return tables...');
+        await ensureReturnTables();
+        console.log('✅ Return tables check complete');
+    } catch (error) {
+        console.log('⚠️ Return tables check warning:', error.message);
     }
 }
 
@@ -218,6 +220,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/customers', customersRoutes);
+app.use('/api/returns', returnsRoutes);  // ADD THIS LINE
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Route not found' });
@@ -243,8 +246,11 @@ async function startServer() {
     
     await setupDatabase();
     
-    // ADD PAYMENT COLUMNS HERE 👇 (AFTER database setup)
+    // ADD PAYMENT COLUMNS
     await addPaymentColumns();
+    
+    // ADD RETURN TABLES
+    await addReturnTables();
     
     app.listen(PORT, () => {
         console.log('✅ ==================================');

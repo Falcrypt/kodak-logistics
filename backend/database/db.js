@@ -185,6 +185,72 @@ async function ensurePaymentColumns() {
     }
 }
 
+// Add this function to automatically create return tables
+async function ensureReturnTables() {
+    try {
+        console.log('🔧 Creating return tables if not exists...');
+        
+        // Create return_requests table
+        await query(`
+            CREATE TABLE IF NOT EXISTS return_requests (
+                id SERIAL PRIMARY KEY,
+                request_ref VARCHAR(20) UNIQUE,
+                booking_id INTEGER REFERENCES bookings(id),
+                booking_ref VARCHAR(20) NOT NULL,
+                customer_name VARCHAR(100) NOT NULL,
+                customer_email VARCHAR(100) NOT NULL,
+                customer_phone VARCHAR(20) NOT NULL,
+                original_hostel VARCHAR(200),
+                items_summary TEXT,
+                total_items_stored INTEGER,
+                return_date DATE NOT NULL,
+                return_time TIME NOT NULL,
+                delivery_fee DECIMAL(10,2) DEFAULT 30.00,
+                payment_method VARCHAR(20) DEFAULT 'delivery',
+                transaction_id VARCHAR(100),
+                payment_status VARCHAR(30) DEFAULT 'unpaid',
+                special_instructions TEXT,
+                status VARCHAR(20) DEFAULT 'pending',
+                status_history JSONB DEFAULT '[]',
+                admin_notes TEXT,
+                confirmed_by VARCHAR(100),
+                confirmed_at TIMESTAMP,
+                completed_at TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ return_requests table ready');
+        
+        // Create return_daily_counter table
+        await query(`
+            CREATE TABLE IF NOT EXISTS return_daily_counter (
+                id SERIAL PRIMARY KEY,
+                request_date DATE UNIQUE NOT NULL,
+                request_count INTEGER DEFAULT 0,
+                daily_limit INTEGER DEFAULT 40,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ return_daily_counter table ready');
+        
+        // Create indexes for faster queries
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_return_requests_booking_ref ON return_requests(booking_ref);
+            CREATE INDEX IF NOT EXISTS idx_return_requests_status ON return_requests(status);
+            CREATE INDEX IF NOT EXISTS idx_return_requests_return_date ON return_requests(return_date);
+            CREATE INDEX IF NOT EXISTS idx_return_requests_customer_email ON return_requests(customer_email);
+        `);
+        console.log('✅ Return tables indexes created');
+        
+        console.log('✅ All return tables are ready!');
+        
+    } catch (error) {
+        console.error('❌ Error creating return tables:', error.message);
+    }
+}
+
 // ========== EXPORT ALL FUNCTIONS ==========
 module.exports = {
     testConnection,
@@ -193,5 +259,7 @@ module.exports = {
     insert,
     update,
     tableExists,
-    ensurePaymentColumns  // ADD THIS
+    ensurePaymentColumns,
+    ensureReturnTables  // ADD THIS LINE
 };
+
