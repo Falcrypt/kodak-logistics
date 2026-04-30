@@ -277,8 +277,232 @@ async function sendPaymentVerificationEmail(booking) {
     }
 }
 
+// Send return request confirmation to customer
+async function sendReturnRequestConfirmation(returnRequest) {
+    try {
+        console.log("📧 Sending return request confirmation email...");
+        
+        // Format the date nicely
+        const returnDateFormatted = new Date(returnRequest.return_date).toLocaleDateString('en-GB', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        const statusMessage = returnRequest.payment_method === 'momo' && returnRequest.payment_status === 'pending_verification'
+            ? '⚠️ Payment pending verification. We will confirm once payment is verified.'
+            : '💰 Pay ₵30 on delivery (cash or MoMo)';
+        
+        const mailOptions = {
+            from: `"Kodak Logistics" <${process.env.EMAIL_USER}>`,
+            to: returnRequest.customer_email,
+            subject: `📦 Return Request Received - ${returnRequest.request_ref}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #8b0000;">Return Request Received!</h2>
+                    
+                    <p>Dear ${returnRequest.customer_name},</p>
+                    
+                    <p>We have received your request to return your stored items. Here are the details:</p>
+                    
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <h3 style="margin-top: 0; color: #8b0000;">📋 Request Details</h3>
+                        <p><strong>Request Reference:</strong> ${returnRequest.request_ref}</p>
+                        <p><strong>Original Booking:</strong> ${returnRequest.booking_ref}</p>
+                        <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
+                        <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
+                        <p><strong>Delivery Location:</strong> ${returnRequest.original_hostel}</p>
+                        <p><strong>Items to Return:</strong> ${returnRequest.items_summary}</p>
+                        <p><strong>Delivery Fee:</strong> ₵30.00</p>
+                        <p><strong>Payment:</strong> ${statusMessage}</p>
+                        ${returnRequest.special_instructions ? `<p><strong>Special Instructions:</strong> ${returnRequest.special_instructions}</p>` : ''}
+                    </div>
+                    
+                    <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <h3 style="margin-top: 0; color: #8b0000;">⏳ What Happens Next?</h3>
+                        <ol style="margin: 0; padding-left: 20px;">
+                            <li>Our team will review your request within 24 hours</li>
+                            <li>You will receive a confirmation email once approved</li>
+                            <li>We will deliver your items on the scheduled date</li>
+                        </ol>
+                    </div>
+                    
+                    <p>Need to modify or cancel? Please contact us within 12 hours.</p>
+                    
+                    <hr>
+                    <p style="color: #666;">Kodak Logistics - Your KNUST Storage Partner</p>
+                    <p>📞 WhatsApp: +233545025296 | 📧 Email: ${process.env.EMAIL_USER}</p>
+                </div>
+            `
+        };
+        
+        await transporter.sendMail(mailOptions);
+        console.log('✅ Return confirmation email sent to customer');
+    } catch (error) {
+        console.error('❌ Return confirmation email error:', error);
+    }
+}
+
+// Send return request notification to admin
+async function sendReturnRequestNotification(returnRequest) {
+    try {
+        console.log("📧 Sending return request notification to admin...");
+        
+        const returnDateFormatted = new Date(returnRequest.return_date).toLocaleDateString('en-GB', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        const mailOptions = {
+            from: `"Kodak Logistics" <${process.env.EMAIL_USER}>`,
+            to: process.env.ADMIN_EMAIL || 'Kodaklogisticsservices@gmail.com',
+            subject: `📦 NEW RETURN REQUEST - ${returnRequest.request_ref}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #8b0000;">📦 New Return Request Received!</h2>
+                    
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <h3 style="margin-top: 0;">Customer Information</h3>
+                        <p><strong>Name:</strong> ${returnRequest.customer_name}</p>
+                        <p><strong>Phone:</strong> ${returnRequest.customer_phone}</p>
+                        <p><strong>Email:</strong> ${returnRequest.customer_email}</p>
+                        <p><strong>Original Booking:</strong> ${returnRequest.booking_ref}</p>
+                    </div>
+                    
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <h3 style="margin-top: 0;">Return Details</h3>
+                        <p><strong>Request Reference:</strong> ${returnRequest.request_ref}</p>
+                        <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
+                        <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
+                        <p><strong>Delivery Location:</strong> ${returnRequest.original_hostel}</p>
+                        <p><strong>Items:</strong> ${returnRequest.items_summary}</p>
+                        <p><strong>Delivery Fee:</strong> ₵30.00</p>
+                        <p><strong>Payment Method:</strong> ${returnRequest.payment_method === 'momo' ? 'Mobile Money (Pending Verification)' : 'Pay on Delivery'}</p>
+                        ${returnRequest.transaction_id ? `<p><strong>Transaction ID:</strong> ${returnRequest.transaction_id}</p>` : ''}
+                        ${returnRequest.special_instructions ? `<p><strong>Instructions:</strong> ${returnRequest.special_instructions}</p>` : ''}
+                    </div>
+                    
+                    <p><a href="https://falcrypt.github.io/kodak-logistics/admin/#returns" style="background: #8b0000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Manage Request</a></p>
+                    
+                    <hr>
+                    <p><strong>Action Required:</strong> Please review and confirm this return request.</p>
+                </div>
+            `
+        };
+        
+        await transporter.sendMail(mailOptions);
+        console.log('✅ Return notification email sent to admin');
+    } catch (error) {
+        console.error('❌ Return notification email error:', error);
+    }
+}
+
+// Send return status update to customer
+async function sendReturnStatusUpdateEmail(returnRequest) {
+    try {
+        console.log("📧 Sending return status update email...");
+        
+        const returnDateFormatted = new Date(returnRequest.return_date).toLocaleDateString('en-GB', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        let statusTitle = '';
+        let statusColor = '';
+        let statusMessage = '';
+        let nextSteps = '';
+        
+        switch(returnRequest.status) {
+            case 'confirmed':
+                statusTitle = '✅ Return Request Confirmed!';
+                statusColor = '#28a745';
+                statusMessage = 'Your return request has been approved!';
+                nextSteps = `
+                    <li>We will deliver your items on ${returnDateFormatted} at ${returnRequest.return_time}</li>
+                    <li>Please be available at ${returnRequest.original_hostel} during the delivery time</li>
+                    <li>Have your payment ready (₵30 delivery fee)</li>
+                `;
+                break;
+            case 'completed':
+                statusTitle = '✅ Items Successfully Delivered!';
+                statusColor = '#28a745';
+                statusMessage = 'Your items have been delivered successfully.';
+                nextSteps = `
+                    <li>Thank you for choosing Kodak Logistics!</li>
+                    <li>We hope you enjoyed our service.</li>
+                    <li>Please consider leaving a review!</li>
+                `;
+                break;
+            case 'cancelled':
+                statusTitle = '❌ Return Request Cancelled';
+                statusColor = '#dc3545';
+                statusMessage = 'Your return request has been cancelled.';
+                nextSteps = `
+                    <li>If you did not request this cancellation, please contact us immediately</li>
+                    <li>You can submit a new return request at any time</li>
+                `;
+                break;
+            default:
+                statusTitle = '📦 Return Request Update';
+                statusColor = '#ffc107';
+                statusMessage = 'There has been an update to your return request.';
+                nextSteps = `<li>Please contact us if you have any questions</li>`;
+        }
+        
+        const mailOptions = {
+            from: `"Kodak Logistics" <${process.env.EMAIL_USER}>`,
+            to: returnRequest.customer_email,
+            subject: `${statusTitle} - ${returnRequest.request_ref}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: ${statusColor};">${statusTitle}</h2>
+                    
+                    <p>Dear ${returnRequest.customer_name},</p>
+                    
+                    <p>${statusMessage}</p>
+                    
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <h3 style="margin-top: 0;">📋 Request Details</h3>
+                        <p><strong>Request Reference:</strong> ${returnRequest.request_ref}</p>
+                        <p><strong>Original Booking:</strong> ${returnRequest.booking_ref}</p>
+                        <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
+                        <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
+                        <p><strong>Delivery Location:</strong> ${returnRequest.original_hostel}</p>
+                        <p><strong>Items:</strong> ${returnRequest.items_summary}</p>
+                        <p><strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${returnRequest.status.toUpperCase()}</span></p>
+                    </div>
+                    
+                    <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <h3 style="margin-top: 0;">📋 Next Steps</h3>
+                        <ol style="margin: 0; padding-left: 20px;">
+                            ${nextSteps}
+                        </ol>
+                    </div>
+                    
+                    <hr>
+                    <p style="color: #666;">Kodak Logistics - Your KNUST Storage Partner</p>
+                    <p>📞 WhatsApp: +233545025296 | 📧 Email: ${process.env.EMAIL_USER}</p>
+                </div>
+            `
+        };
+        
+        await transporter.sendMail(mailOptions);
+        console.log('✅ Return status update email sent to customer');
+    } catch (error) {
+        console.error('❌ Return status update email error:', error);
+    }
+}
+
 module.exports = {
     sendAdminNotification,
     sendCustomerConfirmation,
-    sendPaymentVerificationEmail
+    sendPaymentVerificationEmail,
+    sendReturnRequestConfirmation,
+    sendReturnRequestNotification,
+    sendReturnStatusUpdateEmail
 };
