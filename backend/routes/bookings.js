@@ -112,6 +112,13 @@ router.get('/', authenticateToken, async (req, res) => {
             params.push(status);
             paramCounter++;
         }
+
+                // Add date filter
+        if (req.query.date) {
+            whereConditions.push(`DATE(booking_date) = $${paramCounter}`);
+            params.push(req.query.date);
+            paramCounter++;
+        }
         
         const whereClause = whereConditions.length > 0
             ? 'WHERE ' + whereConditions.join(' AND ')

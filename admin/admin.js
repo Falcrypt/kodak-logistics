@@ -10,6 +10,10 @@ let currentSearchTerm = '';
 let currentStatusFilter = 'all';
 let searchTimeout = null;
 
+// ========== DATE FILTER VARIABLES ==========
+let currentBookingDateFilter = '';
+let currentReturnDateFilter = '';
+
 // ========== AUTHENTICATION ==========
 async function checkAuth() {
   const token = localStorage.getItem('adminToken');
@@ -430,7 +434,7 @@ function displayRecentBookings(bookings) {
 // ========== LOAD BOOKINGS WITH SEARCH & FILTER ==========
 async function loadFilteredBookings() {
     try {
-        console.log(`🔍 Searching: "${currentSearchTerm}", Filter: ${currentStatusFilter}`);
+        console.log(`🔍 Searching: "${currentSearchTerm}", Filter: ${currentStatusFilter}, Date: ${currentBookingDateFilter}`);
         
         const params = new URLSearchParams();
         
@@ -439,6 +443,9 @@ async function loadFilteredBookings() {
         }
         if (currentStatusFilter !== 'all') {
             params.append('status', currentStatusFilter);
+        }
+        if (currentBookingDateFilter) {
+            params.append('date', currentBookingDateFilter);
         }
         
         const url = `/bookings${params.toString() ? '?' + params.toString() : ''}`;
@@ -926,6 +933,111 @@ function setupEventListeners() {
   setupSearchListeners();
 }
 
+// ========== DATE FILTER FUNCTIONS ==========
+function setupDateFilters() {
+    // Bookings Date Filters
+    const todayBtn = document.getElementById('filterToday');
+    const tomorrowBtn = document.getElementById('filterTomorrow');
+    const applyDateBtn = document.getElementById('applyDateFilter');
+    const clearDateBtn = document.getElementById('clearDateFilter');
+    const customDateInput = document.getElementById('customDateFilter');
+    
+    if (todayBtn) {
+        todayBtn.addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            currentBookingDateFilter = today;
+            if (customDateInput) customDateInput.value = today;
+            loadFilteredBookings();
+            showNotification(`Showing bookings for: ${today}`, 'info');
+        });
+    }
+    
+    if (tomorrowBtn) {
+        tomorrowBtn.addEventListener('click', () => {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            currentBookingDateFilter = tomorrowStr;
+            if (customDateInput) customDateInput.value = tomorrowStr;
+            loadFilteredBookings();
+            showNotification(`Showing bookings for: ${tomorrowStr}`, 'info');
+        });
+    }
+    
+    if (applyDateBtn && customDateInput) {
+        applyDateBtn.addEventListener('click', () => {
+            const selectedDate = customDateInput.value;
+            if (selectedDate) {
+                currentBookingDateFilter = selectedDate;
+                loadFilteredBookings();
+                showNotification(`Showing bookings for: ${selectedDate}`, 'info');
+            } else {
+                showNotification('Please select a date first', 'error');
+            }
+        });
+    }
+    
+    if (clearDateBtn) {
+        clearDateBtn.addEventListener('click', () => {
+            currentBookingDateFilter = '';
+            if (customDateInput) customDateInput.value = '';
+            loadFilteredBookings();
+            showNotification('Date filter cleared. Showing all bookings.', 'info');
+        });
+    }
+    
+    // Returns Date Filters
+    const returnTodayBtn = document.getElementById('returnFilterToday');
+    const returnTomorrowBtn = document.getElementById('returnFilterTomorrow');
+    const applyReturnDateBtn = document.getElementById('applyReturnDateFilter');
+    const clearReturnDateBtn = document.getElementById('clearReturnDateFilter');
+    const returnCustomDateInput = document.getElementById('returnCustomDateFilter');
+    
+    if (returnTodayBtn) {
+        returnTodayBtn.addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            currentReturnDateFilter = today;
+            if (returnCustomDateInput) returnCustomDateInput.value = today;
+            loadReturnRequests();
+            showNotification(`Showing returns for: ${today}`, 'info');
+        });
+    }
+    
+    if (returnTomorrowBtn) {
+        returnTomorrowBtn.addEventListener('click', () => {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            currentReturnDateFilter = tomorrowStr;
+            if (returnCustomDateInput) returnCustomDateInput.value = tomorrowStr;
+            loadReturnRequests();
+            showNotification(`Showing returns for: ${tomorrowStr}`, 'info');
+        });
+    }
+    
+    if (applyReturnDateBtn && returnCustomDateInput) {
+        applyReturnDateBtn.addEventListener('click', () => {
+            const selectedDate = returnCustomDateInput.value;
+            if (selectedDate) {
+                currentReturnDateFilter = selectedDate;
+                loadReturnRequests();
+                showNotification(`Showing returns for: ${selectedDate}`, 'info');
+            } else {
+                showNotification('Please select a date first', 'error');
+            }
+        });
+    }
+    
+    if (clearReturnDateBtn) {
+        clearReturnDateBtn.addEventListener('click', () => {
+            currentReturnDateFilter = '';
+            if (returnCustomDateInput) returnCustomDateInput.value = '';
+            loadReturnRequests();
+            showNotification('Date filter cleared. Showing all returns.', 'info');
+        });
+    }
+}
+
 // ========== GLOBAL EXPORTS ==========
 window.showSection = function(sectionId) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
@@ -948,6 +1060,7 @@ async function loadReturnRequests() {
         let url = `/returns?`;
         if (status !== 'all') url += `status=${status}&`;
         if (search) url += `search=${encodeURIComponent(search)}&`;
+        if (currentReturnDateFilter) url += `date=${currentReturnDateFilter}&`;
         
         const requests = await apiCall(url);
         displayReturnRequests(requests || []);
@@ -1183,6 +1296,9 @@ window.toggleMobileMenu = function() {
 document.addEventListener('DOMContentLoaded', function() {
     const menuBtn = document.getElementById('mobileMenuToggle');
     const sidebar = document.querySelector('.sidebar');
+    
+    // Initialize date filters (safe to call even if elements don't exist yet)
+    setupDateFilters();
     
     if (menuBtn && sidebar) {
         function checkWidth() {

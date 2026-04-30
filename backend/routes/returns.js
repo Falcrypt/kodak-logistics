@@ -323,6 +323,13 @@ router.get('/', authenticateToken, async (req, res) => {
             params.push(searchTerm, searchTerm, searchTerm);
             paramCounter += 3;
         }
+
+                // Add date filter
+        if (req.query.date) {
+            whereConditions.push(`DATE(return_date) = $${paramCounter}`);
+            params.push(req.query.date);
+            paramCounter++;
+        }
         
         const whereClause = whereConditions.length > 0
             ? 'WHERE ' + whereConditions.join(' AND ')
