@@ -266,12 +266,18 @@ function setupNavigation() {
         titleEl.textContent = sectionId === 'dashboard' ? 'Dashboard' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
       }
       
+      // Load data based on section
       if (sectionId === 'bookings') {
         loadAllBookings();
       } else if (sectionId === 'customers') {
         loadCustomers();
       } else if (sectionId === 'pricing' || sectionId === 'settings') {
         loadAllSettings();
+      } else if (sectionId === 'returns') {
+        loadReturnRequests();
+        loadReturnStats();
+        // Setup return listeners after loading the section
+        setTimeout(() => setupReturnListeners(), 100);
       }
     });
   });
@@ -363,6 +369,7 @@ async function loadDashboardData() {
       `;
     }
     await loadRecentBookings();
+    loadReturnStats();
   } catch (error) {
     console.error('❌ Dashboard load failed:', error);
   }
@@ -915,6 +922,222 @@ window.showSection = function(sectionId) {
   if (sectionId === 'pricing' || sectionId === 'settings') loadAllSettings();
 };
 
+// ========== RETURN REQUESTS MANAGEMENT ==========
+
+// Load all return requests
+async function loadReturnRequests() {
+    try {
+        const status = document.getElementById('returnStatusFilter')?.value || 'all';
+        const search = document.getElementById('returnSearch')?.value || '';
+        
+        let url = `/returns?`;
+        if (status !== 'all') url += `status=${status}&`;
+        if (search) url += `search=${encodeURIComponent(search)}&`;
+        
+        const requests = await apiCall(url);
+        displayReturnRequests(requests || []);
+        
+    } catch (error) {
+        console.error('Failed to load return requests:', error);
+        displayReturnRequests([]);
+    }
+}
+
+// Display return requests in table
+function displayReturnRequests(requests) {
+    const tbody = document.getElementById('returnRequestsBody');
+    if (!tbody) return;
+    
+    if (!requests || requests.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9">No return requests found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = requests.map(request => {
+        const statusClass = getReturnStatusClass(request.status);
+        const statusText = getReturnStatusText(request.status);
+        const returnDate = new Date(request.return_date).toLocaleDateString();
+        const paymentMethod = request.payment_method === 'momo' ? '📱 MoMo' : '💵 On Delivery';
+        
+        let actionButtons = '';
+        
+        if (request.status === 'pending') {
+            actionButtons = `
+                <button class="action-btn btn-confirm" onclick="updateReturnStatus(${request.id}, 'confirmed')" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-right:5px;">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+                <button class="action-btn btn-cancel" onclick="updateReturnStatus(${request.id}, 'cancelled')" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            `;
+        } else if (request.status === 'confirmed') {
+            actionButtons = `
+                <button class="action-btn btn-complete" onclick="updateReturnStatus(${request.id}, 'completed')" style="background:#17a2b8; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                    <i class="fas fa-check-double"></i> Complete
+                </button>
+                <button class="action-btn btn-whatsapp" onclick="contactCustomer('${request.customer_phone}')" style="background:#25D366; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-left:5px;">
+                    <i class="fab fa-whatsapp"></i>
+                </button>
+            `;
+        } else {
+            actionButtons = `
+                <button class="action-btn btn-view" onclick="viewReturnDetails(${request.id})" style="background:#ffb347; color:#8b0000; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                    <i class="fas fa-eye"></i> View
+                </button>
+            `;
+        }
+        
+        return `
+            <tr>
+                <td>${escapeHtml(request.request_ref || 'N/A')}</td>
+                <td>${escapeHtml(request.booking_ref || 'N/A')}</td>
+                <td>${escapeHtml(request.customer_name || 'N/A')}</td>
+                <td>${escapeHtml(request.customer_phone || 'N/A')}</td>
+                <td>${returnDate}</td>
+                <td>${escapeHtml(request.items_summary?.substring(0, 30) || 'N/A')}${request.items_summary?.length > 30 ? '...' : ''}</td>
+                <td>₵${parseFloat(request.delivery_fee).toFixed(2)}</td>
+                <td>${paymentMethod}</td>
+                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td>${actionButtons}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Get status class for styling
+function getReturnStatusClass(status) {
+    switch(status) {
+        case 'pending': return 'status-pending';
+        case 'confirmed': return 'status-confirmed';
+        case 'completed': return 'status-completed';
+        case 'cancelled': return 'status-cancelled';
+        default: return 'status-pending';
+    }
+}
+
+// Get status text with emoji
+function getReturnStatusText(status) {
+    switch(status) {
+        case 'pending': return '🟡 Pending';
+        case 'confirmed': return '🟢 Confirmed';
+        case 'completed': return '✅ Completed';
+        case 'cancelled': return '❌ Cancelled';
+        default: return '🟡 Pending';
+    }
+}
+
+// Update return request status
+window.updateReturnStatus = async function(requestId, newStatus) {
+    let confirmMessage = '';
+    if (newStatus === 'confirmed') confirmMessage = 'Confirm this return request?';
+    else if (newStatus === 'completed') confirmMessage = 'Mark as completed?';
+    else if (newStatus === 'cancelled') confirmMessage = 'Cancel this return request?';
+    
+    if (!confirm(confirmMessage)) return;
+    
+    try {
+        const result = await apiCall(`/returns/${requestId}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ status: newStatus, confirmed_by: currentUser?.username || 'admin' })
+        });
+        
+        if (result?.success) {
+            showNotification(`Return request ${newStatus} successfully!`, 'success');
+            loadReturnRequests();
+            loadReturnStats();
+        }
+    } catch (error) {
+        showNotification('Failed to update status: ' + error.message, 'error');
+    }
+};
+
+// Load return statistics for dashboard
+async function loadReturnStats() {
+    try {
+        const stats = await apiCall('/returns/stats/summary');
+        if (!stats) return;
+        
+        // Update return stats in dashboard (if element exists)
+        const returnStatsDiv = document.getElementById('returnStats');
+        if (returnStatsDiv) {
+            returnStatsDiv.innerHTML = `
+                <div class="stat-card"><i class="fas fa-clock stat-icon"></i><div class="stat-info"><h3>Pending Returns</h3><p>${stats.pending || 0}</p></div></div>
+                <div class="stat-card"><i class="fas fa-check-circle stat-icon"></i><div class="stat-info"><h3>Confirmed Returns</h3><p>${stats.confirmed || 0}</p></div></div>
+                <div class="stat-card"><i class="fas fa-truck stat-icon"></i><div class="stat-info"><h3>Today's Returns</h3><p>${stats.today_requests || 0}/${stats.today_limit || 40}</p></div></div>
+                <div class="stat-card"><i class="fas fa-check-double stat-icon"></i><div class="stat-info"><h3>Completed Returns</h3><p>${stats.completed || 0}</p></div></div>
+            `;
+        }
+    } catch (error) {
+        console.error('Failed to load return stats:', error);
+    }
+}
+
+// View return request details
+window.viewReturnDetails = async function(requestId) {
+    try {
+        const requests = await apiCall('/returns');
+        const request = requests?.find(r => r.id === requestId);
+        
+        if (!request) {
+            alert('Request not found');
+            return;
+        }
+        
+        const returnDate = new Date(request.return_date).toLocaleDateString();
+        
+        alert(`
+📋 RETURN REQUEST DETAILS
+
+Request Ref: ${request.request_ref}
+Booking Ref: ${request.booking_ref}
+Customer: ${request.customer_name}
+Phone: ${request.customer_phone}
+Email: ${request.customer_email}
+
+📍 Return Details:
+Date: ${returnDate}
+Time: ${request.return_time}
+Location: ${request.original_hostel}
+
+📦 Items: ${request.items_summary}
+
+💰 Payment: ${request.payment_method === 'momo' ? 'Mobile Money' : 'Pay on Delivery'}
+Fee: ₵${request.delivery_fee}
+
+Status: ${request.status}
+        `);
+    } catch (error) {
+        console.error('Error viewing return details:', error);
+        showNotification('Failed to load details', 'error');
+    }
+};
+
+// Setup return section event listeners
+function setupReturnListeners() {
+    const searchInput = document.getElementById('returnSearch');
+    const statusFilter = document.getElementById('returnStatusFilter');
+    const refreshBtn = document.getElementById('refreshReturns');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(() => loadReturnRequests(), 500));
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', () => loadReturnRequests());
+    }
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => loadReturnRequests());
+    }
+}
+
+// Debounce helper for search
+function debounce(func, delay) {
+    let timeout;
+    return function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, arguments), delay);
+    };
+}
+
 window.updateBookingStatus = updateBookingStatus;
 window.contactCustomer = contactCustomer;
 window.savePricing = savePricing;
@@ -926,6 +1149,9 @@ window.closeCustomerModal = closeCustomerModal;
 window.viewCustomerDetails = viewCustomerDetails;
 window.deleteSingleBooking = deleteSingleBooking;
 window.verifyPayment = verifyPayment;
+window.loadReturnRequests = loadReturnRequests;
+window.loadReturnStats = loadReturnStats;
+window.setupReturnListeners = setupReturnListeners;
 
 // ========== MOBILE MENU TOGGLE ==========
 window.toggleMobileMenu = function() {
