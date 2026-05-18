@@ -307,21 +307,27 @@
         </div>
 
         <!-- Success Section (Hidden until submitted) -->
-        <div id="successSection" class="success-message" style="display: none; background: #d4edda; color: #155724;">
-            <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-            <h3>✅ Return Request Submitted!</h3>
-            <p>Your request reference: <strong id="successRef">-</strong></p>
-            <p>We will deliver your items on <strong id="successDate">-</strong></p>
-            <div class="info-box" style="background: #15572420; margin-top: 1rem;">
-                <small>📧 A confirmation email has been sent to your email address.</small>
-            </div>
-            <button onclick="resetForm()" class="btn-secondary" style="margin-top: 1rem;">
-                <i class="fas fa-plus"></i> Submit Another Request
-            </button>
-            <a href="index.html" class="btn-secondary" style="display: inline-block; margin-top: 1rem; margin-left: 0.5rem; text-decoration: none;">
-                <i class="fas fa-home"></i> Back to Home
-            </a>
-        </div>
+  <div id="successSection" class="success-message" style="display: none; background: #fff3e0; color: #e67e22; border-left: 4px solid #e67e22;">
+    <i class="fas fa-clock" style="font-size: 3rem; margin-bottom: 1rem; color: #e67e22;"></i>
+    <h3 style="color: #e67e22;">🟡 Return Request Submitted!</h3>
+    <p>Your request reference: <strong id="successRef" style="color: #8b0000;">-</strong></p>
+    <div id="successMessageContent">
+        <p><strong>Status:</strong> 🟡 Pending Admin Approval</p>
+        <p>You will receive an email once admin confirms your return.</p>
+    </div>
+    <p>Return Date requested: <strong id="successDate">-</strong></p>
+    <div class="info-box" style="background: #fff3e0; margin-top: 1rem;">
+        <small>📧 A confirmation email has been sent to your email address.</small>
+        <br>
+        <small>⏳ You will receive another email once admin approves your return.</small>
+    </div>
+    <button onclick="resetForm()" class="btn-secondary" style="margin-top: 1rem; background: #ffb347; color: #8b0000;">
+        <i class="fas fa-plus"></i> Submit Another Request
+    </button>
+    <a href="index.html" class="btn-secondary" style="display: inline-block; margin-top: 1rem; margin-left: 0.5rem; text-decoration: none; background: #6c757d; color: white;">
+        <i class="fas fa-home"></i> Back to Home
+    </a>
+</div>
 
         <!-- View History Button -->
         <div style="text-align: center; margin: 2rem 0;">

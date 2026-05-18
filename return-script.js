@@ -221,7 +221,7 @@ async function loadDailyLimit() {
     }
 }
 
-// ========== SUBMIT RETURN REQUEST ==========
+// ========== SUBMIT RETURN REQUEST (FIXED - Shows Pending, not Confirmed) ==========
 async function submitReturnRequest(event) {
     event.preventDefault();
     
@@ -280,7 +280,7 @@ async function submitReturnRequest(event) {
         const result = await response.json();
         
         if (response.ok) {
-            // Show success
+            // Show success with PENDING message (not confirmed)
             bookingInfoSection.style.display = 'none';
             returnFormSection.style.display = 'none';
             successSection.style.display = 'block';
@@ -288,7 +288,16 @@ async function submitReturnRequest(event) {
             document.getElementById('successRef').textContent = result.request_ref;
             document.getElementById('successDate').textContent = new Date(returnDate).toLocaleDateString();
             
-            showToast('Return request submitted successfully!', 'success');
+            // Update the success message to show PENDING status
+            const successMessageDiv = document.getElementById('successMessageContent');
+            if (successMessageDiv) {
+                successMessageDiv.innerHTML = `
+                    <p><strong>Status:</strong> 🟡 Pending Admin Approval</p>
+                    <p>You will receive an email once admin confirms your return.</p>
+                `;
+            }
+            
+            showToast('Return request submitted! Awaiting admin approval.', 'success');
             
             // Scroll to success message
             successSection.scrollIntoView({ behavior: 'smooth' });
