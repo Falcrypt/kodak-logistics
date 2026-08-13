@@ -54,31 +54,50 @@ async function incrementDailyCounter(requestDate) {
 
 // ========== PUBLIC ENDPOINTS (Customer) ==========
 
+// Keep only digits, and only the last 9 (drops country code / leading 0
+// so "0541249742", "233541249742" and "+233541249742" all compare equal)
+function normalizePhone(phone) {
+    return (phone || '').replace(/\D/g, '').slice(-9);
+}
+
 // POST /api/returns/verify-booking - Check if booking exists and is eligible
 router.post('/verify-booking', publicWriteLimiter, async (req, res) => {
     try {
-        const { booking_ref } = req.body;
-        
+        const { booking_ref, phone } = req.body;
+
         if (!booking_ref) {
             return res.status(400).json({ error: 'Booking reference required' });
         }
-        
+
+        if (!phone) {
+            return res.status(400).json({ error: 'Phone number used at booking is required' });
+        }
+
         // Find the booking
         const booking = await db.getOne(
-            `SELECT id, booking_ref, customer_name, customer_email, customer_phone, 
+            `SELECT id, booking_ref, customer_name, customer_email, customer_phone,
                     hostel_name, items_summary, created_at, status
-             FROM bookings 
+             FROM bookings
              WHERE booking_ref = $1`,
             [booking_ref.toUpperCase()]
         );
-        
+
         if (!booking) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 error: 'Booking not found. Please check your reference number.',
                 not_found: true
             });
         }
-        
+
+        // Booking ref alone isn't a secret (refs are sequential, e.g. KDL-000123),
+        // so require the phone number on file to prove this is really their booking.
+        if (normalizePhone(phone) !== normalizePhone(booking.customer_phone)) {
+            return res.status(404).json({
+                error: 'Booking not found. Please check your reference number and phone number.',
+                not_found: true
+            });
+        }
+
         // Check if booking is still active
         if (booking.status === 'completed') {
             return res.status(400).json({ 

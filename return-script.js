@@ -78,22 +78,28 @@ function setupMobileMenu() {
 // ========== VERIFY BOOKING ==========
 async function verifyBooking() {
     const bookingRef = document.getElementById('bookingRef').value.trim().toUpperCase();
-    
+    const verifyPhone = document.getElementById('verifyPhone').value.trim();
+
     if (!bookingRef) {
         showToast('Please enter your booking reference', 'error');
         return;
     }
-    
+
+    if (!verifyPhone) {
+        showToast('Please enter the phone number used at booking', 'error');
+        return;
+    }
+
     const verifyBtn = document.getElementById('verifyBtn');
     const originalText = verifyBtn.innerHTML;
     verifyBtn.disabled = true;
     verifyBtn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
-    
+
     try {
         const response = await fetch(`${API_URL}/returns/verify-booking`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ booking_ref: bookingRef })
+            body: JSON.stringify({ booking_ref: bookingRef, phone: verifyPhone })
         });
         
         const result = await response.json();
