@@ -6,10 +6,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
+const { loginLimiter } = require('../middleware/rateLimiters');
 const router = express.Router();
 
 // POST /api/auth/login - Login endpoint
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     try {
         console.log("📥 Login attempt received:", req.body.username);
         
@@ -21,20 +22,13 @@ router.post('/login', async (req, res) => {
         }
         
         // PostgreSQL uses $1 instead of ?
-        let admin = await db.getOne('SELECT * FROM admin_users WHERE username = $1', [username]);
-        
+        const admin = await db.getOne('SELECT * FROM admin_users WHERE username = $1', [username]);
+
         if (!admin) {
-            console.log('👤 Creating default admin user...');
-            const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'Admin@123', 10);
-            const adminId = await db.insert(
-                'INSERT INTO admin_users (username, password_hash, email) VALUES ($1, $2, $3)',
-                [username, hashedPassword, 'admin@kodak.com']
-            );
-            
-            admin = await db.getOne('SELECT * FROM admin_users WHERE id = $1', [adminId]);
-            console.log("✅ Default admin created with ID:", adminId);
+            console.log('❌ Login attempt for unknown user:', username);
+            return res.status(401).json({ error: 'Invalid username or password' });
         }
-        
+
         console.log("🔐 Verifying password...");
         const validPassword = await bcrypt.compare(password, admin.password_hash);
         

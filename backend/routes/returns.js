@@ -2,6 +2,7 @@
 const express = require('express');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
+const { publicWriteLimiter } = require('../middleware/rateLimiters');
 const { sendReturnRequestConfirmation, sendReturnRequestNotification, sendReturnStatusUpdateEmail } = require('../utils/email');
 const router = express.Router();
 
@@ -54,7 +55,7 @@ async function incrementDailyCounter(requestDate) {
 // ========== PUBLIC ENDPOINTS (Customer) ==========
 
 // POST /api/returns/verify-booking - Check if booking exists and is eligible
-router.post('/verify-booking', async (req, res) => {
+router.post('/verify-booking', publicWriteLimiter, async (req, res) => {
     try {
         const { booking_ref } = req.body;
         
@@ -140,7 +141,7 @@ router.post('/verify-booking', async (req, res) => {
 });
 
 // POST /api/returns - Create new return request
-router.post('/', async (req, res) => {
+router.post('/', publicWriteLimiter, async (req, res) => {
     try {
         const {
             booking_id, booking_ref, customer_name, customer_email, customer_phone,

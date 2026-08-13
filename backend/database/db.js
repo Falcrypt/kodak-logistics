@@ -26,10 +26,12 @@ async function query(sql, params = []) {
         if (!Array.isArray(params)) {
             params = [params];
         }
-        
-        console.log('🔍 Executing query:', sql.substring(0, 100));
-        console.log('📦 With params:', params);
-        
+
+        if (process.env.NODE_ENV === 'development') {
+            console.log('🔍 Executing query:', sql.substring(0, 100));
+            console.log('📦 With params:', params);
+        }
+
         const result = await pool.query(sql, params);
         return result.rows;
     } catch (error) {
@@ -59,11 +61,12 @@ async function insert(sql, params = []) {
             params = [params];
         }
         
-        console.log('🔍 Insert query:', sql.substring(0, 100));
-        console.log('📦 Insert params:', params);
-        
+        if (process.env.NODE_ENV === 'development') {
+            console.log('🔍 Insert query:', sql.substring(0, 100));
+            console.log('📦 Insert params:', params);
+        }
+
         const result = await pool.query(sql + ' RETURNING id', params);
-        console.log('✅ Insert result:', result.rows[0]);
         return result.rows[0].id;
     } catch (error) {
         console.error('❌ insert error:', error.message);

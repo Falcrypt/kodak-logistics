@@ -47,31 +47,13 @@ app.use(cors({
             callback(null, true);
         } else {
             console.log('❌ CORS blocked for origin:', origin);
-            callback(null, true);
+            callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 }));
-
-// 5.3 Additional CORS middleware
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.some(allowed => origin === allowed || (allowed.includes('*') && origin && origin.includes('onrender.com')))) {
-        res.header('Access-Control-Allow-Origin', origin);
-    }
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400');
-    
-    if (req.method === 'OPTIONS') {
-        console.log('📋 Handling preflight request');
-        return res.sendStatus(200);
-    }
-    next();
-});
 
 // 5.4 Parse JSON bodies
 app.use(express.json());
@@ -227,6 +209,9 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
+    if (err.message === 'Not allowed by CORS') {
+        return res.status(403).json({ error: 'Origin not allowed' });
+    }
     console.error('❌ Server error:', err);
     res.status(500).json({ error: 'Internal server error' });
 });

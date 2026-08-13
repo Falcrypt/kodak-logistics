@@ -1,11 +1,12 @@
 const express = require('express');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
+const { publicWriteLimiter } = require('../middleware/rateLimiters');
 const { sendAdminNotification, sendCustomerConfirmation, sendPaymentVerificationEmail } = require('../utils/email');
 const router = express.Router();
 
 // ========== PUBLIC ENDPOINT ==========
-router.post('/', async (req, res) => {
+router.post('/', publicWriteLimiter, async (req, res) => {
     try {
         console.log("📥 RECEIVED BOOKING DATA:", req.body);
         const { 
