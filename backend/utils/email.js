@@ -332,7 +332,7 @@ async function sendReturnRequestConfirmation(returnRequest) {
                     
                     <hr>
                     <p style="color: #666;">Kodak Logistics - Your KNUST Storage Partner</p>
-                    <p>📞 WhatsApp: +233545025296 | 📧 Email: ${process.env.EMAIL_USER}</p>
+                    <p>📞 WhatsApp: +233541249742 | 📧 Email: ${process.env.EMAIL_USER}</p>
                 </div>
             `
         };
@@ -486,7 +486,7 @@ async function sendReturnStatusUpdateEmail(returnRequest) {
                     
                     <hr>
                     <p style="color: #666;">Kodak Logistics - Your KNUST Storage Partner</p>
-                    <p>📞 WhatsApp: +233545025296 | 📧 Email: ${process.env.EMAIL_USER}</p>
+                    <p>📞 WhatsApp: +233541249742 | 📧 Email: ${process.env.EMAIL_USER}</p>
                 </div>
             `
         };

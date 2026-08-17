@@ -94,7 +94,7 @@ async function loadBusinessSettings() {
         if (response.ok) {
             const contactInfo = await response.json();
 
-            const whatsappNumber = contactInfo.whatsapp_number || '233545025296';
+            const whatsappNumber = contactInfo.whatsapp_number || '233541249742';
             const cleanNumber = whatsappNumber.replace(/\D/g, '');
 
             const whatsappBtn = document.querySelector('.whatsapp-btn');

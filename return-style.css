@@ -856,6 +856,25 @@ footer {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.footer-legal {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    margin-top: 1.4rem;
+    font-size: 0.88rem;
+}
+
+.footer-legal a {
+    color: rgba(255, 255, 255, 0.55);
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.footer-legal a:hover {
+    color: #ffb347;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
     .navbar { flex-wrap: wrap; }
