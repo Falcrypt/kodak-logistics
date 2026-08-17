@@ -9,8 +9,6 @@ const reviewFormSection = document.getElementById('reviewFormSection');
 const successSection = document.getElementById('successSection');
 
 document.addEventListener('DOMContentLoaded', function() {
-    setupMobileMenu();
-
     const verifyBtn = document.getElementById('verifyBtn');
     if (verifyBtn) verifyBtn.addEventListener('click', verifyBooking);
 
@@ -24,19 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const ref = params.get('ref');
     if (ref) document.getElementById('bookingRef').value = ref.toUpperCase();
 });
-
-function setupMobileMenu() {
-    const menuToggle = document.getElementById('mobileMenuToggle');
-    const navLinks = document.getElementById('navLinks');
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-        });
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => navLinks.classList.remove('active'));
-        });
-    }
-}
 
 async function verifyBooking() {
     const bookingRef = document.getElementById('bookingRef').value.trim().toUpperCase();

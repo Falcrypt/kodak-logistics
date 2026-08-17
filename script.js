@@ -95,7 +95,14 @@ async function loadBusinessSettings() {
             const contactInfo = await response.json();
 
             const whatsappNumber = contactInfo.whatsapp_number || '233541249742';
-            const cleanNumber = whatsappNumber.replace(/\D/g, '');
+            let cleanNumber = whatsappNumber.replace(/\D/g, '');
+            // The admin settings field stores the number without the Ghana
+            // country code (e.g. "541249742"), so add it back if missing.
+            if (cleanNumber.startsWith('0')) {
+              cleanNumber = '233' + cleanNumber.substring(1);
+            } else if (!cleanNumber.startsWith('233')) {
+              cleanNumber = '233' + cleanNumber;
+            }
 
             const whatsappBtn = document.querySelector('.whatsapp-btn');
             if (whatsappBtn) {
@@ -851,21 +858,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const dateInput = document.getElementById("date");
   if (dateInput) {
     dateInput.min = new Date().toISOString().split("T")[0];
-  }
-
-  // Mobile menu toggle
-  const menuToggle = document.getElementById('mobileMenuToggle');
-  const navLinks = document.getElementById('navLinks');
-  if (menuToggle && navLinks) {
-    menuToggle.addEventListener('click', function() {
-      navLinks.classList.toggle('active');
-    });
-
-    navLinks.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', function() {
-        navLinks.classList.remove('active');
-      });
-    });
   }
 
   initCustomDropdowns();

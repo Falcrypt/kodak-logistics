@@ -323,11 +323,24 @@ img {
 
 .menu-toggle {
     display: none;
-    font-size: 1.7rem;
-    background: none;
-    border: none;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    font-size: 1.35rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
     color: var(--white);
     cursor: pointer;
+    transition: var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-toggle:hover, .menu-toggle:active {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 179, 71, 0.4);
+    transform: scale(0.96);
 }
 
 /* ========== HERO SECTION ========== */
@@ -1615,7 +1628,7 @@ footer {
     .navbar { padding: 1rem 5%; }
 
     .nav-links {
-        display: none;
+        display: flex;
         position: absolute;
         top: 100%;
         left: 0;
@@ -1627,10 +1640,21 @@ footer {
         text-align: center;
         gap: 1.2rem;
         border-bottom: 1px solid rgba(255, 179, 71, 0.25);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
     }
 
-    .nav-links.active { display: flex; }
-    .menu-toggle { display: block; }
+    .nav-links.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    .menu-toggle { display: flex; }
 
     .form-row { grid-template-columns: 1fr; }
     .item-row { grid-template-columns: 1fr; }

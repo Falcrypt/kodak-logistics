@@ -15,10 +15,7 @@ const historySection = document.getElementById('historySection');
 // ========== INITIALIZATION ==========
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Return Items Page Loaded');
-    
-    // Setup mobile menu
-    setupMobileMenu();
-    
+
     // Setup verify button
     const verifyBtn = document.getElementById('verifyBtn');
     if (verifyBtn) {
@@ -58,22 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
         returnDateInput.max = maxDate.toISOString().split('T')[0];
     }
 });
-
-// ========== MOBILE MENU ==========
-function setupMobileMenu() {
-    const menuToggle = document.getElementById('mobileMenuToggle');
-    const navLinks = document.getElementById('navLinks');
-    
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-        });
-        
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => navLinks.classList.remove('active'));
-        });
-    }
-}
 
 // ========== VERIFY BOOKING ==========
 async function verifyBooking() {
