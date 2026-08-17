@@ -11,7 +11,7 @@ const helmet = require('helmet');
 const db = require('./database/db');
 
 // ===== IMPORT THE FUNCTIONS FROM db.js =====
-const { ensurePaymentColumns, ensureReturnTables } = require('./database/db');
+const { ensurePaymentColumns, ensureReturnTables, ensureReviewsTable, ensureAdminAvatarColumn } = require('./database/db');
 
 // ===== STEP 3: IMPORT ROUTES =====
 const authRoutes = require('./routes/auth');
@@ -19,6 +19,8 @@ const bookingRoutes = require('./routes/bookings');
 const settingsRoutes = require('./routes/settings');
 const customersRoutes = require('./routes/customers');
 const returnsRoutes = require('./routes/returns');  // ADD THIS LINE
+const reviewsRoutes = require('./routes/reviews');
+const insightsRoutes = require('./routes/insights');
 
 // ===== STEP 4: CREATE EXPRESS APP =====
 const app = express();
@@ -57,7 +59,7 @@ app.use(cors({
 }));
 
 // 5.4 Parse JSON bodies
-app.use(express.json());
+app.use(express.json({ limit: '2mb' })); // raised slightly to fit a resized profile picture
 
 // 5.5 Log all requests
 app.use((req, res, next) => {
@@ -143,7 +145,13 @@ async function setupDatabase() {
             // ===== CONTAINERS =====
             ['price_container_small', '29.99'],
             ['price_container_big', '49.99'],
-            
+
+            // ===== ELECTRONICS =====
+            ['price_tv_small', '39.99'],
+            ['price_tv_medium', '54.99'],
+            ['price_tv_large', '69.99'],
+            ['price_tv_xlarge', '89.99'],
+
             // ===== FREE ITEMS =====
             ['price_buckets', '0']
         ];
@@ -190,6 +198,16 @@ async function addReturnTables() {
     }
 }
 
+async function addReviewsTable() {
+    try {
+        console.log('📦 Checking reviews table...');
+        await ensureReviewsTable();
+        console.log('✅ Reviews table check complete');
+    } catch (error) {
+        console.log('⚠️ Reviews table check warning:', error.message);
+    }
+}
+
 // ===== STEP 7: SET UP ROUTES =====
 
 app.get('/api/test', (req, res) => {
@@ -204,6 +222,8 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/customers', customersRoutes);
 app.use('/api/returns', returnsRoutes);  // ADD THIS LINE
+app.use('/api/reviews', reviewsRoutes);
+app.use('/api/insights', insightsRoutes);
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Route not found' });
@@ -237,7 +257,19 @@ async function startServer() {
     
     // ADD RETURN TABLES
     await addReturnTables();
-    
+
+    // ADD REVIEWS TABLE
+    await addReviewsTable();
+
+    // ADD ADMIN AVATAR COLUMN
+    try {
+        console.log('🖼️ Checking admin avatar column...');
+        await ensureAdminAvatarColumn();
+        console.log('✅ Admin avatar column check complete');
+    } catch (error) {
+        console.log('⚠️ Admin avatar column check warning:', error.message);
+    }
+
     app.listen(PORT, () => {
         console.log('✅ ==================================');
         console.log(`✅ Server running on http://localhost:${PORT}`);

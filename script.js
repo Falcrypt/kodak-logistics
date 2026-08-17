@@ -1,4 +1,4 @@
-// script.js - UPGRADED VERSION with PAYMENT SYSTEM (WORKING)
+// script.js - Kodak Logistics public site
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
 
 // Global prices object - ALL SPECIFIC ITEMS
@@ -12,24 +12,55 @@ let prices = {
   travel_small: 29.99,
   travel_medium: 49.99,
   travel_big: 69.99,
-  
+
   // APPLIANCES
   microwave: 30,
   fridge_tabletop: 59.99,
   fridge_doubledoor: 79.99,
   fridge_small: 39.99,
-  
+
   // GAS CYLINDERS
   gas_small: 29.99,
   gas_medium: 34.99,
   gas_big: 39.99,
-  
+
   // CONTAINERS
   container_small: 29.99,
   container_big: 49.99,
-  
+
+  // ELECTRONICS
+  tv_small: 39.99,
+  tv_medium: 54.99,
+  tv_large: 69.99,
+  tv_xlarge: 89.99,
+
   // FREE ITEMS
   buckets: 0
+};
+
+const ITEM_IMAGES = {
+  duffle_small: 'images/duffle-small.jpg', duffle_big: 'images/duffle-big.jpg',
+  jute_small: 'images/jute-small.jpg', jute_medium: 'images/jute-medium.jpg', jute_big: 'images/jute-big.jpg',
+  travel_small: 'images/travel-small.jpg', travel_medium: 'images/travel-medium.jpg', travel_big: 'images/travel-big.jpg',
+  microwave: 'images/microwave.jpg',
+  fridge_tabletop: 'images/fridge-tabletop.jpg', fridge_doubledoor: 'images/fridge-doubledoor.jpg', fridge_small: 'images/fridge-small.jpg',
+  gas_small: 'images/gas-small.jpg', gas_medium: 'images/gas-medium.jpg', gas_big: 'images/gas-big.jpg',
+  container_small: 'images/container-small.jpg', container_big: 'images/container-big.jpg',
+  tv_small: 'images/smallscreen.jpg', tv_medium: 'images/mediumscreen.jpg', tv_large: 'images/largescreen.jpg', tv_xlarge: 'images/tv.jpg',
+  buckets: 'images/buckets.jpg'
+};
+
+const ITEM_LABELS = {
+  duffle_small: 'Duffle Bag (Small)', duffle_big: 'Duffle Bag (Big)',
+  jute_small: 'Jute Bag (Small)', jute_medium: 'Jute Bag (Medium)', jute_big: 'Jute Bag (Big)',
+  travel_small: 'Travel Bag (Small)', travel_medium: 'Travel Bag (Medium)', travel_big: 'Travel Bag (Big)',
+  microwave: 'Microwave',
+  fridge_tabletop: 'Fridge (Table Top)', fridge_doubledoor: 'Fridge (Double Door)', fridge_small: 'Fridge (Small)',
+  gas_small: 'Gas Cylinder (Small)', gas_medium: 'Gas Cylinder (Medium)', gas_big: 'Gas Cylinder (Big)',
+  container_small: 'Container (Small)', container_big: 'Container (Big)',
+  tv_small: 'Television (Small, up to 32")', tv_medium: 'Television (Medium, 33"–43")',
+  tv_large: 'Television (Large, 44"–55")', tv_xlarge: 'Television (Extra Large, 56"+)',
+  buckets: 'Buckets'
 };
 
 // Hide loader
@@ -48,133 +79,150 @@ setTimeout(function() {
   if (loader) loader.classList.add('hidden');
 }, 2000);
 
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
 // ===== LOAD BUSINESS SETTINGS =====
 async function loadBusinessSettings() {
     try {
         const timestamp = Date.now();
         const response = await fetch(`${API_URL}/settings/contact?t=${timestamp}`);
-        
+
         if (response.ok) {
             const contactInfo = await response.json();
-            console.log('Business settings loaded:', contactInfo);
-            
+
             const whatsappNumber = contactInfo.whatsapp_number || '233545025296';
             const cleanNumber = whatsappNumber.replace(/\D/g, '');
-            
+
             const whatsappBtn = document.querySelector('.whatsapp-btn');
             if (whatsappBtn) {
                 whatsappBtn.href = `https://wa.me/${cleanNumber}?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage...`;
             }
-            
+
             const footerWhatsapp = document.querySelector('.footer-whatsapp');
             if (footerWhatsapp) {
                 footerWhatsapp.href = `https://wa.me/${cleanNumber}`;
                 const displayNumber = cleanNumber.slice(-9);
                 footerWhatsapp.innerHTML = `<i class="fab fa-whatsapp"></i> +233 ${displayNumber}`;
             }
-            
+
             const footerEmail = document.querySelector('.footer-email a');
             if (footerEmail && contactInfo.business_email) {
                 footerEmail.href = `mailto:${contactInfo.business_email}`;
                 footerEmail.textContent = contactInfo.business_email;
             }
-        } else {
-            console.log('Failed to fetch contact settings, status:', response.status);
         }
     } catch (error) {
         console.log('Using default contact info');
     }
 }
 
-// ===== UPDATE PRICE DISPLAYS =====
-function updatePriceDisplay() {
-  // BAGS
-  const duffleSmallDisplay = document.getElementById('priceDuffleSmallDisplay');
-  const duffleBigDisplay = document.getElementById('priceDuffleBigDisplay');
-  const juteSmallDisplay = document.getElementById('priceJuteSmallDisplay');
-  const juteMediumDisplay = document.getElementById('priceJuteMediumDisplay');
-  const juteBigDisplay = document.getElementById('priceJuteBigDisplay');
-  const travelSmallDisplay = document.getElementById('priceTravelSmallDisplay');
-  const travelMediumDisplay = document.getElementById('priceTravelMediumDisplay');
-  const travelBigDisplay = document.getElementById('priceTravelBigDisplay');
-  
-  if (duffleSmallDisplay) duffleSmallDisplay.textContent = prices.duffle_small;
-  if (duffleBigDisplay) duffleBigDisplay.textContent = prices.duffle_big;
-  if (juteSmallDisplay) juteSmallDisplay.textContent = prices.jute_small;
-  if (juteMediumDisplay) juteMediumDisplay.textContent = prices.jute_medium;
-  if (juteBigDisplay) juteBigDisplay.textContent = prices.jute_big;
-  if (travelSmallDisplay) travelSmallDisplay.textContent = prices.travel_small;
-  if (travelMediumDisplay) travelMediumDisplay.textContent = prices.travel_medium;
-  if (travelBigDisplay) travelBigDisplay.textContent = prices.travel_big;
-  
-  // APPLIANCES
-  const microwaveDisplay = document.getElementById('priceMicrowaveDisplay');
-  const fridgeTabletopDisplay = document.getElementById('priceFridgeTabletopDisplay');
-  const fridgeDoubledoorDisplay = document.getElementById('priceFridgeDoubledoorDisplay');
-  const fridgeSmallDisplay = document.getElementById('priceFridgeSmallDisplay');
-  
-  if (microwaveDisplay) microwaveDisplay.textContent = prices.microwave;
-  if (fridgeTabletopDisplay) fridgeTabletopDisplay.textContent = prices.fridge_tabletop;
-  if (fridgeDoubledoorDisplay) fridgeDoubledoorDisplay.textContent = prices.fridge_doubledoor;
-  if (fridgeSmallDisplay) fridgeSmallDisplay.textContent = prices.fridge_small;
-  
-  // GAS CYLINDERS
-  const gasSmallDisplay = document.getElementById('priceGasSmallDisplay');
-  const gasMediumDisplay = document.getElementById('priceGasMediumDisplay');
-  const gasBigDisplay = document.getElementById('priceGasBigDisplay');
-  
-  if (gasSmallDisplay) gasSmallDisplay.textContent = prices.gas_small;
-  if (gasMediumDisplay) gasMediumDisplay.textContent = prices.gas_medium;
-  if (gasBigDisplay) gasBigDisplay.textContent = prices.gas_big;
-  
-  // CONTAINERS
-  const containerSmallDisplay = document.getElementById('priceContainerSmallDisplay');
-  const containerBigDisplay = document.getElementById('priceContainerBigDisplay');
-  
-  if (containerSmallDisplay) containerSmallDisplay.textContent = prices.container_small;
-  if (containerBigDisplay) containerBigDisplay.textContent = prices.container_big;
-  
-  // FREE ITEMS
-  const bucketsDisplay = document.getElementById('priceBucketsDisplay');
-  if (bucketsDisplay) bucketsDisplay.textContent = prices.buckets;
-  
-  updateSelectOptions();
+// ===== LOAD TESTIMONIALS (real customer reviews) =====
+function testimonialStars(rating) {
+  const full = Math.round(rating);
+  let out = '';
+  for (let i = 1; i <= 5; i++) out += i <= full ? '★' : '<span class="dim">★</span>';
+  return out;
 }
 
-// ===== UPDATE SELECT OPTIONS =====
+function testimonialInitials(name) {
+  const parts = (name || '?').trim().split(/\s+/);
+  return (parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0].substring(0, 2)).toUpperCase();
+}
+
+async function loadTestimonials() {
+  try {
+    const response = await fetch(`${API_URL}/reviews/public?limit=6`);
+    if (!response.ok) return;
+
+    const reviews = await response.json();
+    if (!reviews || reviews.length === 0) return;
+
+    const section = document.getElementById('testimonials');
+    const grid = document.getElementById('testimonialsGrid');
+    if (!section || !grid) return;
+
+    grid.innerHTML = reviews.map(r => `
+      <div class="testimonial-card">
+        <div class="testimonial-stars">${testimonialStars(r.rating)}</div>
+        ${r.comment ? `<p class="testimonial-comment">"${escapeHtml(r.comment)}"</p>` : ''}
+        <div class="testimonial-footer">
+          <div class="testimonial-avatar">${testimonialInitials(r.customer_name)}</div>
+          <p class="testimonial-name">${escapeHtml(r.customer_name)}</p>
+        </div>
+      </div>
+    `).join('');
+
+    section.style.display = 'block';
+  } catch (error) {
+    console.log('Testimonials not loaded:', error.message);
+  }
+}
+
+// ===== UPDATE PRICE DISPLAYS =====
+function updatePriceDisplay() {
+  updateSelectOptions();
+  updateDropdownPrices();
+  updateBucketsTeaser();
+}
+
+// Buckets can be free or priced by the admin — reflect whichever is set
+// on the gallery teaser card (avoids showing a stale "FREE" label).
+function updateBucketsTeaser() {
+  const tag = document.getElementById('bucketsPriceTag');
+  if (!tag) return;
+  if (prices.buckets) {
+    tag.textContent = `From ${prices.buckets}`;
+    tag.classList.remove('free');
+  } else {
+    tag.textContent = 'FREE';
+    tag.classList.add('free');
+  }
+}
+
+// Refresh the visible price shown next to each item in every dropdown
+// (static first row included) so admin price changes always show correctly.
+function updateDropdownPrices() {
+  document.querySelectorAll('.custom-option').forEach(opt => {
+    const key = opt.getAttribute('data-value');
+    const priceEl = opt.querySelector('.option-price');
+    if (!key || !priceEl || !(key in prices)) return;
+    priceEl.textContent = !prices[key] ? 'Free' : `₵${prices[key]}`;
+  });
+}
+
+// ===== UPDATE HIDDEN SELECT OPTIONS (kept in sync for price lookup) =====
 function updateSelectOptions() {
   const selects = document.querySelectorAll('.itemSelect');
   const optionsHtml = `
-    <option value="">Select item</option>
-    <!-- BAGS -->
-    <option value="duffle_small">🎽 Duffle Bag (Small) – ₵${prices.duffle_small}</option>
-    <option value="duffle_big">🎒 Duffle Bag (Big) – ₵${prices.duffle_big}</option>
-    <option value="jute_small">🌾 Jute Bag (Small) – ₵${prices.jute_small}</option>
-    <option value="jute_medium">🌾 Jute Bag (Medium) – ₵${prices.jute_medium}</option>
-    <option value="jute_big">🌾 Jute Bag (Big) – ₵${prices.jute_big}</option>
-    <option value="travel_small">✈️ Traveling Bag (Small) – ₵${prices.travel_small}</option>
-    <option value="travel_medium">✈️ Traveling Bag (Medium) – ₵${prices.travel_medium}</option>
-    <option value="travel_big">✈️ Traveling Bag (Big) – ₵${prices.travel_big}</option>
-    
-    <!-- APPLIANCES -->
-    <option value="microwave">🍿 Microwave – ₵${prices.microwave}</option>
-    <option value="fridge_tabletop">❄️ Fridge (Table Top) – ₵${prices.fridge_tabletop}</option>
-    <option value="fridge_doubledoor">❄️❄️ Fridge (Double Door) – ₵${prices.fridge_doubledoor}</option>
-    <option value="fridge_small">🧊 Fridge (Small) – ₵${prices.fridge_small}</option>
-    
-    <!-- GAS CYLINDERS -->
-    <option value="gas_small">🔥 Gas Cylinder (Small) – ₵${prices.gas_small}</option>
-    <option value="gas_medium">🔥 Gas Cylinder (Medium) – ₵${prices.gas_medium}</option>
-    <option value="gas_big">🔥 Gas Cylinder (Big) – ₵${prices.gas_big}</option>
-    
-    <!-- CONTAINERS -->
-    <option value="container_small">📦 Other Container (Small) – ₵${prices.container_small}</option>
-    <option value="container_big">📦 Other Container (Big) – ₵${prices.container_big}</option>
-    
-    <!-- FREE ITEMS -->
-    <option value="buckets">🪣 Buckets – Free</option>
+    <option value="">Select item type</option>
+    <option value="duffle_small">Duffle Bag (Small) – ₵${prices.duffle_small}</option>
+    <option value="duffle_big">Duffle Bag (Big) – ₵${prices.duffle_big}</option>
+    <option value="jute_small">Jute Bag (Small) – ₵${prices.jute_small}</option>
+    <option value="jute_medium">Jute Bag (Medium) – ₵${prices.jute_medium}</option>
+    <option value="jute_big">Jute Bag (Big) – ₵${prices.jute_big}</option>
+    <option value="travel_small">Travel Bag (Small) – ₵${prices.travel_small}</option>
+    <option value="travel_medium">Travel Bag (Medium) – ₵${prices.travel_medium}</option>
+    <option value="travel_big">Travel Bag (Big) – ₵${prices.travel_big}</option>
+    <option value="microwave">Microwave – ₵${prices.microwave}</option>
+    <option value="fridge_tabletop">Fridge (Table Top) – ₵${prices.fridge_tabletop}</option>
+    <option value="fridge_doubledoor">Fridge (Double Door) – ₵${prices.fridge_doubledoor}</option>
+    <option value="fridge_small">Fridge (Small) – ₵${prices.fridge_small}</option>
+    <option value="gas_small">Gas Cylinder (Small) – ₵${prices.gas_small}</option>
+    <option value="gas_medium">Gas Cylinder (Medium) – ₵${prices.gas_medium}</option>
+    <option value="gas_big">Gas Cylinder (Big) – ₵${prices.gas_big}</option>
+    <option value="container_small">Container (Small) – ₵${prices.container_small}</option>
+    <option value="container_big">Container (Big) – ₵${prices.container_big}</option>
+    <option value="tv_small">Television (Small, up to 32") – ₵${prices.tv_small}</option>
+    <option value="tv_medium">Television (Medium, 33"–43") – ₵${prices.tv_medium}</option>
+    <option value="tv_large">Television (Large, 44"–55") – ₵${prices.tv_large}</option>
+    <option value="tv_xlarge">Television (Extra Large, 56"+) – ₵${prices.tv_xlarge}</option>
+    <option value="buckets">Buckets – ${prices.buckets ? '₵' + prices.buckets : 'Free'}</option>
   `;
-  
+
   selects.forEach(select => {
     const currentValue = select.value;
     select.innerHTML = optionsHtml;
@@ -189,17 +237,14 @@ async function loadPrices() {
     if (response.ok) {
       const serverPrices = await response.json();
       prices = { ...prices, ...serverPrices };
-      console.log('Prices loaded from server:', prices);
       updatePriceDisplay();
-    } else {
-      console.log('Using default prices');
     }
   } catch (error) {
     console.log('Network error - using default prices');
   }
 }
 
-// ===== CALCULATE TOTAL (UPDATED to update MoMo display) =====
+// ===== CALCULATE TOTAL =====
 function calculateTotal() {
   let total = 0;
   document.querySelectorAll(".item-row").forEach(row => {
@@ -213,88 +258,261 @@ function calculateTotal() {
   });
   const totalEl = document.getElementById("totalPrice");
   if (totalEl) totalEl.textContent = total.toFixed(2);
-  
-  // Update MoMo amount display
+
   updateMomoAmountDisplay();
-  
+
   return total;
 }
 
-// ===== SETUP ADD ITEM BUTTON (FIXED - removed ghana_must_go) =====
-function setupAddItem() {
-  const addBtn = document.getElementById("addItem");
-  const container = document.getElementById("itemsContainer");
-  if (!addBtn || !container) return;
-  
-  addBtn.addEventListener("click", function() {
-    const newRow = document.createElement("div");
-    newRow.className = "item-row";
-    newRow.innerHTML = `
-      <select class="itemSelect" required>
-        <option value="">Select item</option>
-        <option value="duffle_small">🎽 Duffle Bag (Small) – ₵${prices.duffle_small}</option>
-        <option value="duffle_big">🎒 Duffle Bag (Big) – ₵${prices.duffle_big}</option>
-        <option value="jute_small">🌾 Jute Bag (Small) – ₵${prices.jute_small}</option>
-        <option value="jute_medium">🌾 Jute Bag (Medium) – ₵${prices.jute_medium}</option>
-        <option value="jute_big">🌾 Jute Bag (Big) – ₵${prices.jute_big}</option>
-        <option value="travel_small">✈️ Travel Bag (Small) – ₵${prices.travel_small}</option>
-        <option value="travel_medium">✈️ Travel Bag (Medium) – ₵${prices.travel_medium}</option>
-        <option value="travel_big">✈️ Travel Bag (Big) – ₵${prices.travel_big}</option>
-        <option value="microwave">🍿 Microwave – ₵${prices.microwave}</option>
-        <option value="fridge_tabletop">❄️ Fridge (Table Top) – ₵${prices.fridge_tabletop}</option>
-        <option value="fridge_doubledoor">❄️❄️ Fridge (Double Door) – ₵${prices.fridge_doubledoor}</option>
-        <option value="fridge_small">🧊 Fridge (Small) – ₵${prices.fridge_small}</option>
-        <option value="gas_small">🔥 Gas Cylinder (Small) – ₵${prices.gas_small}</option>
-        <option value="gas_medium">🔥 Gas Cylinder (Medium) – ₵${prices.gas_medium}</option>
-        <option value="gas_big">🔥 Gas Cylinder (Big) – ₵${prices.gas_big}</option>
-        <option value="container_small">📦 Container (Small) – ₵${prices.container_small}</option>
-        <option value="container_big">📦 Container (Big) – ₵${prices.container_big}</option>
-        <option value="buckets">🪣 Buckets – Free</option>
-      </select>
-      <input type="number" class="quantity" min="1" value="1" required>
-      <button type="button" class="remove-btn">✕ Remove</button>
-    `;
-    container.appendChild(newRow);
-    
-    newRow.querySelector(".remove-btn").addEventListener("click", function() {
-      if (document.querySelectorAll(".item-row").length > 1) {
-        newRow.remove();
+// ===== CUSTOM ITEM DROPDOWN =====
+function initCustomDropdowns() {
+  document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+    if (wrapper.hasAttribute('data-initialized')) return;
+    wrapper.setAttribute('data-initialized', 'true');
+
+    const trigger = wrapper.querySelector('.custom-select-trigger');
+    const hiddenSelect = wrapper.parentElement.querySelector('.itemSelect');
+    const triggerImg = wrapper.querySelector('.trigger-image');
+    const triggerText = wrapper.querySelector('.trigger-text');
+
+    if (!trigger) return;
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+        if (w !== wrapper) w.classList.remove('open');
+      });
+      wrapper.classList.toggle('open');
+    });
+
+    wrapper.querySelectorAll('.custom-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const value = opt.getAttribute('data-value');
+        const imgSrc = opt.getAttribute('data-img');
+        const text = opt.querySelector('.option-name').textContent;
+
+        if (hiddenSelect) {
+          hiddenSelect.value = value;
+          hiddenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        if (triggerImg) triggerImg.src = imgSrc;
+        if (triggerText) triggerText.textContent = text;
+
+        wrapper.classList.remove('open');
         calculateTotal();
-      }
+      });
     });
-    newRow.querySelectorAll(".itemSelect, .quantity").forEach(input => {
-      input.addEventListener("input", calculateTotal);
-    });
+  });
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+});
+
+// ===== QUANTITY STEPPER =====
+// Quantity starts blank on purpose (not defaulted to 1) so customers have to
+// consciously enter how many of an item they have — a blank/0 quantity row
+// gets caught and blocked at submit time instead of silently under-counting.
+function setupQtyStepper(row) {
+  const input = row.querySelector('.quantity');
+  const minusBtn = row.querySelector('.qty-minus');
+  const plusBtn = row.querySelector('.qty-plus');
+  if (!input || !minusBtn || !plusBtn) return;
+
+  function clearInvalid() {
+    row.querySelector('.qty-stepper')?.classList.remove('invalid');
+  }
+
+  minusBtn.addEventListener('click', () => {
+    const current = parseInt(input.value) || 0;
+    input.value = current > 1 ? current - 1 : '';
+    clearInvalid();
+    calculateTotal();
+  });
+
+  plusBtn.addEventListener('click', () => {
+    const val = (parseInt(input.value) || 0) + 1;
+    input.value = val;
+    clearInvalid();
+    calculateTotal();
+  });
+
+  input.addEventListener('input', () => {
+    clearInvalid();
     calculateTotal();
   });
 }
 
-// ===== SETUP EXISTING ROWS =====
-function setupExistingRows() {
-  document.querySelectorAll(".item-row").forEach(row => {
-    const removeBtn = row.querySelector(".remove-btn");
-    if (removeBtn) {
-      removeBtn.addEventListener("click", function() {
-        if (document.querySelectorAll(".item-row").length > 1) {
-          row.remove();
-          calculateTotal();
-        }
-      });
+function setupRemoveButton(row) {
+  const removeBtn = row.querySelector('.remove-btn');
+  if (!removeBtn) return;
+  removeBtn.addEventListener('click', () => {
+    if (document.querySelectorAll('.item-row').length > 1) {
+      row.remove();
+      calculateTotal();
     }
-    row.querySelectorAll(".itemSelect, .quantity").forEach(input => {
-      input.addEventListener("input", calculateTotal);
+  });
+}
+
+function itemRowTemplate() {
+  return `
+    <select class="itemSelect" style="display: none;">
+      <option value="">Select item type</option>
+    </select>
+
+    <div class="custom-select-wrapper">
+      <div class="custom-select-trigger">
+        <img class="trigger-image" src="images/default-item.png" alt="icon" onerror="this.src='https://placehold.co/28x28/ffb347/8b0000?text=?'">
+        <span class="trigger-text">Select item type</span>
+        <span class="trigger-arrow"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="custom-select-dropdown">
+        ${Object.keys(ITEM_LABELS).map(key => `
+          <div class="custom-option" data-value="${key}" data-img="${ITEM_IMAGES[key]}">
+            <img src="${ITEM_IMAGES[key]}" alt="">
+            <span class="option-name">${ITEM_LABELS[key]}</span>
+            <span class="option-price">${!prices[key] ? 'Free' : '₵' + prices[key]}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="qty-stepper">
+      <button type="button" class="qty-minus" aria-label="Decrease quantity">−</button>
+      <input type="number" class="quantity" min="1" placeholder="Qty" required>
+      <button type="button" class="qty-plus" aria-label="Increase quantity">+</button>
+    </div>
+    <button type="button" class="remove-btn"><i class="fas fa-xmark"></i> Remove</button>
+  `;
+}
+
+function setupAddItem() {
+  const addBtn = document.getElementById('addItem');
+  const container = document.getElementById('itemsContainer');
+  if (!addBtn || !container) return;
+
+  addBtn.addEventListener('click', () => {
+    const newRow = document.createElement('div');
+    newRow.className = 'item-row';
+    newRow.setAttribute('data-row', Date.now());
+    newRow.innerHTML = itemRowTemplate();
+
+    container.appendChild(newRow);
+
+    setupRemoveButton(newRow);
+    setupQtyStepper(newRow);
+    initCustomDropdowns();
+    calculateTotal();
+  });
+}
+
+function setupExistingRows() {
+  document.querySelectorAll('.item-row').forEach(row => {
+    setupRemoveButton(row);
+    setupQtyStepper(row);
+  });
+}
+
+// ===== PRICE MODAL =====
+function getCategoryItems() {
+  return {
+    duffle: [
+      { name: "Duffle Bag (Small)", key: "duffle_small", price: prices.duffle_small, image: ITEM_IMAGES.duffle_small },
+      { name: "Duffle Bag (Big)", key: "duffle_big", price: prices.duffle_big, image: ITEM_IMAGES.duffle_big }
+    ],
+    jute: [
+      { name: "Jute Bag (Small)", key: "jute_small", price: prices.jute_small, image: ITEM_IMAGES.jute_small },
+      { name: "Jute Bag (Medium)", key: "jute_medium", price: prices.jute_medium, image: ITEM_IMAGES.jute_medium },
+      { name: "Jute Bag (Big)", key: "jute_big", price: prices.jute_big, image: ITEM_IMAGES.jute_big }
+    ],
+    travel: [
+      { name: "Traveling Bag (Small)", key: "travel_small", price: prices.travel_small, image: ITEM_IMAGES.travel_small },
+      { name: "Traveling Bag (Medium)", key: "travel_medium", price: prices.travel_medium, image: ITEM_IMAGES.travel_medium },
+      { name: "Traveling Bag (Big)", key: "travel_big", price: prices.travel_big, image: ITEM_IMAGES.travel_big }
+    ],
+    microwave: [
+      { name: "Microwave", key: "microwave", price: prices.microwave, image: ITEM_IMAGES.microwave }
+    ],
+    fridge_tabletop: [
+      { name: "Fridge (Table Top)", key: "fridge_tabletop", price: prices.fridge_tabletop, image: ITEM_IMAGES.fridge_tabletop }
+    ],
+    fridge_doubledoor: [
+      { name: "Fridge (Double Door)", key: "fridge_doubledoor", price: prices.fridge_doubledoor, image: ITEM_IMAGES.fridge_doubledoor }
+    ],
+    fridge_small: [
+      { name: "Fridge (Small)", key: "fridge_small", price: prices.fridge_small, image: ITEM_IMAGES.fridge_small }
+    ],
+    gas: [
+      { name: "Gas Cylinder (Small)", key: "gas_small", price: prices.gas_small, image: ITEM_IMAGES.gas_small },
+      { name: "Gas Cylinder (Medium)", key: "gas_medium", price: prices.gas_medium, image: ITEM_IMAGES.gas_medium },
+      { name: "Gas Cylinder (Big)", key: "gas_big", price: prices.gas_big, image: ITEM_IMAGES.gas_big }
+    ],
+    container: [
+      { name: "Container (Small)", key: "container_small", price: prices.container_small, image: ITEM_IMAGES.container_small },
+      { name: "Container (Big)", key: "container_big", price: prices.container_big, image: ITEM_IMAGES.container_big }
+    ],
+    tv: [
+      { name: "Television (Small, up to 32\")", key: "tv_small", price: prices.tv_small, image: ITEM_IMAGES.tv_small },
+      { name: "Television (Medium, 33\"–43\")", key: "tv_medium", price: prices.tv_medium, image: ITEM_IMAGES.tv_medium },
+      { name: "Television (Large, 44\"–55\")", key: "tv_large", price: prices.tv_large, image: ITEM_IMAGES.tv_large },
+      { name: "Television (Extra Large, 56\"+)", key: "tv_xlarge", price: prices.tv_xlarge, image: ITEM_IMAGES.tv_xlarge }
+    ],
+    buckets: [
+      { name: "Buckets", key: "buckets", price: prices.buckets, image: ITEM_IMAGES.buckets }
+    ]
+  };
+}
+
+const categoryTitles = {
+  duffle: "Duffle Bags", jute: "Jute Bags", travel: "Travel Bags", microwave: "Microwaves",
+  fridge_tabletop: "Fridge (Table Top)", fridge_doubledoor: "Fridge (Double Door)", fridge_small: "Fridge (Small)",
+  gas: "Gas Cylinders", container: "Storage Containers", tv: "Televisions", buckets: "Buckets"
+};
+
+window.openModal = function(category) {
+  const modal = document.getElementById('priceModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalContainer = document.getElementById('modalItemsContainer');
+  modalTitle.textContent = categoryTitles[category] || category;
+
+  const items = getCategoryItems()[category];
+  if (!items) return;
+
+  modalContainer.innerHTML = items.map(item => `<div class="modal-item"><img class="modal-item-img" src="${item.image}" alt="${item.name}"><div class="modal-item-info"><div class="modal-item-name">${item.name}</div><div class="modal-item-price">${item.price}</div></div></div>`).join('');
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeModal = function() {
+  const modal = document.getElementById('priceModal');
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+};
+
+function setupGallery() {
+  document.querySelectorAll('.gallery-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const category = this.getAttribute('data-category');
+      if (category) openModal(category);
     });
   });
+
+  const modal = document.getElementById('priceModal');
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  }
 }
 
 // ========== PAYMENT SYSTEM FUNCTIONS ==========
 
-// Toggle MoMo fields visibility
 function toggleMomoFields() {
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
     const momoFields = document.getElementById('momoFields');
     const transactionIdInput = document.getElementById('transactionId');
-    
+
     if (paymentMethod === 'momo') {
         if (momoFields) momoFields.style.display = 'block';
         if (transactionIdInput) transactionIdInput.required = true;
@@ -307,27 +525,24 @@ function toggleMomoFields() {
     }
 }
 
-// Copy MoMo number to clipboard
 async function copyMomoNumber() {
     const momoNumber = '0544705397';
-    
+
     try {
         await navigator.clipboard.writeText(momoNumber);
-        
+
         const copyBtn = document.getElementById('copyMomoBtn');
         if (copyBtn) {
-            const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '✅ Copied!';
-            copyBtn.style.background = '#2ecc71';
-            
+            const originalHtml = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+
             setTimeout(() => {
-                copyBtn.innerHTML = originalText;
-                copyBtn.style.background = '#25D366';
+                copyBtn.innerHTML = originalHtml;
             }, 2000);
         }
-        
-        showToastMessage('📱 MoMo number copied!', 'success');
-        
+
+        showToastMessage('MoMo number copied!', 'success');
+
     } catch (err) {
         const textarea = document.createElement('textarea');
         textarea.value = momoNumber;
@@ -335,15 +550,14 @@ async function copyMomoNumber() {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        showToastMessage('📱 Number copied!', 'success');
+        showToastMessage('Number copied!', 'success');
     }
 }
 
-// Show toast notification
 function showToastMessage(message, type = 'info') {
     const existingToast = document.querySelector('.toast-notification');
     if (existingToast) existingToast.remove();
-    
+
     const toast = document.createElement('div');
     toast.className = 'toast-notification';
     toast.style.cssText = `
@@ -361,17 +575,16 @@ function showToastMessage(message, type = 'info') {
     `;
     toast.textContent = message;
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.remove();
     }, 3000);
 }
 
-// Update amount display in MoMo section
 function updateMomoAmountDisplay() {
     const totalElement = document.getElementById('totalPrice');
     const displayAmountElement = document.getElementById('displayAmount');
-    
+
     if (totalElement && displayAmountElement) {
         const total = totalElement.textContent;
         displayAmountElement.textContent = `GH₵${total}`;
@@ -393,9 +606,9 @@ function autoSaveFormData() {
         paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value || 'pickup',
         transactionId: document.getElementById('transactionId')?.value || ''
     };
-    
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-    
+
     const notice = document.getElementById('autoSaveNotice');
     if (notice) {
         notice.style.display = 'block';
@@ -412,12 +625,12 @@ function autoSaveFormData() {
 function restoreSavedFormData() {
     const savedData = localStorage.getItem(STORAGE_KEY);
     if (!savedData) return false;
-    
+
     try {
         const data = JSON.parse(savedData);
-        
+
         if (data.name || data.email || data.phone) {
-            if (confirm('🔄 We found a partially filled booking form. Would you like to restore it?')) {
+            if (confirm('We found a partially filled booking form. Would you like to restore it?')) {
                 if (document.getElementById('name')) document.getElementById('name').value = data.name || '';
                 if (document.getElementById('email')) document.getElementById('email').value = data.email || '';
                 if (document.getElementById('phone')) document.getElementById('phone').value = data.phone || '';
@@ -426,13 +639,13 @@ function restoreSavedFormData() {
                 if (document.getElementById('time')) document.getElementById('time').value = data.time || '';
                 if (document.getElementById('description')) document.getElementById('description').value = data.description || '';
                 if (document.getElementById('transactionId')) document.getElementById('transactionId').value = data.transactionId || '';
-                
+
                 const paymentRadio = document.querySelector(`input[name="paymentMethod"][value="${data.paymentMethod}"]`);
                 if (paymentRadio) {
                     paymentRadio.checked = true;
                     toggleMomoFields();
                 }
-                
+
                 calculateTotal();
                 return true;
             }
@@ -449,7 +662,7 @@ function clearSavedFormData() {
 
 function setupAutoSave() {
     const formInputs = ['name', 'email', 'phone', 'hostel', 'date', 'time', 'description', 'transactionId'];
-    
+
     formInputs.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
@@ -457,7 +670,7 @@ function setupAutoSave() {
             element.addEventListener('change', () => autoSaveFormData());
         }
     });
-    
+
     const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
     paymentRadios.forEach(radio => {
         radio.addEventListener('change', () => {
@@ -467,42 +680,65 @@ function setupAutoSave() {
     });
 }
 
-// ========== MAIN SUBMIT FUNCTION (WITH PAYMENT) ==========
+// ========== MAIN SUBMIT FUNCTION ==========
 async function submitBooking(event) {
     if (event) event.preventDefault();
-    
-    // ✅ NEW: Check if payment method is selected
+
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-    
+
     if (!paymentMethod) {
         showToastMessage('Please select a payment method (Pay on Pickup or Mobile Money)', 'error');
         return;
     }
-    
+
     const transactionId = document.getElementById('transactionId')?.value;
-    
+
     if (paymentMethod === 'momo' && !transactionId) {
         showToastMessage('Please enter your transaction ID after sending the payment', 'error');
         return;
     }
-    
+
     const items = [];
+    let firstInvalidRow = null;
+    let missingQtyLabel = null;
+
     document.querySelectorAll('.item-row').forEach(row => {
         const select = row.querySelector('.itemSelect');
-        const quantity = row.querySelector('.quantity')?.value;
-        if (select && select.value && quantity > 0) {
-            items.push({
-                type: select.value,
-                quantity: parseInt(quantity)
-            });
+        const quantityInput = row.querySelector('.quantity');
+        const quantity = parseInt(quantityInput?.value);
+        const stepper = row.querySelector('.qty-stepper');
+
+        if (!select || !select.value) return; // empty row (no item picked) is fine, just skip it
+
+        if (!quantity || quantity < 1) {
+            stepper?.classList.add('invalid');
+            if (!firstInvalidRow) {
+                firstInvalidRow = quantityInput;
+                missingQtyLabel = ITEM_LABELS[select.value] || 'this item';
+            }
+            return;
         }
+
+        stepper?.classList.remove('invalid');
+        items.push({ type: select.value, quantity });
     });
-    
+
+    if (missingQtyLabel) {
+        showToastMessage(`Enter how many ${missingQtyLabel} you have`, 'error');
+        firstInvalidRow.closest('.item-row').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstInvalidRow.focus();
+        return;
+    }
+
     if (items.length === 0) {
         showToastMessage('Please add at least one item to store', 'error');
         return;
     }
-    
+
+    // Compute the total straight from the validated items + live prices —
+    // never trust the displayed #totalPrice text, which can go stale.
+    const computedTotal = items.reduce((sum, item) => sum + (prices[item.type] || 0) * item.quantity, 0);
+
     const bookingData = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
@@ -512,59 +748,63 @@ async function submitBooking(event) {
         time: document.getElementById('time').value,
         description: document.getElementById('description').value,
         items: items,
-        total: parseFloat(document.getElementById('totalPrice').textContent) || 0,
+        total: computedTotal,
         payment_method: paymentMethod,
         transaction_id: paymentMethod === 'momo' ? transactionId : null
     };
-    
+
     if (!bookingData.name || !bookingData.email || !bookingData.phone || !bookingData.hostel || !bookingData.date || !bookingData.time) {
         showToastMessage('Please fill in all required fields', 'error');
         return;
     }
-    
+
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Processing...';
-    
+    submitBtn.innerHTML = 'Processing...';
+
     try {
         const response = await fetch(`${API_URL}/bookings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(bookingData)
         });
-        
+
         const result = await response.json();
-        
+
         if (response.ok) {
             clearSavedFormData();
-            
-            let successMessage = `✅ Booking confirmed!\nReference: ${result.bookingRef}\n\n`;
+
+            let successMessage = `Booking confirmed!\nReference: ${result.bookingRef}\n\n`;
             if (paymentMethod === 'momo') {
                 successMessage += `We've received your payment information. You will receive an email once we verify your payment.\n\n`;
             } else {
                 successMessage += `You will pay when we pick up your items.\n\n`;
             }
             successMessage += `Check your email for confirmation.`;
-            
+
             alert(successMessage);
-            
+
             document.getElementById('bookingForm').reset();
             document.querySelectorAll('.item-row').forEach((row, index) => {
                 if (index > 0) row.remove();
             });
-            
+
             const firstRow = document.querySelector('.item-row');
             if (firstRow) {
                 const firstSelect = firstRow.querySelector('.itemSelect');
                 const firstQuantity = firstRow.querySelector('.quantity');
+                const firstTriggerText = firstRow.querySelector('.trigger-text');
+                const firstTriggerImg = firstRow.querySelector('.trigger-image');
                 if (firstSelect) firstSelect.value = '';
-                if (firstQuantity) firstQuantity.value = '1';
+                if (firstQuantity) firstQuantity.value = '';
+                if (firstTriggerText) firstTriggerText.textContent = 'Select item type';
+                if (firstTriggerImg) firstTriggerImg.src = 'images/default-item.png';
             }
-            
+
             const pickupRadio = document.querySelector('input[name="paymentMethod"][value="pickup"]');
             if (pickupRadio) pickupRadio.checked = true;
             toggleMomoFields();
-            
+
             calculateTotal();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
@@ -575,7 +815,7 @@ async function submitBooking(event) {
         showToastMessage('Network error. Please check your connection.', 'error');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = '✅ Confirm Booking';
+        submitBtn.innerHTML = '<i class="fas fa-circle-check"></i> Confirm Booking';
     }
 }
 
@@ -585,12 +825,12 @@ function initPaymentSystem() {
     if (copyBtn) {
         copyBtn.addEventListener('click', copyMomoNumber);
     }
-    
+
     const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
     paymentRadios.forEach(radio => {
         radio.addEventListener('change', toggleMomoFields);
     });
-    
+
     toggleMomoFields();
     setupAutoSave();
     restoreSavedFormData();
@@ -606,15 +846,13 @@ toastStyle.textContent = `
 `;
 document.head.appendChild(toastStyle);
 
-// ===== SINGLE DOMContentLoaded EVENT (MERGED) =====
+// ===== INITIALIZE =====
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("🚀 Kodak Logistics - Page loaded");
-  
   const dateInput = document.getElementById("date");
   if (dateInput) {
     dateInput.min = new Date().toISOString().split("T")[0];
   }
-  
+
   // Mobile menu toggle
   const menuToggle = document.getElementById('mobileMenuToggle');
   const navLinks = document.getElementById('navLinks');
@@ -622,28 +860,28 @@ document.addEventListener("DOMContentLoaded", function() {
     menuToggle.addEventListener('click', function() {
       navLinks.classList.toggle('active');
     });
-    
+
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', function() {
         navLinks.classList.remove('active');
       });
     });
   }
-  
+
+  initCustomDropdowns();
   setupAddItem();
   setupExistingRows();
-  
+  setupGallery();
+
   loadPrices().then(() => {
     calculateTotal();
-    console.log("✅ Prices loaded and ready");
   });
-  
+
   loadBusinessSettings();
-  
-  // Initialize payment system
+  loadTestimonials();
+
   initPaymentSystem();
-  
-  // Set up form submission (ONE handler only)
+
   const form = document.getElementById("bookingForm");
   if (form) {
     form.addEventListener("submit", submitBooking);

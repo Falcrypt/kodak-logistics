@@ -435,7 +435,7 @@ async function sendReturnStatusUpdateEmail(returnRequest) {
                 nextSteps = `
                     <li>Thank you for choosing Kodak Logistics!</li>
                     <li>We hope you enjoyed our service.</li>
-                    <li>Please consider leaving a review!</li>
+                    <li><a href="https://falcrypt.github.io/kodak-logistics/leave-review.html?ref=${encodeURIComponent(returnRequest.booking_ref)}">Leave a review</a> — it takes less than a minute and helps other students.</li>
                 `;
                 break;
             case 'cancelled':

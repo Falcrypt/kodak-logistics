@@ -6,648 +6,35 @@
   <title>KODAK LOGISTICS | Student Storage & Pickup – Ghana</title>
   <meta name="description" content="Affordable, secure luggage, fridge & student item storage with hostel pickup for Ghana University students during vacation."/>
   <meta name="keywords" content="University storage, student luggage Ghana, fridge storage, vacation storage Ghana, hostel pickup"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&display=swap">
   <link rel="stylesheet" href="style.css"/>
-  <style>
-    /* Force Ghana Cedi symbol */
-    .price-tag::before,
-    .price::before,
-    .total-section p::before {
-      content: "₵";
-      margin-right: 2px;
-    }
-    
-    img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      background-color: #f0f0f0;
-      border-radius: 10px;
-    }
-    
-    section {
-      opacity: 1 !important;
-      transform: none !important;
-    }
-    
-    .hero {
-      background: linear-gradient(135deg, rgba(139,0,0,0.85), rgba(107,15,26,0.9)),
-                  url('https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat fixed;
-      min-height: 90vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 4rem 2rem;
-      position: relative;
-    }
-    
-    .gallery-intro {
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto 1.5rem auto;
-      background: rgba(255,179,71,0.15);
-      padding: 0.75rem 1.5rem;
-      border-radius: 60px;
-      backdrop-filter: blur(5px);
-      font-size: 0.85rem;
-    }
-    .gallery-intro i {
-      color: #ffb347;
-      margin-right: 8px;
-    }
-    
-    .image-gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1.5rem;
-      padding: 1rem;
-    }
-    
-    .gallery-item {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 0.75rem;
-      text-align: center;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255,255,255,0.2);
-      cursor: pointer;
-    }
-    
-    .gallery-item:hover {
-      transform: translateY(-8px);
-      border-color: #ffb347;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-    }
-    
-    .gallery-item img {
-      width: 100%;
-      height: 140px;
-      object-fit: contain;
-      border-radius: 12px;
-      margin-bottom: 0.5rem;
-      background: rgba(0,0,0,0.2);
-    }
-    
-    .gallery-item h3 {
-      font-size: 0.9rem;
-      color: #ffb347;
-      margin-bottom: 0.25rem;
-      font-weight: 700;
-    }
-    
-    .gallery-item p {
-      font-size: 0.7rem;
-      color: rgba(255,255,255,0.8);
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-    
-    .gallery-item .price-tag {
-      display: inline-block;
-      background: linear-gradient(135deg, #ffb347, #ff8c42);
-      color: #8b0000;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-weight: 800;
-      font-size: 0.75rem;
-    }
-    
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.95);
-      z-index: 10000;
-      justify-content: center;
-      align-items: center;
-      backdrop-filter: blur(5px);
-    }
-    
-    .modal.active {
-      display: flex;
-    }
-    
-    .modal-content {
-      background: linear-gradient(135deg, #8b0000, #6b0f1a);
-      border-radius: 30px;
-      max-width: 600px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 2rem;
-      position: relative;
-      border: 2px solid #ffb347;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-    }
-    
-    .modal-close {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      font-size: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .modal-close:hover {
-      transform: scale(1.1);
-      background: #ff4444;
-    }
-    
-    .modal-title {
-      color: #ffb347;
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      border-bottom: 2px solid #ffb347;
-      padding-bottom: 0.5rem;
-      font-weight: 800;
-    }
-    
-    .modal-items {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-    
-    .modal-item {
-      background: rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    
-    .modal-item:hover {
-      transform: translateX(5px);
-      border-color: #ffb347;
-    }
-    
-    .modal-item-img {
-      width: 60px;
-      height: 60px;
-      object-fit: contain;
-      border-radius: 10px;
-      background: rgba(0,0,0,0.2);
-    }
-    
-    .modal-item-info {
-      flex: 1;
-    }
-    
-    .modal-item-name {
-      color: #ffb347;
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 0.25rem;
-    }
-    
-    .modal-item-price {
-      color: white;
-      font-weight: 900;
-      font-size: 1.2rem;
-    }
-    
-    .modal-item-price::before {
-      content: "₵";
-      margin-right: 2px;
-    }
-    
-    .book-now-btn {
-      display: block;
-      width: 100%;
-      margin-top: 1.5rem;
-      padding: 0.8rem;
-      background: linear-gradient(135deg, #ffb347, #ff8c42);
-      color: #8b0000;
-      border: none;
-      border-radius: 50px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-      text-decoration: none;
-    }
-    
-    .book-now-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(255,179,71,0.4);
-    }
-    
-    /* ===== CUSTOM IMAGE DROPDOWN - SOLID BACKGROUND ===== */
-    .custom-select-wrapper {
-      position: relative;
-      flex: 2;
-      min-width: 200px;
-    }
-    
-    .custom-select-trigger {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .custom-select-trigger:hover {
-      border-color: #ffb347;
-      background: rgba(255,255,255,0.15);
-    }
-    
-    .trigger-image {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-      border-radius: 6px;
-    }
-    
-    .trigger-text {
-      flex: 1;
-      color: white;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-    
-    .trigger-arrow {
-      color: #ffb347;
-      font-size: 12px;
-      transition: transform 0.3s ease;
-    }
-    
-    .custom-select-wrapper.open .trigger-arrow {
-      transform: rotate(180deg);
-    }
-    
-    /* SOLID DROPDOWN - NO TRANSPARENCY */
-    .custom-select-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #3a0000;
-      border: 2px solid #ffb347;
-      border-radius: 12px;
-      margin-top: 5px;
-      max-height: 280px;
-      overflow-y: auto;
-      z-index: 99999;
-      display: none;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      backdrop-filter: none;
-      opacity: 1;
-    }
-    
-    .custom-select-wrapper.open .custom-select-dropdown {
-      display: block;
-    }
-    
-    /* SOLID OPTIONS - NO TRANSPARENCY */
-    .custom-option {
-      padding: 0.7rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border-bottom: 1px solid #ffb347;
-      background: #3a0000;
-      opacity: 1;
-    }
-    
-    .custom-option:hover {
-      background: #8b0000;
-    }
-    
-    .custom-option img {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-      border-radius: 6px;
-      background: transparent;
-    }
-    
-    .custom-option .option-name {
-      flex: 1;
-      color: white;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-    
-    .custom-option .option-price {
-      color: #ffb347;
-      font-weight: bold;
-      font-size: 0.8rem;
-    }
-    
-    /* Hide original select */
-    .item-row select {
-      display: none;
-    }
-    
-    .item-row {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
-    
-    .item-row .quantity {
-      width: 80px;
-      padding: 0.75rem;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white;
-      text-align: center;
-      font-weight: 600;
-    }
-    
-    .item-row .remove-btn {
-      background: rgba(220,53,69,0.8);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 0.7rem 1rem;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    
-    .item-row .remove-btn:hover {
-      background: rgba(220,53,69,1);
-      transform: scale(1.05);
-    }
-    
-    /* Prevent overlap with Special Instructions */
-    .items-section {
-      position: relative;
-      margin-bottom: 2rem;
-    }
-    
-    .form-group {
-      position: relative;
-      margin-bottom: 1.5rem;
-    }
-    
-    .add-btn {
-      background: linear-gradient(135deg, #ffb347, #ff8c42);
-      color: #8b0000;
-      border: none;
-      padding: 0.8rem 2rem;
-      border-radius: 40px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    
-    .add-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255,179,71,0.4);
-    }
-    
-    #description {
-      width: 100%;
-      padding: 0.8rem;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white;
-      resize: vertical;
-      font-weight: 500;
-    }
-    
-    /* Required field indicator */
-    .required-star {
-      color: #ff6b6b;
-      margin-left: 4px;
-    }
-    
-    /* ===== MOBILE MENU STYLES - FIXED ===== */
-    @media (max-width: 992px) {
-      .nav-links {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: #8b0000;
-        flex-direction: column;
-        padding: 1.5rem;
-        text-align: center;
-        gap: 1rem;
-        border-bottom: 2px solid #ffb347;
-        z-index: 999;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-      }
-      
-      .nav-links.active {
-        display: flex !important;
-      }
-      
-      .menu-toggle {
-        display: block;
-        font-size: 2rem;
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
-        z-index: 1000;
-      }
-      
-      .nav-links li {
-        margin: 0;
-        width: 100%;
-      }
-      
-      .nav-links a {
-        display: block;
-        padding: 12px;
-        font-size: 1.1rem;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-      }
-      
-      .nav-links a:hover {
-        background: #ffb347;
-        color: #8b0000;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .trigger-image, .custom-option img {
-        width: 24px;
-        height: 24px;
-      }
-      .trigger-text, .custom-option .option-name {
-        font-size: 0.75rem;
-      }
-      .item-row .quantity {
-        width: 70px;
-        padding: 0.6rem;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .modal-content { padding: 1.5rem; }
-      .modal-title { font-size: 1.3rem; }
-      .modal-item-img { width: 45px; height: 45px; }
-      .image-gallery {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-        padding: 0.75rem;
-      }
-      .gallery-item img { height: 100px; }
-    }
-    
-    @media (min-width: 481px) and (max-width: 768px) {
-      .image-gallery { grid-template-columns: repeat(3, 1fr); }
-      .gallery-item img { height: 110px; }
-    }
-    
-    @media (min-width: 769px) {
-      .image-gallery { grid-template-columns: repeat(5, 1fr); }
-      .gallery-item img { height: 130px; }
-    }
-    
-    /* ===== SOLID DROPDOWN - COMPLETE OVERRIDE - NO TRANSPARENCY ===== */
-    .custom-select-dropdown,
-    .custom-select-dropdown *,
-    .custom-option,
-    .custom-option * {
-      background-color: #3a0000 !important;
-      opacity: 1 !important;
-      backdrop-filter: none !important;
-    }
-    
-    .custom-option:hover {
-      background-color: #8b0000 !important;
-    }
-    
-    .custom-option .option-name,
-    .custom-option .option-price {
-      background: transparent !important;
-      color: white;
-    }
-    
-    .custom-option .option-price {
-      color: #ffb347 !important;
-    }
-    
-    /* Fix cursor - always show pointer on dropdown items */
-    .custom-option {
-      cursor: pointer !important;
-    }
-    
-    .custom-option * {
-      cursor: pointer !important;
-    }
-
-    /* ===== BRIGHTER DROPDOWN - MORE VISIBLE ===== */
-    .custom-select-dropdown {
-      background: #8b0000 !important;
-      border: 2px solid #ffb347 !important;
-    }
-
-    .custom-option {
-      background: #8b0000 !important;
-      border-bottom: 1px solid rgba(255,179,71,0.3) !important;
-    }
-
-    .custom-option:hover {
-      background: #a52a2a !important;
-    }
-
-    .custom-option .option-name {
-      color: #ffffff !important;
-      font-weight: 600 !important;
-    }
-
-    .custom-option .option-price {
-      color: #ffb347 !important;
-      font-weight: bold !important;
-    }
-
-    /* Make the trigger/selected item more visible */
-    .custom-select-trigger {
-      background: rgba(255,255,255,0.15) !important;
-      border: 1px solid #ffb347 !important;
-    }
-
-    .custom-select-trigger:hover {
-      background: rgba(255,255,255,0.25) !important;
-    }
-
-    .trigger-text {
-      color: #ffffff !important;
-      font-weight: 600 !important;
-    }
-
-    .trigger-arrow {
-      color: #ffb347 !important;
-    }
-        /* Return Button Style */
-    .btn-return {
-        background: linear-gradient(135deg, #28a745, #1e7e34);
-        color: white;
-        padding: 12px 28px;
-        border-radius: 50px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-
-    .btn-return:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.4);
-    }
-
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <div id="loading">
-    <div class="loader"><div class="pulse-ring">📦</div><div class="loading-text">KODAK LOGISTICS<span class="loading-dots">...</span></div></div>
+    <div class="loader"><div class="pulse-ring"><i class="fas fa-box"></i></div><div class="loading-text">KODAK LOGISTICS<span class="loading-dots">...</span></div></div>
   </div>
 
-  <a href="https://wa.me/233545025296?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage..." class="whatsapp-btn" target="_blank"><i class="fab fa-whatsapp"></i> Chat</a>
+  <a href="https://wa.me/233545025296?text=Hi%20Kodak%20Logistics%2C%20I%20want%20to%20book%20storage..." class="whatsapp-btn" target="_blank" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
 
   <header>
     <nav class="navbar">
       <div class="logo-wrapper">
         <div class="logo">
-          <span class="logo-icons"><span class="icon-box">📦</span><span class="icon-box">🔐</span><span class="icon-box">🚚</span></span>
+          <span class="logo-icons"><span class="icon-box"><i class="fas fa-box"></i></span><span class="icon-box"><i class="fas fa-lock"></i></span><span class="icon-box"><i class="fas fa-truck"></i></span></span>
           <span class="brand-name">KODAK</span>
         </div>
-        <span class="tagline">📍 Nationwide Student Storage</span>
+        <span class="tagline"><i class="fas fa-location-dot"></i> Nationwide Student Storage</span>
       </div>
-      <button class="menu-toggle" id="mobileMenuToggle">☰</button>
+      <button class="menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
       <ul class="nav-links" id="navLinks">
           <li><a href="#home">Home</a></li>
           <li><a href="#gallery">Items</a></li>
           <li><a href="#book">Book Storage</a></li>
           <li><a href="return-items.html">Request Return</a></li>
+          <li><a href="leave-review.html">Leave a Review</a></li>
           <li><a href="#faq">FAQ</a></li>
       </ul>
     </nav>
@@ -656,70 +43,72 @@
   <main>
     <section class="hero" id="home">
       <div class="hero-content">
-        <h1>Secure & Affordable<br>Student Storage</h1>
-        <p>Store your items safely during vacation — with <strong>free pickup</strong> from your hostel nationwide. <span style="color: #ffb347;">Serving all Ghanaian universities!</span></p>
+        <h1>Secure &amp; Affordable<br><span class="accent">Student Storage</span></h1>
+        <p>Store your items safely during vacation — with <strong>free pickup</strong> from your hostel nationwide. Serving all Ghanaian universities!</p>
         <div class="hero-buttons">
-            <a href="#book" class="btn-primary">📦 Book Storage</a>
-            <a href="return-items.html" class="btn-return" style="background: linear-gradient(135deg, #28a745, #1e7e34); color: white; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; display: inline-block;">📦 Request Return</a>
-            <a href="#gallery" class="btn-secondary">📸 See Items</a>
+            <a href="#book" class="btn-primary"><i class="fas fa-box"></i> Book Storage</a>
+            <a href="return-items.html" class="btn-return"><i class="fas fa-rotate-left"></i> Request Return</a>
+            <a href="#gallery" class="btn-secondary"><i class="fas fa-images"></i> See Items</a>
         </div>
-        <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
-          <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">✅ 10,000+ Students Nationwide</span>
-          <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">🔒 24/7 Security</span>
-          <span style="background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.8rem;">🚚 Free Pickup Nationwide</span>
+        <div class="trust-badges">
+          <span class="pill-badge"><i class="fas fa-circle-check"></i> 10,000+ Students Nationwide</span>
+          <span class="pill-badge"><i class="fas fa-shield-halved"></i> 24/7 Security</span>
+          <span class="pill-badge"><i class="fas fa-truck-fast"></i> Free Pickup Nationwide</span>
         </div>
       </div>
     </section>
 
     <section class="image-gallery-section" id="gallery">
       <div class="section-header"><h2>What We Store</h2><p>Click on any category to see all sizes and prices</p></div>
-      <div class="gallery-intro"><i class="fas fa-info-circle"></i> Click on any item below to see detailed pricing</div>
+      <span class="pill-badge gallery-intro"><i class="fas fa-circle-info"></i> Click on any item below to see detailed pricing</span>
       <div class="image-gallery">
-        <div class="gallery-item" data-category="duffle"><img src="images/gallery-duffle.jpg" alt="Duffle Bags"><h3>Duffle Bags</h3><p>Small & Large sizes</p><span class="price-tag">From 30</span></div>
-        <div class="gallery-item" data-category="jute"><img src="images/gallery-jute.jpg" alt="Jute Bags"><h3>Jute Bags</h3><p>Small, Medium & Large</p><span class="price-tag">From 40</span></div>
-        <div class="gallery-item" data-category="travel"><img src="images/gallery-suitcase.jpg" alt="Travel Suitcases"><h3>Travel Bags</h3><p>Small, Medium & Large</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="duffle"><img src="images/gallery-duffle.jpg" alt="Duffle Bags"><h3>Duffle Bags</h3><p>Small &amp; Large sizes</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="jute"><img src="images/gallery-jute.jpg" alt="Jute Bags"><h3>Jute Bags</h3><p>Small, Medium &amp; Large</p><span class="price-tag">From 40</span></div>
+        <div class="gallery-item" data-category="travel"><img src="images/gallery-suitcase.jpg" alt="Travel Suitcases"><h3>Travel Bags</h3><p>Small, Medium &amp; Large</p><span class="price-tag">From 30</span></div>
         <div class="gallery-item" data-category="microwave"><img src="images/gallery-microwave.jpg" alt="Microwave"><h3>Microwaves</h3><p>Kitchen appliances</p><span class="price-tag">From 30</span></div>
         <div class="gallery-item" data-category="fridge_tabletop"><img src="images/gallery-fridge-table.jpg" alt="Table Top Fridge"><h3>Fridge (Table)</h3><p>Table top refrigerator</p><span class="price-tag">From 60</span></div>
         <div class="gallery-item" data-category="fridge_doubledoor"><img src="images/gallery-fridge-double.jpg" alt="Double Door Fridge"><h3>Fridge (DD)</h3><p>Double door refrigerator</p><span class="price-tag">From 80</span></div>
         <div class="gallery-item" data-category="fridge_small"><img src="images/gallery-fridge-small.jpg" alt="Small Fridge"><h3>Fridge (Small)</h3><p>Mini fridge</p><span class="price-tag">From 40</span></div>
-        <div class="gallery-item" data-category="gas"><img src="images/gallery-gas.jpg" alt="Gas Cylinders"><h3>Gas Cylinders</h3><p>Small, Medium & Large</p><span class="price-tag">From 30</span></div>
-        <div class="gallery-item" data-category="container"><img src="images/gallery-container.jpg" alt="Storage Containers"><h3>Storage Containers</h3><p>Small & Large boxes</p><span class="price-tag">From 30</span></div>
-        <div class="gallery-item" data-category="buckets"><img src="images/gallery-buckets.jpg" alt="Buckets"><h3>Buckets</h3><p>Free with paid items</p><span class="price-tag">FREE</span></div>
+        <div class="gallery-item" data-category="gas"><img src="images/gallery-gas.jpg" alt="Gas Cylinders"><h3>Gas Cylinders</h3><p>Small, Medium &amp; Large</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="container"><img src="images/gallery-container.jpg" alt="Storage Containers"><h3>Storage Containers</h3><p>Small &amp; Large boxes</p><span class="price-tag">From 30</span></div>
+        <div class="gallery-item" data-category="tv"><img src="images/mediumscreen.jpg" alt="Televisions"><h3>Televisions</h3><p>All sizes, small to extra large</p><span class="price-tag">From 40</span></div>
+        <div class="gallery-item" data-category="buckets"><img src="images/gallery-buckets.jpg" alt="Buckets"><h3>Buckets</h3><p>Included with paid items</p><span class="price-tag" id="bucketsPriceTag">FREE</span></div>
       </div>
     </section>
 
     <div id="priceModal" class="modal">
       <div class="modal-content">
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button class="modal-close" onclick="closeModal()" aria-label="Close"><i class="fas fa-xmark"></i></button>
         <h2 class="modal-title" id="modalTitle">Category</h2>
         <div id="modalItemsContainer" class="modal-items"></div>
-        <a href="#book" class="book-now-btn" onclick="closeModal()">📦 Book Now</a>
+        <a href="#book" class="book-now-btn" onclick="closeModal()"><i class="fas fa-box"></i> Book Now</a>
       </div>
     </div>
 
-    <section style="background: rgba(0,0,0,0.2); padding: 2rem 5%; text-align: center;">
+    <section class="how-it-works">
       <div class="section-header"><h2>How It Works</h2><p>Three simple steps</p></div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 800px; margin: 0 auto;">
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">📝</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">1. Book Online</h3><p style="font-size: 0.85rem;">Fill the booking form</p></div>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🚚</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">2. Free Pickup</h3><p style="font-size: 0.85rem;">From your hostel</p></div>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;"><div style="font-size: 2rem;">🔒</div><h3 style="color: #ffb347; font-size: 1rem; font-weight: 700;">3. Safe Storage</h3><p style="font-size: 0.85rem;">Securely stored</p></div>
+      <div class="steps-grid">
+        <div class="step-card"><div class="icon-badge"><i class="fas fa-clipboard-list"></i></div><h3>1. Book Online</h3><p>Fill the booking form</p></div>
+        <div class="step-card"><div class="icon-badge"><i class="fas fa-truck"></i></div><h3>2. Free Pickup</h3><p>From your hostel</p></div>
+        <div class="step-card"><div class="icon-badge"><i class="fas fa-shield-halved"></i></div><h3>3. Safe Storage</h3><p>Securely stored</p></div>
       </div>
     </section>
 
-    <section style="background: rgba(0,0,0,0.3); padding: 2rem 5%; text-align: center;">
-    <div class="section-header">
-        <h2>Need Your Items Back?</h2>
-        <p>Fast delivery to your hostel</p>
-    </div>
-    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-        <a href="return-items.html" style="background: linear-gradient(135deg, #28a745, #1e7e34); color: white; padding: 15px 40px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease;">
-            📦 Request Your Items Back
-        </a>
-    </div>
-    <p style="margin-top: 1rem; font-size: 0.85rem; color: rgba(255,255,255,0.7);">
-        Delivery fee: ₵30 | 24-hour notice required | Same location delivery
-    </p>
-</section>
+    <section class="return-cta">
+      <div class="glass-panel return-cta-panel">
+        <div class="section-header" style="margin-bottom: 1.5rem;">
+          <h2>Need Your Items Back?</h2>
+          <p>Fast delivery to your hostel</p>
+        </div>
+        <a href="return-items.html" class="btn-return"><i class="fas fa-rotate-left"></i> Request Your Items Back</a>
+        <p class="fee-note">Delivery fee: ₵30 | 24-hour notice required | Same location delivery</p>
+      </div>
+    </section>
+
+    <section id="testimonials" style="display: none;">
+      <div class="section-header"><h2>What Students Say</h2><p>Real feedback from students who've used our storage service</p></div>
+      <div class="testimonials-grid" id="testimonialsGrid"></div>
+    </section>
 
     <section class="booking" id="book">
       <div class="section-header"><h2>Book Storage</h2><p>Fill the form — we'll confirm with a reference ID</p></div>
@@ -728,7 +117,7 @@
         <div class="form-group"><label for="email">Email *</label><input type="email" id="email" required placeholder="your@email.com"></div>
         <div class="form-group"><label for="phone">WhatsApp Number *</label><input type="tel" id="phone" required placeholder="0545025296"></div>
         <div class="form-group"><label for="hostel">Hostel / Location *</label><input type="text" id="hostel" required placeholder="Hall or Hostel/Location"></div>
-        
+
         <div class="form-row">
           <div class="form-group"><label for="date">Pickup Date *</label><input type="date" id="date" required></div>
           <div class="form-group"><label for="time">Pickup Time *</label><input type="time" id="time" required></div>
@@ -748,12 +137,12 @@
                 <option value="gas_small">Gas Cylinder (Small)</option><option value="gas_medium">Gas Cylinder (Medium)</option><option value="gas_big">Gas Cylinder (Big)</option>
                 <option value="container_small">Container (Small)</option><option value="container_big">Container (Big)</option><option value="buckets">Buckets</option>
               </select>
-              
+
               <div class="custom-select-wrapper">
                 <div class="custom-select-trigger">
                   <img class="trigger-image" src="images/default-item.png" alt="icon" onerror="this.src='https://placehold.co/28x28/ffb347/8b0000?text=?'">
                   <span class="trigger-text">Select item type</span>
-                  <span class="trigger-arrow">▼</span>
+                  <span class="trigger-arrow"><i class="fas fa-chevron-down"></i></span>
                 </div>
                 <div class="custom-select-dropdown">
                   <div class="custom-option" data-value="duffle_small" data-price="30" data-img="images/duffle-small.jpg"><img src="images/duffle-small.jpg" alt=""><span class="option-name">Duffle Bag (Small)</span><span class="option-price">₵30</span></div>
@@ -773,15 +162,23 @@
                   <div class="custom-option" data-value="gas_big" data-price="40" data-img="images/gas-big.jpg"><img src="images/gas-big.jpg" alt=""><span class="option-name">Gas Cylinder (Big)</span><span class="option-price">₵40</span></div>
                   <div class="custom-option" data-value="container_small" data-price="30" data-img="images/container-small.jpg"><img src="images/container-small.jpg" alt=""><span class="option-name">Container (Small)</span><span class="option-price">₵30</span></div>
                   <div class="custom-option" data-value="container_big" data-price="50" data-img="images/container-big.jpg"><img src="images/container-big.jpg" alt=""><span class="option-name">Container (Big)</span><span class="option-price">₵50</span></div>
+                  <div class="custom-option" data-value="tv_small" data-price="39.99" data-img="images/smallscreen.jpg"><img src="images/smallscreen.jpg" alt=""><span class="option-name">Television (Small, up to 32")</span><span class="option-price">₵39.99</span></div>
+                  <div class="custom-option" data-value="tv_medium" data-price="54.99" data-img="images/mediumscreen.jpg"><img src="images/mediumscreen.jpg" alt=""><span class="option-name">Television (Medium, 33"–43")</span><span class="option-price">₵54.99</span></div>
+                  <div class="custom-option" data-value="tv_large" data-price="69.99" data-img="images/largescreen.jpg"><img src="images/largescreen.jpg" alt=""><span class="option-name">Television (Large, 44"–55")</span><span class="option-price">₵69.99</span></div>
+                  <div class="custom-option" data-value="tv_xlarge" data-price="89.99" data-img="images/tv.jpg"><img src="images/tv.jpg" alt=""><span class="option-name">Television (Extra Large, 56"+)</span><span class="option-price">₵89.99</span></div>
                   <div class="custom-option" data-value="buckets" data-price="0" data-img="images/buckets.jpg"><img src="images/buckets.jpg" alt=""><span class="option-name">Buckets</span><span class="option-price">Free</span></div>
                 </div>
               </div>
-              
-              <input type="number" class="quantity" min="1" value="1" required>
-              <button type="button" class="remove-btn">✕ Remove</button>
+
+              <div class="qty-stepper">
+                <button type="button" class="qty-minus" aria-label="Decrease quantity">−</button>
+                <input type="number" class="quantity" min="1" placeholder="Qty" required>
+                <button type="button" class="qty-plus" aria-label="Increase quantity">+</button>
+              </div>
+              <button type="button" class="remove-btn"><i class="fas fa-xmark"></i> Remove</button>
             </div>
           </div>
-          <button type="button" id="addItem" class="add-btn">+ Add Another Item</button>
+          <button type="button" id="addItem" class="add-btn"><i class="fas fa-plus"></i> Add Another Item</button>
         </div>
 
         <div class="form-group">
@@ -794,63 +191,57 @@
           <small>Final Amount</small>
         </div>
 
-        <!-- ========== PAYMENT SECTION - FIXED (no checked attribute) ========== -->
-        <div class="payment-section" style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px; border: 1px solid rgba(255,179,71,0.3);">
-            <h3 style="margin-bottom: 15px; color: #ffb347;">💰 Payment Method <span style="color: #ff6b6b;">*</span></h3>
-            
-            <div class="payment-options" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 20px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 2px solid #ffb347; flex: 1;">
-                    <input type="radio" name="paymentMethod" value="pickup" style="width: 18px; height: 18px;">
-                    <div>
-                        <strong style="color: white;">💵 Pay on Pickup</strong>
-                        <small style="display: block; color: #ccc;">Pay when we collect your items</small>
+        <!-- Payment Section -->
+        <div class="payment-section">
+            <div class="payment-section-title"><i class="fas fa-wallet"></i> Payment Method <span class="required-star">*</span></div>
+
+            <div class="payment-options">
+                <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="pickup">
+                    <div class="payment-option-content">
+                        <strong><i class="fas fa-money-bill-wave"></i> Pay on Pickup</strong>
+                        <small>Pay when we collect your items</small>
                     </div>
                 </label>
-                
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 20px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 2px solid #ffb347; flex: 1;">
-                    <input type="radio" name="paymentMethod" value="momo" style="width: 18px; height: 18px;">
-                    <div>
-                        <strong style="color: white;">📱 Mobile Money</strong>
-                        <small style="display: block; color: #ccc;">Pay now to secure your booking</small>
+
+                <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="momo">
+                    <div class="payment-option-content">
+                        <strong><i class="fas fa-mobile-screen-button"></i> Mobile Money</strong>
+                        <small>Pay now to secure your booking</small>
                     </div>
                 </label>
             </div>
-            
+
             <div id="momoFields" style="display: none;">
-                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border-left: 4px solid #ffb347;">
-                    <p style="margin-bottom: 15px; color: white;"><strong>📱 Send payment to:</strong></p>
-                    
-                    <!-- MoMo Number with Copy Button -->
-                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-                        <div style="background: #8b0000; padding: 12px 20px; border-radius: 8px; font-size: 20px; font-weight: bold; font-family: monospace; color: #ffb347;">
-                            054 470 5397
-                        </div>
-                        <button type="button" id="copyMomoBtn" style="background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                            📋 Copy Number
-                        </button>
+                <div class="momo-panel">
+                    <p><strong><i class="fas fa-paper-plane"></i> Send payment to:</strong></p>
+
+                    <div class="momo-number-row">
+                        <div class="momo-number-code">054 470 5397</div>
+                        <button type="button" id="copyMomoBtn" class="copy-btn"><i class="fas fa-copy"></i> Copy Number</button>
                     </div>
-                    
-                    <p style="color: white;"><strong>💰 Amount:</strong> <span id="displayAmount" style="font-size: 18px; font-weight: bold; color: #ffb347;">GH₵0</span></p>
+
+                    <p><strong>Amount:</strong> <span id="displayAmount" style="font-size: 18px; font-weight: bold; color: #ffb347;">GH₵0</span></p>
                     <p style="color: #ffb347; font-size: 14px; margin-top: 10px;">
-                        ⚠️ <strong>Important:</strong> Your booking is NOT confirmed until we verify your payment.
+                        <i class="fas fa-triangle-exclamation"></i> <strong>Important:</strong> Your booking is NOT confirmed until we verify your payment.
                         After sending money, enter the transaction ID below.
                     </p>
                 </div>
-                
-                <div class="form-group" style="margin-top: 20px;">
-                    <label style="color: white;">📝 Transaction ID (from your SMS):</label>
-                    <input type="text" id="transactionId" placeholder="e.g., MTN123456789" style="width: 100%; padding: 12px; border: 1px solid #ffb347; border-radius: 8px; background: rgba(0,0,0,0.3); color: white;">
-                    <small style="color: #ccc;">Enter the transaction ID from your mobile money confirmation message</small>
+
+                <div class="form-group" style="margin-top: 1.2rem;">
+                    <label>Transaction ID (from your SMS)</label>
+                    <input type="text" id="transactionId" placeholder="e.g., MTN123456789">
+                    <small style="color: rgba(255,255,255,0.55); display: block; margin-top: 0.4rem;">Enter the transaction ID from your mobile money confirmation message</small>
                 </div>
             </div>
-            
+
             <div id="autoSaveNotice" style="margin-top: 15px; font-size: 12px; color: #ffb347; text-align: center; display: none;">
-                💾 Form data auto-saved. You can safely leave and come back.
+                <i class="fas fa-floppy-disk"></i> Form data auto-saved. You can safely leave and come back.
             </div>
         </div>
-        <!-- ========== END PAYMENT SECTION ========== -->
 
-        <button type="submit" id="submitBtn" class="btn-primary">✅ Confirm Booking</button>
+        <button type="submit" id="submitBtn" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1.5rem;"><i class="fas fa-circle-check"></i> Confirm Booking</button>
         <div id="formMessage" class="form-message"></div>
       </form>
     </section>
@@ -875,242 +266,6 @@
     </div>
   </footer>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="script.js"></script>
-  <script>
- 
-    // ===== CUSTOM DROPDOWN INITIALIZATION =====
-    function initCustomDropdowns() {
-      document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
-        if (wrapper.hasAttribute('data-initialized')) return;
-        wrapper.setAttribute('data-initialized', 'true');
-        
-        const trigger = wrapper.querySelector('.custom-select-trigger');
-        const hiddenSelect = wrapper.parentElement.querySelector('.itemSelect');
-        const triggerImg = wrapper.querySelector('.trigger-image');
-        const triggerText = wrapper.querySelector('.trigger-text');
-        
-        if (!trigger) return;
-        
-        trigger.addEventListener('click', (e) => {
-          e.stopPropagation();
-          document.querySelectorAll('.custom-select-wrapper').forEach(w => {
-            if (w !== wrapper) w.classList.remove('open');
-          });
-          wrapper.classList.toggle('open');
-        });
-        
-        wrapper.querySelectorAll('.custom-option').forEach(opt => {
-          opt.addEventListener('click', () => {
-            const value = opt.getAttribute('data-value');
-            const imgSrc = opt.getAttribute('data-img');
-            const text = opt.querySelector('.option-name').textContent;
-            
-            if (hiddenSelect) {
-              hiddenSelect.value = value;
-              const changeEvent = new Event('change', { bubbles: true });
-              hiddenSelect.dispatchEvent(changeEvent);
-            }
-            
-            if (triggerImg) triggerImg.src = imgSrc;
-            if (triggerText) triggerText.textContent = text;
-            
-            wrapper.classList.remove('open');
-            if (typeof calculateTotal === 'function') calculateTotal();
-          });
-        });
-      });
-    }
-    
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
-    });
-    
-    // ===== ADD ITEM FUNCTION =====
-    function enhancedSetupAddItem() {
-      const addBtn = document.getElementById('addItem');
-      const container = document.getElementById('itemsContainer');
-      if (!addBtn || !container) return;
-      
-      const newAddBtn = addBtn.cloneNode(true);
-      addBtn.parentNode.replaceChild(newAddBtn, addBtn);
-      
-      newAddBtn.addEventListener('click', () => {
-        const newRow = document.createElement('div');
-        newRow.className = 'item-row';
-        newRow.setAttribute('data-row', Date.now());
-        
-        newRow.innerHTML = `
-          <select class="itemSelect" style="display: none;">
-            <option value="">Select item type</option>
-            <option value="duffle_small">Duffle Bag (Small)</option>
-            <option value="duffle_big">Duffle Bag (Big)</option>
-            <option value="jute_small">Jute Bag (Small)</option>
-            <option value="jute_medium">Jute Bag (Medium)</option>
-            <option value="jute_big">Jute Bag (Big)</option>
-            <option value="travel_small">Travel Bag (Small)</option>
-            <option value="travel_medium">Travel Bag (Medium)</option>
-            <option value="travel_big">Travel Bag (Big)</option>
-            <option value="microwave">Microwave</option>
-            <option value="fridge_tabletop">Fridge (Table Top)</option>
-            <option value="fridge_doubledoor">Fridge (Double Door)</option>
-            <option value="fridge_small">Fridge (Small)</option>
-            <option value="gas_small">Gas Cylinder (Small)</option>
-            <option value="gas_medium">Gas Cylinder (Medium)</option>
-            <option value="gas_big">Gas Cylinder (Big)</option>
-            <option value="container_small">Container (Small)</option>
-            <option value="container_big">Container (Big)</option>
-            <option value="buckets">Buckets</option>
-          </select>
-          
-          <div class="custom-select-wrapper">
-            <div class="custom-select-trigger">
-              <img class="trigger-image" src="images/default-item.png" alt="icon" onerror="this.src='https://placehold.co/28x28/ffb347/8b0000?text=?'">
-              <span class="trigger-text">Select item type</span>
-              <span class="trigger-arrow">▼</span>
-            </div>
-            <div class="custom-select-dropdown">
-              <div class="custom-option" data-value="duffle_small" data-price="30" data-img="images/duffle-small.jpg"><img src="images/duffle-small.jpg" alt=""><span class="option-name">Duffle Bag (Small)</span><span class="option-price">₵30</span></div>
-              <div class="custom-option" data-value="duffle_big" data-price="50" data-img="images/duffle-big.jpg"><img src="images/duffle-big.jpg" alt=""><span class="option-name">Duffle Bag (Big)</span><span class="option-price">₵50</span></div>
-              <div class="custom-option" data-value="jute_small" data-price="40" data-img="images/jute-small.jpg"><img src="images/jute-small.jpg" alt=""><span class="option-name">Jute Bag (Small)</span><span class="option-price">₵40</span></div>
-              <div class="custom-option" data-value="jute_medium" data-price="60" data-img="images/jute-medium.jpg"><img src="images/jute-medium.jpg" alt=""><span class="option-name">Jute Bag (Medium)</span><span class="option-price">₵60</span></div>
-              <div class="custom-option" data-value="jute_big" data-price="80" data-img="images/jute-big.jpg"><img src="images/jute-big.jpg" alt=""><span class="option-name">Jute Bag (Big)</span><span class="option-price">₵80</span></div>
-              <div class="custom-option" data-value="travel_small" data-price="30" data-img="images/travel-small.jpg"><img src="images/travel-small.jpg" alt=""><span class="option-name">Travel Bag (Small)</span><span class="option-price">₵30</span></div>
-              <div class="custom-option" data-value="travel_medium" data-price="50" data-img="images/travel-medium.jpg"><img src="images/travel-medium.jpg" alt=""><span class="option-name">Travel Bag (Medium)</span><span class="option-price">₵50</span></div>
-              <div class="custom-option" data-value="travel_big" data-price="70" data-img="images/travel-big.jpg"><img src="images/travel-big.jpg" alt=""><span class="option-name">Travel Bag (Big)</span><span class="option-price">₵70</span></div>
-              <div class="custom-option" data-value="microwave" data-price="30" data-img="images/microwave.jpg"><img src="images/microwave.jpg" alt=""><span class="option-name">Microwave</span><span class="option-price">₵30</span></div>
-              <div class="custom-option" data-value="fridge_tabletop" data-price="60" data-img="images/fridge-tabletop.jpg"><img src="images/fridge-tabletop.jpg" alt=""><span class="option-name">Fridge (Table Top)</span><span class="option-price">₵60</span></div>
-              <div class="custom-option" data-value="fridge_doubledoor" data-price="80" data-img="images/fridge-doubledoor.jpg"><img src="images/fridge-doubledoor.jpg" alt=""><span class="option-name">Fridge (Double Door)</span><span class="option-price">₵80</span></div>
-              <div class="custom-option" data-value="fridge_small" data-price="40" data-img="images/fridge-small.jpg"><img src="images/fridge-small.jpg" alt=""><span class="option-name">Fridge (Small)</span><span class="option-price">₵40</span></div>
-              <div class="custom-option" data-value="gas_small" data-price="30" data-img="images/gas-small.jpg"><img src="images/gas-small.jpg" alt=""><span class="option-name">Gas Cylinder (Small)</span><span class="option-price">₵30</span></div>
-              <div class="custom-option" data-value="gas_medium" data-price="35" data-img="images/gas-medium.jpg"><img src="images/gas-medium.jpg" alt=""><span class="option-name">Gas Cylinder (Medium)</span><span class="option-price">₵35</span></div>
-              <div class="custom-option" data-value="gas_big" data-price="40" data-img="images/gas-big.jpg"><img src="images/gas-big.jpg" alt=""><span class="option-name">Gas Cylinder (Big)</span><span class="option-price">₵40</span></div>
-              <div class="custom-option" data-value="container_small" data-price="30" data-img="images/container-small.jpg"><img src="images/container-small.jpg" alt=""><span class="option-name">Container (Small)</span><span class="option-price">₵30</span></div>
-              <div class="custom-option" data-value="container_big" data-price="50" data-img="images/container-big.jpg"><img src="images/container-big.jpg" alt=""><span class="option-name">Container (Big)</span><span class="option-price">₵50</span></div>
-              <div class="custom-option" data-value="buckets" data-price="0" data-img="images/buckets.jpg"><img src="images/buckets.jpg" alt=""><span class="option-name">Buckets</span><span class="option-price">Free</span></div>
-            </div>
-          </div>
-          
-          <input type="number" class="quantity" min="1" value="1" required>
-          <button type="button" class="remove-btn">✕ Remove</button>
-        `;
-        
-        container.appendChild(newRow);
-        
-        const removeBtn = newRow.querySelector('.remove-btn');
-        removeBtn.addEventListener('click', () => {
-          if (document.querySelectorAll('.item-row').length > 1) {
-            newRow.remove();
-            if (typeof calculateTotal === 'function') calculateTotal();
-          }
-        });
-        
-        const quantityInput = newRow.querySelector('.quantity');
-        quantityInput.addEventListener('input', () => {
-          if (typeof calculateTotal === 'function') calculateTotal();
-        });
-        
-        initCustomDropdowns();
-        if (typeof calculateTotal === 'function') calculateTotal();
-      });
-    }
-    
-    // ===== DYNAMIC CATEGORY ITEMS =====
-    function getCategoryItems() {
-      return {
-        duffle: [
-          { name: "Duffle Bag (Small)", key: "duffle_small", price: (typeof prices !== 'undefined' && prices.duffle_small) ? prices.duffle_small : 29.99, image: "images/duffle-small.jpg" },
-          { name: "Duffle Bag (Big)", key: "duffle_big", price: (typeof prices !== 'undefined' && prices.duffle_big) ? prices.duffle_big : 49.99, image: "images/duffle-big.jpg" }
-        ],
-        jute: [
-          { name: "Jute Bag (Small)", key: "jute_small", price: (typeof prices !== 'undefined' && prices.jute_small) ? prices.jute_small : 39.99, image: "images/jute-small.jpg" },
-          { name: "Jute Bag (Medium)", key: "jute_medium", price: (typeof prices !== 'undefined' && prices.jute_medium) ? prices.jute_medium : 59.99, image: "images/jute-medium.jpg" },
-          { name: "Jute Bag (Big)", key: "jute_big", price: (typeof prices !== 'undefined' && prices.jute_big) ? prices.jute_big : 79.99, image: "images/jute-big.jpg" }
-        ],
-        travel: [
-          { name: "Traveling Bag (Small)", key: "travel_small", price: (typeof prices !== 'undefined' && prices.travel_small) ? prices.travel_small : 29.99, image: "images/travel-small.jpg" },
-          { name: "Traveling Bag (Medium)", key: "travel_medium", price: (typeof prices !== 'undefined' && prices.travel_medium) ? prices.travel_medium : 49.99, image: "images/travel-medium.jpg" },
-          { name: "Traveling Bag (Big)", key: "travel_big", price: (typeof prices !== 'undefined' && prices.travel_big) ? prices.travel_big : 69.99, image: "images/travel-big.jpg" }
-        ],
-        microwave: [
-          { name: "Microwave", key: "microwave", price: (typeof prices !== 'undefined' && prices.microwave) ? prices.microwave : 30, image: "images/microwave.jpg" }
-        ],
-        fridge_tabletop: [
-          { name: "Fridge (Table Top)", key: "fridge_tabletop", price: (typeof prices !== 'undefined' && prices.fridge_tabletop) ? prices.fridge_tabletop : 59.99, image: "images/fridge-tabletop.jpg" }
-        ],
-        fridge_doubledoor: [
-          { name: "Fridge (Double Door)", key: "fridge_doubledoor", price: (typeof prices !== 'undefined' && prices.fridge_doubledoor) ? prices.fridge_doubledoor : 79.99, image: "images/fridge-doubledoor.jpg" }
-        ],
-        fridge_small: [
-          { name: "Fridge (Small)", key: "fridge_small", price: (typeof prices !== 'undefined' && prices.fridge_small) ? prices.fridge_small : 39.99, image: "images/fridge-small.jpg" }
-        ],
-        gas: [
-          { name: "Gas Cylinder (Small)", key: "gas_small", price: (typeof prices !== 'undefined' && prices.gas_small) ? prices.gas_small : 29.99, image: "images/gas-small.jpg" },
-          { name: "Gas Cylinder (Medium)", key: "gas_medium", price: (typeof prices !== 'undefined' && prices.gas_medium) ? prices.gas_medium : 34.99, image: "images/gas-medium.jpg" },
-          { name: "Gas Cylinder (Big)", key: "gas_big", price: (typeof prices !== 'undefined' && prices.gas_big) ? prices.gas_big : 39.99, image: "images/gas-big.jpg" }
-        ],
-        container: [
-          { name: "Container (Small)", key: "container_small", price: (typeof prices !== 'undefined' && prices.container_small) ? prices.container_small : 29.99, image: "images/container-small.jpg" },
-          { name: "Container (Big)", key: "container_big", price: (typeof prices !== 'undefined' && prices.container_big) ? prices.container_big : 49.99, image: "images/container-big.jpg" }
-        ],
-        buckets: [
-          { name: "Buckets", key: "buckets", price: (typeof prices !== 'undefined' && prices.buckets) ? prices.buckets : 0, image: "images/buckets.jpg" }
-        ]
-      };
-    }
-    
-    const categoryTitles = {
-      duffle: "Duffle Bags", jute: "Jute Bags", travel: "Travel Bags", microwave: "Microwaves",
-      fridge_tabletop: "Fridge (Table Top)", fridge_doubledoor: "Fridge (Double Door)", fridge_small: "Fridge (Small)",
-      gas: "Gas Cylinders", container: "Storage Containers", buckets: "Buckets"
-    };
-    
-    window.openModal = function(category) {
-      const modal = document.getElementById('priceModal');
-      const modalTitle = document.getElementById('modalTitle');
-      const modalContainer = document.getElementById('modalItemsContainer');
-      modalTitle.textContent = categoryTitles[category] || category;
-      
-      const items = getCategoryItems()[category];
-      if (!items) return;
-      
-      modalContainer.innerHTML = items.map(item => `<div class="modal-item"><img class="modal-item-img" src="${item.image}" alt="${item.name}"><div class="modal-item-info"><div class="modal-item-name">${item.name}</div><div class="modal-item-price">${item.price}</div></div></div>`).join('');
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    };
-    
-    window.closeModal = function() {
-      const modal = document.getElementById('priceModal');
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-    };
-    
-    // ===== INITIALIZE =====
-    document.addEventListener('DOMContentLoaded', function() {
-      initCustomDropdowns();
-      window.setupAddItem = enhancedSetupAddItem;
-      enhancedSetupAddItem();
-      
-      document.querySelectorAll('.item-row .remove-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          if (document.querySelectorAll('.item-row').length > 1) {
-            this.closest('.item-row').remove();
-            if (typeof calculateTotal === 'function') calculateTotal();
-          }
-        });
-      });
-      
-      document.querySelectorAll('.gallery-item').forEach(item => {
-        item.addEventListener('click', function() {
-          const category = this.getAttribute('data-category');
-          if (category) openModal(category);
-        });
-      });
-      
-      document.getElementById('priceModal').addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
-      });
-    });
-  </script>
 </body>
 </html>

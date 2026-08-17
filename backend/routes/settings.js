@@ -90,7 +90,10 @@ router.put('/', authenticateToken, async (req, res) => {
             
             // Containers
             'container_small', 'container_big',
-            
+
+            // Electronics
+            'tv_small', 'tv_medium', 'tv_large', 'tv_xlarge',
+
             // Free items
             'buckets'
         ];

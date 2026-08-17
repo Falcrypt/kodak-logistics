@@ -1,9 +1,105 @@
 // admin/admin.js - UPGRADED VERSION with DELETE BOOKING & PAYMENT VERIFICATION
 const API_URL = 'https://kodak-logistics-api.onrender.com/api';
-console.log('🚀 Admin JS loaded - Upgraded Version with Payment Verification');
+console.log('Admin JS loaded - Upgraded Version with Payment Verification');
 
 let currentUser = null;
 let sessionCheckInterval = null;
+
+// ========== AVATAR DISPLAY ==========
+// Reflects currentUser.avatar_url into both the top-bar trigger icon and the
+// dropdown header avatar, falling back to initials when there's no picture.
+function renderAvatar(url) {
+  const triggerBtn = document.getElementById('adminUserTrigger');
+  const avatarInitialsEl = document.getElementById('adminAvatarInitials');
+  const removeBtn = document.getElementById('removeAvatarBtn');
+  const nameEl = document.getElementById('adminName');
+  const name = (nameEl?.textContent || currentUser?.username || 'Admin').trim();
+  const initials = name.substring(0, 2).toUpperCase();
+
+  if (url) {
+    if (triggerBtn) triggerBtn.innerHTML = `<img src="${url}" alt="">`;
+    if (avatarInitialsEl) avatarInitialsEl.innerHTML = `<img src="${url}" alt="">`;
+    if (removeBtn) removeBtn.style.display = 'flex';
+  } else {
+    if (triggerBtn) triggerBtn.innerHTML = `<i class="fas fa-user-circle"></i>`;
+    if (avatarInitialsEl) avatarInitialsEl.textContent = initials;
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
+// Reads an image file, downsizes/crops it to a square JPEG so the upload
+// stays small regardless of the source photo's resolution.
+function resizeImageFile(file, maxSize = 256, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Could not read image'));
+      img.onload = () => {
+        const side = Math.min(img.width, img.height);
+        const sx = (img.width - side) / 2;
+        const sy = (img.height - side) / 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = maxSize;
+        canvas.height = maxSize;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, maxSize, maxSize);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ========== ITEM IMAGE LOOKUP ==========
+const ITEM_IMAGES = {
+  duffle_small: '../images/duffle-small.jpg',
+  duffle_big: '../images/duffle-big.jpg',
+  jute_small: '../images/jute-small.jpg',
+  jute_medium: '../images/jute-medium.jpg',
+  jute_big: '../images/jute-big.jpg',
+  travel_small: '../images/travel-small.jpg',
+  travel_medium: '../images/travel-medium.jpg',
+  travel_big: '../images/travel-big.jpg',
+  microwave: '../images/microwave.jpg',
+  fridge_tabletop: '../images/fridge-tabletop.jpg',
+  fridge_doubledoor: '../images/fridge-doubledoor.jpg',
+  fridge_small: '../images/fridge-small.jpg',
+  gas_small: '../images/gas-small.jpg',
+  gas_medium: '../images/gas-medium.jpg',
+  gas_big: '../images/gas-big.jpg',
+  container_small: '../images/container-small.jpg',
+  container_big: '../images/container-big.jpg',
+  tv_small: '../images/smallscreen.jpg',
+  tv_medium: '../images/mediumscreen.jpg',
+  tv_large: '../images/largescreen.jpg',
+  tv_xlarge: '../images/tv.jpg',
+  buckets: '../images/buckets.jpg'
+};
+
+// Turns an items summary like "2x jute_big, 1x travel_medium" into thumbnail
+// images (max 3) plus the original text, for use in booking/return tables.
+function renderItemThumbs(itemsSummary, maxThumbs = 3) {
+  const text = itemsSummary || '';
+  const keys = Array.from(text.matchAll(/\d+x\s*([a-z_]+)/gi)).map(m => m[1]);
+  const images = keys.map(k => ITEM_IMAGES[k]).filter(Boolean);
+
+  if (images.length === 0) {
+    return `<span class="item-text">${escapeHtml(text.substring(0, 30))}</span>`;
+  }
+
+  const shown = images.slice(0, maxThumbs)
+    .map(src => `<img class="item-thumb" src="${src}" alt="" onerror="this.style.display='none'">`)
+    .join('');
+  const extra = images.length > maxThumbs
+    ? `<span class="item-thumb-more">+${images.length - maxThumbs}</span>`
+    : '';
+
+  return `<div class="item-thumb-row">${shown}${extra}</div>
+    <span class="item-text">${escapeHtml(text.substring(0, 40))}</span>`;
+}
 
 // ========== SEARCH & FILTER VARIABLES ==========
 let currentSearchTerm = '';
@@ -35,6 +131,7 @@ async function checkAuth() {
       currentUser = data.user;
       const adminNameEl = document.getElementById('adminName');
       if (adminNameEl) adminNameEl.textContent = currentUser.username || 'Admin';
+      renderAvatar(currentUser.avatar_url);
       startSessionMonitor();
       return true;
     } else {
@@ -107,8 +204,10 @@ if (window.location.pathname.includes('dashboard.html')) {
         loadDashboardData();
         loadAllBookings();
         loadCustomers();
+        setupCustomerSearch();
         loadAllSettings();
         setupNavigation();
+        setupAccountMenu();
         setupEventListeners();
         setupMobileMenu();
       } else {
@@ -176,7 +275,7 @@ function setupMobileMenu() {
 
 // ========== LOAD ALL SETTINGS ==========
 async function loadAllSettings() {
-  console.log('⚙️ Loading settings and pricing...');
+  console.log('Loading settings and pricing...');
   try {
     const token = localStorage.getItem('adminToken');
     const response = await fetch(`${API_URL}/settings`, {
@@ -239,61 +338,186 @@ async function loadAllSettings() {
     if (pContainerSmall) pContainerSmall.value = settings.price_container_small || 29.99;
     if (pContainerBig) pContainerBig.value = settings.price_container_big || 49.99;
     
+    // ===== ELECTRONICS =====
+    const pTvSmall = document.getElementById('priceTvSmall');
+    const pTvMedium = document.getElementById('priceTvMedium');
+    const pTvLarge = document.getElementById('priceTvLarge');
+    const pTvXlarge = document.getElementById('priceTvXlarge');
+    if (pTvSmall) pTvSmall.value = settings.price_tv_small || 39.99;
+    if (pTvMedium) pTvMedium.value = settings.price_tv_medium || 54.99;
+    if (pTvLarge) pTvLarge.value = settings.price_tv_large || 69.99;
+    if (pTvXlarge) pTvXlarge.value = settings.price_tv_xlarge || 89.99;
+
     // ===== FREE ITEMS =====
     const pBuckets = document.getElementById('priceBuckets');
     if (pBuckets) pBuckets.value = settings.price_buckets || 0;
 
-    console.log('✅ Settings and pricing loaded successfully');
+    console.log('Settings and pricing loaded successfully');
   } catch (error) {
     console.error('Failed to load settings:', error);
   }
 }
 
 // ========== NAVIGATION SETUP ==========
+function navigateToSection(sectionId) {
+  document.querySelectorAll('.content-section').forEach(section => {
+    section.classList.remove('active-section');
+  });
+
+  const targetSection = document.getElementById(sectionId + '-section');
+  if (targetSection) {
+    targetSection.classList.add('active-section');
+  }
+
+  document.querySelectorAll('.sidebar-nav a[data-section]').forEach(link => {
+    link.classList.toggle('active', link.dataset.section === sectionId);
+  });
+
+  const titleEl = document.getElementById('pageTitle');
+  if (titleEl) {
+    titleEl.textContent = sectionId === 'dashboard' ? 'Overview' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+  }
+
+  // Load data based on section
+  if (sectionId === 'bookings') {
+    loadAllBookings();
+  } else if (sectionId === 'customers') {
+    loadCustomers();
+    setupCustomerSearch();
+  } else if (sectionId === 'pricing' || sectionId === 'settings') {
+    loadAllSettings();
+  } else if (sectionId === 'returns') {
+    loadReturnRequests();
+    loadReturnStats();
+    setTimeout(() => setupReturnListeners(), 100);
+  } else if (sectionId === 'reviews') {
+    loadReviewsSection();
+    setTimeout(() => setupReviewListeners(), 100);
+  }
+}
+
 function setupNavigation() {
-  console.log('🔧 Setting up navigation...');
-  
   const navLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
-  
+
   navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       e.preventDefault();
-      const sectionId = this.dataset.section;
-      console.log('📌 Navigation clicked:', sectionId);
-      
-      document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active-section');
-      });
-      
-      const targetSection = document.getElementById(sectionId + '-section');
-      if (targetSection) {
-        targetSection.classList.add('active-section');
-        console.log('✅ Section activated:', sectionId + '-section');
+      navigateToSection(this.dataset.section);
+    });
+  });
+}
+
+// ========== ACCOUNT MENU (top-bar avatar) ==========
+function setupAccountMenu() {
+  const trigger = document.getElementById('adminUserTrigger');
+  const dropdown = document.getElementById('adminUserDropdown');
+  if (!trigger || !dropdown) return;
+
+  const nameEl = document.getElementById('adminName');
+  const dropdownName = document.getElementById('adminDropdownName');
+
+  function syncIdentity() {
+    const name = (nameEl?.textContent || currentUser?.username || 'Admin').trim();
+    if (dropdownName) dropdownName.textContent = name;
+    renderAvatar(currentUser?.avatar_url);
+  }
+  syncIdentity();
+  setTimeout(syncIdentity, 500); // adminName is filled in slightly after checkAuth resolves
+
+  // ---- Profile picture upload / remove ----
+  const avatarBtn = document.getElementById('adminAvatarBtn');
+  const avatarFileInput = document.getElementById('avatarFileInput');
+  const removeAvatarBtn = document.getElementById('removeAvatarBtn');
+
+  if (avatarBtn && avatarFileInput) {
+    avatarBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      avatarFileInput.click();
+    });
+
+    avatarFileInput.addEventListener('change', async () => {
+      const file = avatarFileInput.files[0];
+      avatarFileInput.value = '';
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showNotification('Please choose an image file', 'error');
+        return;
       }
-      
-      navLinks.forEach(link => link.classList.remove('active'));
-      this.classList.add('active');
-      
-      const titleEl = document.getElementById('pageTitle');
-      if (titleEl) {
-        titleEl.textContent = sectionId === 'dashboard' ? 'Dashboard' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+      if (file.size > 8 * 1024 * 1024) {
+        showNotification('Image is too large (max 8MB)', 'error');
+        return;
       }
-      
-      // Load data based on section
-      if (sectionId === 'bookings') {
-        loadAllBookings();
-      } else if (sectionId === 'customers') {
-        loadCustomers();
-      } else if (sectionId === 'pricing' || sectionId === 'settings') {
-        loadAllSettings();
-      } else if (sectionId === 'returns') {
-        loadReturnRequests();
-        loadReturnStats();
-        // Setup return listeners after loading the section
-        setTimeout(() => setupReturnListeners(), 100);
+
+      avatarBtn.classList.add('uploading');
+      try {
+        const dataUrl = await resizeImageFile(file);
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`${API_URL}/auth/avatar`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ avatar: dataUrl })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Upload failed');
+
+        currentUser.avatar_url = result.avatar_url;
+        renderAvatar(result.avatar_url);
+        showNotification('Profile picture updated', 'success');
+      } catch (error) {
+        showNotification('Failed to update profile picture: ' + error.message, 'error');
+      } finally {
+        avatarBtn.classList.remove('uploading');
+      }
+    });
+  }
+
+  if (removeAvatarBtn) {
+    removeAvatarBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`${API_URL}/auth/avatar`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Request failed');
+
+        currentUser.avatar_url = null;
+        renderAvatar(null);
+        dropdown.classList.remove('open');
+        showNotification('Profile picture removed', 'success');
+      } catch (error) {
+        showNotification('Failed to remove profile picture: ' + error.message, 'error');
+      }
+    });
+  }
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => dropdown.classList.remove('open'));
+
+  dropdown.querySelectorAll('a[data-section]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      dropdown.classList.remove('open');
+      navigateToSection(link.dataset.section);
+      if (link.dataset.focus) {
+        setTimeout(() => document.getElementById(link.dataset.focus)?.focus(), 150);
       }
     });
   });
+
+  const dropdownLogout = document.getElementById('dropdownLogoutBtn');
+  if (dropdownLogout) {
+    dropdownLogout.addEventListener('click', () => logout());
+  }
 }
 
 // ========== SESSION MANAGEMENT ==========
@@ -346,7 +570,7 @@ async function apiCall(endpoint, options = {}) {
   };
 
   try {
-    console.log(`📡 API Call: ${options.method || 'GET'} ${endpoint}`);
+    console.log(`API Call: ${options.method || 'GET'} ${endpoint}`);
     const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
     
     if (response.status === 401) {
@@ -358,7 +582,7 @@ async function apiCall(endpoint, options = {}) {
     if (!response.ok) throw new Error(data.error || 'Request failed');
     return data;
   } catch (error) {
-    console.error('❌ API call failed:', error);
+    console.error('API call failed:', error);
     throw error;
   }
 }
@@ -374,6 +598,7 @@ async function loadDashboardData() {
     const statsGrid = document.getElementById('statsGrid');
     if (statsGrid) {
       statsGrid.innerHTML = `
+        <div class="stat-card"><i class="fas fa-boxes-stacked stat-icon"></i><div class="stat-info"><h3>Total Bookings</h3><p>${stats.total || 0}</p></div></div>
         <div class="stat-card"><i class="fas fa-calendar-alt stat-icon"></i><div class="stat-info"><h3>Today's Bookings</h3><p>${stats.today || 0}</p></div></div>
         <div class="stat-card"><i class="fas fa-clock stat-icon"></i><div class="stat-info"><h3>Pending</h3><p>${stats.pending || 0}</p></div></div>
         <div class="stat-card"><i class="fas fa-check-circle stat-icon"></i><div class="stat-info"><h3>Confirmed</h3><p>${stats.confirmed || 0}</p></div></div>
@@ -383,8 +608,99 @@ async function loadDashboardData() {
     }
     await loadRecentBookings();
     loadReturnStats();
+    loadSmartStats();
+    loadRevenueTrend();
+    loadPopularItems();
   } catch (error) {
-    console.error('❌ Dashboard load failed:', error);
+    console.error('Dashboard load failed:', error);
+  }
+}
+
+// ========== SMART INSIGHTS ==========
+async function loadSmartStats() {
+  try {
+    const [growth, reviewStats] = await Promise.all([
+      apiCall('/insights/customer-growth'),
+      apiCall('/reviews/stats/summary')
+    ]);
+
+    const grid = document.getElementById('smartStatsGrid');
+    if (!grid) return;
+
+    const avgRating = reviewStats?.average_rating ? reviewStats.average_rating.toFixed(1) : '–';
+
+    grid.innerHTML = `
+      <div class="stat-card"><i class="fas fa-users stat-icon"></i><div class="stat-info"><h3>Total Customers</h3><p>${growth?.total_customers ?? 0}</p><small>${growth?.new_last_30_days ?? 0} new in last 30 days</small></div></div>
+      <div class="stat-card"><i class="fas fa-repeat stat-icon"></i><div class="stat-info"><h3>Repeat Customers</h3><p>${growth?.repeat_customers ?? 0}</p><small>Booked more than once</small></div></div>
+      <div class="stat-card"><i class="fas fa-star stat-icon"></i><div class="stat-info"><h3>Average Rating</h3><p>${avgRating}</p><small>${reviewStats?.total ?? 0} review${reviewStats?.total === 1 ? '' : 's'}</small></div></div>
+    `;
+  } catch (error) {
+    console.error('Failed to load smart stats:', error);
+  }
+}
+
+async function loadRevenueTrend() {
+  try {
+    const data = await apiCall('/insights/revenue-trend?days=30');
+    const wrap = document.getElementById('revenueChart');
+    if (!wrap || !data || data.length === 0) return;
+
+    const svg = wrap.querySelector('svg');
+    const w = 600, h = 160, pad = 8;
+    const max = Math.max(1, ...data.map(d => d.revenue));
+    const stepX = (w - pad * 2) / (data.length - 1);
+
+    const points = data.map((d, i) => {
+      const x = pad + i * stepX;
+      const y = h - pad - (d.revenue / max) * (h - pad * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+
+    const areaPoints = `${pad},${h - pad} ${points} ${w - pad},${h - pad}`;
+
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#cda36a" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#cda36a" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <polygon points="${areaPoints}" fill="url(#revFill)"></polygon>
+      <polyline points="${points}" fill="none" stroke="#cda36a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>
+    `;
+  } catch (error) {
+    console.error('Failed to load revenue trend:', error);
+  }
+}
+
+async function loadPopularItems() {
+  try {
+    const items = await apiCall('/insights/popular-items');
+    const list = document.getElementById('popularItemsList');
+    if (!list) return;
+
+    if (!items || items.length === 0) {
+      list.innerHTML = '<span class="item-text">No booking data yet</span>';
+      return;
+    }
+
+    const max = Math.max(...items.map(i => i.count));
+
+    list.innerHTML = items.map(item => {
+      const img = ITEM_IMAGES[item.key];
+      const pct = Math.round((item.count / max) * 100);
+      return `
+        <div class="popular-item-row">
+          ${img ? `<img class="popular-item-thumb" src="${img}" alt="">` : ''}
+          <div class="popular-item-info">
+            <div class="popular-item-label"><span>${escapeHtml(item.label)}</span><span>${item.count}</span></div>
+            <div class="popular-item-bar-track"><div class="popular-item-bar-fill" style="width:${pct}%"></div></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (error) {
+    console.error('Failed to load popular items:', error);
   }
 }
 
@@ -393,7 +709,7 @@ async function loadRecentBookings() {
     const data = await apiCall('/bookings?limit=5');
     displayRecentBookings(data?.bookings || []);
   } catch (error) {
-    console.error('❌ Failed to load recent bookings:', error);
+    console.error('Failed to load recent bookings:', error);
     displayRecentBookings([]);
   }
 }
@@ -408,33 +724,33 @@ function displayRecentBookings(bookings) {
   tbody.innerHTML = bookings.map(booking => {
     const date = booking.booking_date || booking.date || '';
     const name = booking.customer_name || booking.name || '';
-    const items = (booking.items_summary || booking.items || '').substring(0, 30) + '...';
+    const items = booking.items_summary || booking.items || '';
     const total = booking.total_amount || booking.total || '0';
     const status = booking.status || 'pending';
     const phone = booking.customer_phone || booking.phone || '';
     const id = booking.id || '';
     const ref = booking.booking_ref || '';
     const paymentStatus = booking.payment_status || 'unpaid';
-    
+
     let paymentBadge = '';
     if (paymentStatus === 'pending_verification') {
-      paymentBadge = '<span class="payment-badge pending">🟡 Pending</span>';
+      paymentBadge = '<span class="payment-badge pending">Pending</span>';
     } else if (paymentStatus === 'verified') {
-      paymentBadge = '<span class="payment-badge verified">🟢 Verified</span>';
+      paymentBadge = '<span class="payment-badge verified">Verified</span>';
     } else {
-      paymentBadge = '<span class="payment-badge unpaid">⚪ Unpaid</span>';
+      paymentBadge = '<span class="payment-badge unpaid">Unpaid</span>';
     }
-    
+
     return `<tr>
       <td>${escapeHtml(date)}</td>
       <td>${escapeHtml(name)}</td>
-      <td>${escapeHtml(items)}</td>
+      <td>${renderItemThumbs(items)}</td>
       <td>₵${escapeHtml(total)}</td>
       <td>${paymentBadge}</td>
       <td><span class="status-badge status-${escapeHtml(status)}">${escapeHtml(status)}</span></td>
       <td>
         <button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')"><i class="fab fa-whatsapp"></i></button>
-        <button class="action-btn btn-delete" onclick="deleteSingleBooking(${id}, '${escapeHtml(ref)}')" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 5px;"><i class="fas fa-trash"></i></button>
+        <button class="action-btn btn-delete" onclick="deleteSingleBooking(${id}, '${escapeHtml(ref)}')"><i class="fas fa-trash"></i></button>
        </td>
      </tr>`;
   }).join('');
@@ -443,7 +759,7 @@ function displayRecentBookings(bookings) {
 // ========== LOAD BOOKINGS WITH SEARCH & FILTER ==========
 async function loadFilteredBookings() {
     try {
-        console.log(`🔍 Searching: "${currentSearchTerm}", Filter: ${currentStatusFilter}, Date: ${currentBookingDateFilter}`);
+        console.log(`Searching: "${currentSearchTerm}", Filter: ${currentStatusFilter}, Date: ${currentBookingDateFilter}`);
         
         const params = new URLSearchParams();
         
@@ -484,13 +800,13 @@ async function loadAllBookings() {
 function getPaymentStatusBadge(paymentStatus) {
     switch(paymentStatus) {
         case 'pending_verification':
-            return '<span class="payment-badge pending" style="background: #fff3e0; color: #e67e22; padding: 4px 8px; border-radius: 12px; font-size: 11px;">🟡 Pending Verification</span>';
+            return '<span class="payment-badge pending">Pending Verification</span>';
         case 'verified':
-            return '<span class="payment-badge verified" style="background: #d4edda; color: #28a745; padding: 4px 8px; border-radius: 12px; font-size: 11px;">🟢 Verified</span>';
+            return '<span class="payment-badge verified">Verified</span>';
         case 'rejected':
-            return '<span class="payment-badge rejected" style="background: #f8d7da; color: #dc3545; padding: 4px 8px; border-radius: 12px; font-size: 11px;">🔴 Rejected</span>';
+            return '<span class="payment-badge rejected">Rejected</span>';
         default:
-            return '<span class="payment-badge unpaid" style="background: #e9ecef; color: #6c757d; padding: 4px 8px; border-radius: 12px; font-size: 11px;">⚪ Unpaid</span>';
+            return '<span class="payment-badge unpaid">Unpaid</span>';
     }
 }
 
@@ -515,18 +831,17 @@ function displayAllBookings(bookings) {
     const paymentStatus = booking.payment_status || 'unpaid';
     const transactionId = booking.transaction_id || '';
     
-    const paymentMethodIcon = paymentMethod === 'momo' ? '📱' : '💵';
     const paymentMethodText = paymentMethod === 'momo' ? 'MoMo' : 'Pickup';
-    
+
     const showVerifyButton = paymentMethod === 'momo' && paymentStatus === 'pending_verification';
-    
+
     return `<tr>
       <td>${escapeHtml(id)}</td>
       <td>${escapeHtml(ref)}</td>
       <td>${escapeHtml(name)}</td>
       <td>${escapeHtml(phone)}</td>
       <td>${escapeHtml(date)}</td>
-      <td>${escapeHtml(items.substring(0, 20))}</td>
+      <td>${renderItemThumbs(items)}</td>
       <td>₵${escapeHtml(total)}</td>
       <td>
         <select class="status-select" onchange="updateBookingStatus(${id}, this.value)">
@@ -536,13 +851,13 @@ function displayAllBookings(bookings) {
         </select>
        </td>
       <td>
-        <span title="${paymentMethodText}">${paymentMethodIcon}</span> ${getPaymentStatusBadge(paymentStatus)}
+        <span class="item-text">${paymentMethodText}</span> ${getPaymentStatusBadge(paymentStatus)}
         ${transactionId ? `<br><small style="font-size: 10px;">TX: ${escapeHtml(transactionId)}</small>` : ''}
        </td>
       <td>
-        ${showVerifyButton ? `<button class="action-btn btn-verify" onclick="verifyPayment(${id}, '${escapeHtml(booking.customer_email)}', '${escapeHtml(ref)}', ${total})" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;"><i class="fas fa-check-circle"></i> Verify</button>` : ''}
+        ${showVerifyButton ? `<button class="action-btn btn-verify" onclick="verifyPayment(${id}, '${escapeHtml(booking.customer_email)}', '${escapeHtml(ref)}', ${total})"><i class="fas fa-check-circle"></i> Verify</button>` : ''}
         <button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(phone)}')" style="margin-right: 5px;"><i class="fab fa-whatsapp"></i></button>
-        <button class="action-btn btn-delete" onclick="deleteSingleBooking(${id}, '${escapeHtml(ref)}')" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"><i class="fas fa-trash"></i> Delete</button>
+        <button class="action-btn btn-delete" onclick="deleteSingleBooking(${id}, '${escapeHtml(ref)}')"><i class="fas fa-trash"></i> Delete</button>
        </td>
      </tr>`;
   }).join('');
@@ -550,7 +865,7 @@ function displayAllBookings(bookings) {
 
 // ========== VERIFY PAYMENT (NEW) ==========
 window.verifyPayment = async function(bookingId, customerEmail, bookingRef, amount) {
-  if (!confirm(`✅ Verify payment for booking ${bookingRef}?\n\nAmount: GH₵${amount}\nCustomer: ${customerEmail}\n\nMake sure you have confirmed the money in your mobile money statement before verifying.`)) {
+  if (!confirm(`Verify payment for booking ${bookingRef}?\n\nAmount: GH₵${amount}\nCustomer: ${customerEmail}\n\nMake sure you have confirmed the money in your mobile money statement before verifying.`)) {
     return;
   }
   
@@ -574,7 +889,7 @@ window.verifyPayment = async function(bookingId, customerEmail, bookingRef, amou
     }
     
     const result = await response.json();
-    showNotification(`✅ Payment verified for ${bookingRef}! Email sent to customer.`, 'success');
+    showNotification(`Payment verified for ${bookingRef}! Email sent to customer.`, 'success');
     
     // Refresh the current view
     await loadFilteredBookings();
@@ -582,17 +897,17 @@ window.verifyPayment = async function(bookingId, customerEmail, bookingRef, amou
     
   } catch (error) {
     console.error('Error verifying payment:', error);
-    showNotification(`❌ Failed to verify payment: ${error.message}`, 'error');
+    showNotification(`Failed to verify payment: ${error.message}`, 'error');
   }
 };
 
 // ========== DELETE SINGLE BOOKING ==========
 window.deleteSingleBooking = async function(bookingId, bookingRef) {
-  if (!confirm(`⚠️ Are you sure you want to delete booking ${bookingRef}?\n\nThis action CANNOT be undone!`)) {
+  if (!confirm(`Are you sure you want to delete booking ${bookingRef}?\n\nThis action CANNOT be undone!`)) {
     return;
   }
   
-  if (!confirm(`🔴 FINAL WARNING: Are you ABSOLUTELY sure you want to delete ${bookingRef}?\n\nThis will permanently remove this booking from the database.`)) {
+  if (!confirm(`FINAL WARNING: Are you ABSOLUTELY sure you want to delete ${bookingRef}?\n\nThis will permanently remove this booking from the database.`)) {
     return;
   }
   
@@ -613,7 +928,7 @@ window.deleteSingleBooking = async function(bookingId, bookingRef) {
     
     const result = await response.json();
     
-    showNotification(`✅ Booking ${result.booking_ref} has been deleted successfully!`, 'success');
+    showNotification(`Booking ${result.booking_ref} has been deleted successfully!`, 'success');
     await loadFilteredBookings();
     loadDashboardData();
     
@@ -623,7 +938,7 @@ window.deleteSingleBooking = async function(bookingId, bookingRef) {
     
   } catch (error) {
     console.error('Error deleting booking:', error);
-    showNotification(`❌ Failed to delete booking: ${error.message}`, 'error');
+    showNotification(`Failed to delete booking: ${error.message}`, 'error');
   }
 };
 
@@ -640,36 +955,92 @@ async function updateBookingStatus(bookingId, status) {
 }
 
 // ========== CUSTOMERS ==========
+let allCustomers = [];
+
 async function loadCustomers() {
   try {
     const data = await apiCall('/customers');
-    displayCustomers(data || []);
+    allCustomers = data || [];
+    displayCustomers(allCustomers);
   } catch (error) {
     console.error('Failed to load customers:', error);
     displayCustomers([]);
   }
 }
 
+function customerInitials(name) {
+  const parts = (name || '?').trim().split(/\s+/);
+  const initials = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0].substring(0, 2);
+  return initials.toUpperCase();
+}
+
 function displayCustomers(customers) {
   const tbody = document.getElementById('customersBody');
   if (!tbody) return;
-  
+
   if (!customers || customers.length === 0) {
     tbody.innerHTML = '<tr><td colspan="6">No customers found</td></tr>';
     return;
   }
-  
+
   tbody.innerHTML = customers.map(customer => `
     <tr>
-      <td><a href="#" onclick="viewCustomerDetails('${escapeHtml(customer.phone)}'); return false;" style="color: #ffb347; text-decoration: underline; cursor: pointer;">${escapeHtml(customer.name || '')}</a></td>
+      <td>
+        <div class="customer-cell">
+          <div class="customer-avatar">${customerInitials(customer.name)}</div>
+          <a href="#" class="customer-name-link" onclick="viewCustomerDetails('${escapeHtml(customer.phone)}'); return false;">${escapeHtml(customer.name || 'Unknown')}</a>
+        </div>
+      </td>
       <td>${escapeHtml(customer.phone || '')}</td>
       <td>${escapeHtml(customer.email || '')}</td>
       <td>${escapeHtml(customer.total_bookings || 0)}</td>
       <td>${escapeHtml(customer.last_booking || '')}</td>
-      <td><button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(customer.phone)}')"><i class="fab fa-whatsapp"></i></button></td>
+      <td>
+        <button class="action-btn btn-whatsapp" onclick="contactCustomer('${escapeHtml(customer.phone)}')" title="Message on WhatsApp"><i class="fab fa-whatsapp"></i></button>
+        <button class="action-btn" style="background: var(--info-soft); color: var(--info);" onclick="viewCustomerDetails('${escapeHtml(customer.phone)}')" title="View booking history"><i class="fas fa-eye"></i></button>
+        <button class="action-btn btn-delete" onclick="deleteCustomer('${escapeHtml(customer.phone)}', '${escapeHtml((customer.name || 'this customer').replace(/'/g, "\\'"))}')" title="Delete customer and all their data"><i class="fas fa-trash"></i></button>
+      </td>
     </tr>
   `).join('');
 }
+
+function setupCustomerSearch() {
+  const searchInput = document.getElementById('customerSearch');
+  if (!searchInput || searchInput.dataset.bound) return;
+  searchInput.dataset.bound = 'true';
+  searchInput.addEventListener('input', function() {
+    const term = this.value.trim().toLowerCase();
+    if (!term) {
+      displayCustomers(allCustomers);
+      return;
+    }
+    const filtered = allCustomers.filter(c =>
+      (c.name || '').toLowerCase().includes(term) ||
+      (c.phone || '').toLowerCase().includes(term) ||
+      (c.email || '').toLowerCase().includes(term)
+    );
+    displayCustomers(filtered);
+  });
+}
+
+window.deleteCustomer = async function(phone, name) {
+  if (!confirm(`Delete ${name} permanently?\n\nThis removes ALL their bookings, return requests, and reviews. This cannot be undone.`)) {
+    return;
+  }
+  if (!confirm(`FINAL WARNING: Are you absolutely sure you want to permanently delete ${name} and every record tied to them?`)) {
+    return;
+  }
+
+  try {
+    const result = await apiCall(`/customers/${encodeURIComponent(phone)}`, { method: 'DELETE' });
+    if (result?.success) {
+      showNotification(`${name} and all associated data have been deleted.`, 'success');
+      loadCustomers();
+    }
+  } catch (error) {
+    showNotification('Failed to delete customer: ' + error.message, 'error');
+  }
+};
 
 // ========== CUSTOMER DETAILS MODAL ==========
 window.viewCustomerDetails = async function(phone) {
@@ -688,7 +1059,7 @@ window.viewCustomerDetails = async function(phone) {
     }
 
     document.getElementById('modalCustomerName').textContent = customerBookings[0].customer_name || 'Customer';
-    document.getElementById('modalCustomerPhone').textContent = `📞 ${phone} | 📧 ${customerBookings[0].customer_email || ''}`;
+    document.getElementById('modalCustomerPhone').textContent = `Phone: ${phone}  |  Email: ${customerBookings[0].customer_email || ''}`;
 
     const tableBody = document.getElementById('modalBookingsTableBody');
     tableBody.innerHTML = '';
@@ -696,11 +1067,11 @@ window.viewCustomerDetails = async function(phone) {
     customerBookings.forEach(booking => {
       const row = tableBody.insertRow();
       row.innerHTML = `
-        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_ref || 'N/A')}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.booking_date || 'N/A')}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(booking.items_summary || 'N/A')}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">₵${escapeHtml(booking.total_amount || '0')}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">
+        <td style="padding: 10px; border-bottom: 1px solid var(--glass-border);">${escapeHtml(booking.booking_ref || 'N/A')}</td>
+        <td style="padding: 10px; border-bottom: 1px solid var(--glass-border);">${escapeHtml(booking.booking_date || 'N/A')}</td>
+        <td style="padding: 10px; border-bottom: 1px solid var(--glass-border);">${escapeHtml(booking.items_summary || 'N/A')}</td>
+        <td style="padding: 10px; border-bottom: 1px solid var(--glass-border);">₵${escapeHtml(booking.total_amount || '0')}</td>
+        <td style="padding: 10px; border-bottom: 1px solid var(--glass-border);">
           <span class="status-badge status-${escapeHtml(booking.status)}">${escapeHtml(booking.status)}</span>
         </td>
       `;
@@ -719,8 +1090,8 @@ window.closeCustomerModal = function() {
 
 // ========== RESET ALL BOOKINGS ==========
 window.resetAllBookings = async function() {
-  if (!confirm('⚠️ WARNING: This will delete ALL bookings permanently!')) return;
-  if (!confirm('⚠️ LAST WARNING: This action CANNOT be undone!')) return;
+  if (!confirm('WARNING: This will delete ALL bookings permanently!')) return;
+  if (!confirm('LAST WARNING: This action CANNOT be undone!')) return;
   
   const userInput = prompt('Type "RESET" to confirm:');
   if (userInput !== 'RESET') {
@@ -740,14 +1111,14 @@ window.resetAllBookings = async function() {
     const result = await response.json();
 
     if (result.success) {
-      alert('✅ All bookings deleted successfully!');
+      alert('All bookings deleted successfully!');
       location.reload();
     } else {
-      alert('❌ Failed: ' + (result.error || 'Unknown error'));
+      alert('Failed: ' + (result.error || 'Unknown error'));
     }
   } catch (error) {
     console.error('Reset error:', error);
-    alert('❌ Failed to reset bookings');
+    alert('Failed to reset bookings');
   }
 };
 
@@ -776,10 +1147,14 @@ window.savePricing = async function() {
     price_gas_big: getVal('priceGasBig', 39.99),
     price_container_small: getVal('priceContainerSmall', 29.99),
     price_container_big: getVal('priceContainerBig', 49.99),
+    price_tv_small: getVal('priceTvSmall', 39.99),
+    price_tv_medium: getVal('priceTvMedium', 54.99),
+    price_tv_large: getVal('priceTvLarge', 69.99),
+    price_tv_xlarge: getVal('priceTvXlarge', 89.99),
     price_buckets: getVal('priceBuckets', 0)
   };
 
-  console.log('📤 Saving prices:', prices);
+  console.log('Saving prices:', prices);
 
   const saveButton = document.querySelector('#pricing-section .btn-save-modern');
   if (saveButton) {
@@ -790,14 +1165,14 @@ window.savePricing = async function() {
   try {
     const result = await apiCall('/settings', { method: 'PUT', body: JSON.stringify(prices) });
     if (result?.success) {
-      showMessage('pricingMessage', '✅ All prices saved successfully!', 'success');
+      showMessage('pricingMessage', 'All prices saved successfully!', 'success');
       await loadAllSettings();
     } else {
       throw new Error(result?.error || 'Save failed');
     }
   } catch (error) {
     console.error('Save error:', error);
-    showMessage('pricingMessage', `❌ Error: ${error.message}`, 'error');
+    showMessage('pricingMessage', `Error: ${error.message}`, 'error');
   } finally {
     if (saveButton) {
       saveButton.disabled = false;
@@ -1047,16 +1422,152 @@ function setupDateFilters() {
     }
 }
 
-// ========== GLOBAL EXPORTS ==========
-window.showSection = function(sectionId) {
-  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active-section'));
-  const target = document.getElementById(sectionId + '-section');
-  if (target) target.classList.add('active-section');
-  document.getElementById('pageTitle').textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-  if (sectionId === 'bookings') loadAllBookings();
-  if (sectionId === 'customers') loadCustomers();
-  if (sectionId === 'pricing' || sectionId === 'settings') loadAllSettings();
+// ========== REVIEWS MANAGEMENT ==========
+let currentReviewSearch = '';
+let currentReviewStatusFilter = 'all';
+let reviewSearchTimeout = null;
+
+function starsHtml(rating) {
+  const full = Math.round(rating);
+  let out = '';
+  for (let i = 1; i <= 5; i++) {
+    out += i <= full ? '★' : '<span class="dim">★</span>';
+  }
+  return out;
+}
+
+async function loadReviewsSection() {
+  loadReviewsSummary();
+  loadReviewsList();
+}
+
+async function loadReviewsSummary() {
+  try {
+    const stats = await apiCall('/reviews/stats/summary');
+    if (!stats) return;
+
+    document.getElementById('reviewsAvgNumber').textContent = stats.total > 0 ? stats.average_rating.toFixed(1) : '–';
+    document.getElementById('reviewsAvgStars').innerHTML = starsHtml(stats.average_rating || 0);
+    document.getElementById('reviewsTotalCount').textContent = stats.total > 0
+      ? `${stats.total} review${stats.total === 1 ? '' : 's'} · ${stats.published} published`
+      : 'No reviews yet';
+
+    const breakdown = document.getElementById('reviewsBreakdown');
+    if (breakdown) {
+      breakdown.innerHTML = [5, 4, 3, 2, 1].map(n => {
+        const count = stats.breakdown[n] || 0;
+        const pct = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
+        return `
+          <div class="rating-bar-row">
+            <span>${n} star</span>
+            <div class="rating-bar-track"><div class="rating-bar-fill" style="width:${pct}%"></div></div>
+            <span>${count}</span>
+          </div>
+        `;
+      }).join('');
+    }
+  } catch (error) {
+    console.error('Failed to load review summary:', error);
+  }
+}
+
+async function loadReviewsList() {
+  try {
+    const params = new URLSearchParams();
+    if (currentReviewStatusFilter !== 'all') params.append('status', currentReviewStatusFilter);
+    if (currentReviewSearch) params.append('search', currentReviewSearch);
+
+    const url = `/reviews${params.toString() ? '?' + params.toString() : ''}`;
+    const reviews = await apiCall(url);
+    displayReviews(reviews || []);
+  } catch (error) {
+    console.error('Failed to load reviews:', error);
+    displayReviews([]);
+  }
+}
+
+function displayReviews(reviews) {
+  const list = document.getElementById('reviewsList');
+  if (!list) return;
+
+  if (!reviews || reviews.length === 0) {
+    list.innerHTML = '<div class="insight-panel"><p class="item-text">No reviews found.</p></div>';
+    return;
+  }
+
+  list.innerHTML = reviews.map(review => {
+    const date = new Date(review.created_at).toLocaleDateString();
+    const isPublished = review.status === 'published';
+    return `
+      <div class="review-card">
+        <div class="review-card-top">
+          <div>
+            <div class="review-card-name">${escapeHtml(review.customer_name)}</div>
+            <div class="review-card-meta">${escapeHtml(review.booking_ref)} &middot; ${date}</div>
+          </div>
+          <span class="stars">${starsHtml(review.rating)}</span>
+        </div>
+        ${review.comment ? `<div class="review-card-comment">${escapeHtml(review.comment)}</div>` : ''}
+        <div class="review-card-actions">
+          <span class="status-badge ${isPublished ? 'status-confirmed' : 'status-pending'}">${isPublished ? 'Published' : 'Hidden'}</span>
+          <button class="action-btn" style="background: var(--info-soft); color: var(--info);" onclick="toggleReviewStatus(${review.id}, '${isPublished ? 'hidden' : 'published'}')">
+            <i class="fas fa-eye${isPublished ? '-slash' : ''}"></i> ${isPublished ? 'Hide' : 'Publish'}
+          </button>
+          <button class="action-btn btn-delete" onclick="deleteReview(${review.id})"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.toggleReviewStatus = async function(id, status) {
+  try {
+    await apiCall(`/reviews/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) });
+    showNotification(`Review ${status}`, 'success');
+    loadReviewsList();
+    loadReviewsSummary();
+  } catch (error) {
+    showNotification('Failed to update review: ' + error.message, 'error');
+  }
 };
+
+window.deleteReview = async function(id) {
+  if (!confirm('Delete this review permanently?')) return;
+  try {
+    await apiCall(`/reviews/${id}`, { method: 'DELETE' });
+    showNotification('Review deleted', 'success');
+    loadReviewsList();
+    loadReviewsSummary();
+  } catch (error) {
+    showNotification('Failed to delete review: ' + error.message, 'error');
+  }
+};
+
+function setupReviewListeners() {
+  const searchInput = document.getElementById('reviewSearch');
+  const statusFilter = document.getElementById('reviewStatusFilter');
+
+  if (searchInput && !searchInput.dataset.bound) {
+    searchInput.dataset.bound = 'true';
+    searchInput.addEventListener('input', function() {
+      clearTimeout(reviewSearchTimeout);
+      reviewSearchTimeout = setTimeout(() => {
+        currentReviewSearch = this.value;
+        loadReviewsList();
+      }, 400);
+    });
+  }
+
+  if (statusFilter && !statusFilter.dataset.bound) {
+    statusFilter.dataset.bound = 'true';
+    statusFilter.addEventListener('change', function() {
+      currentReviewStatusFilter = this.value;
+      loadReviewsList();
+    });
+  }
+}
+
+// ========== GLOBAL EXPORTS ==========
 
 // ========== RETURN REQUESTS MANAGEMENT ==========
 
@@ -1094,36 +1605,36 @@ function displayReturnRequests(requests) {
         const statusClass = getReturnStatusClass(request.status);
         const statusText = getReturnStatusText(request.status);
         const returnDate = new Date(request.return_date).toLocaleDateString();
-        const paymentMethod = request.payment_method === 'momo' ? '📱 MoMo' : '💵 On Delivery';
+        const paymentMethod = request.payment_method === 'momo' ? 'MoMo' : 'On Delivery';
         
         let actionButtons = '';
         
         if (request.status === 'pending') {
             actionButtons = `
-                <button class="action-btn btn-confirm" onclick="updateReturnStatus(${request.id}, 'confirmed')" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-right:5px;">
+                <button class="action-btn btn-confirm" onclick="updateReturnStatus(${request.id}, 'confirmed')" style="background:var(--success-soft); color:var(--success);">
                     <i class="fas fa-check"></i> Confirm
                 </button>
-                <button class="action-btn btn-cancel" onclick="updateReturnStatus(${request.id}, 'cancelled')" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                <button class="action-btn btn-cancel" onclick="updateReturnStatus(${request.id}, 'cancelled')" style="background:var(--danger-soft); color:var(--danger);">
                     <i class="fas fa-times"></i> Cancel
                 </button>
             `;
         } else if (request.status === 'confirmed') {
             actionButtons = `
-                <button class="action-btn btn-complete" onclick="updateReturnStatus(${request.id}, 'completed')" style="background:#17a2b8; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                <button class="action-btn btn-complete" onclick="updateReturnStatus(${request.id}, 'completed')" style="background:var(--info-soft); color:var(--info);">
                     <i class="fas fa-check-double"></i> Complete
                 </button>
-                <button class="action-btn btn-whatsapp" onclick="contactCustomer('${request.customer_phone}')" style="background:#25D366; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-left:5px;">
+                <button class="action-btn btn-whatsapp" onclick="contactCustomer('${request.customer_phone}')">
                     <i class="fab fa-whatsapp"></i>
                 </button>
             `;
         } else {
             actionButtons = `
-                <button class="action-btn btn-view" onclick="viewReturnDetails(${request.id})" style="background:#ffb347; color:#8b0000; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                <button class="action-btn btn-view" onclick="viewReturnDetails(${request.id})" style="background:var(--gold-soft); color:var(--gold-dark);">
                     <i class="fas fa-eye"></i> View
                 </button>
             `;
         }
-        
+
         return `
             <tr>
                 <td>${escapeHtml(request.request_ref || 'N/A')}</td>
@@ -1131,7 +1642,7 @@ function displayReturnRequests(requests) {
                 <td>${escapeHtml(request.customer_name || 'N/A')}</td>
                 <td>${escapeHtml(request.customer_phone || 'N/A')}</td>
                 <td>${returnDate}</td>
-                <td>${escapeHtml(request.items_summary?.substring(0, 30) || 'N/A')}${request.items_summary?.length > 30 ? '...' : ''}</td>
+                <td>${renderItemThumbs(request.items_summary || '')}</td>
                 <td>₵${parseFloat(request.delivery_fee).toFixed(2)}</td>
                 <td>${paymentMethod}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
@@ -1152,14 +1663,14 @@ function getReturnStatusClass(status) {
     }
 }
 
-// Get status text with emoji
+// Get status text
 function getReturnStatusText(status) {
     switch(status) {
-        case 'pending': return '🟡 Pending';
-        case 'confirmed': return '🟢 Confirmed';
-        case 'completed': return '✅ Completed';
-        case 'cancelled': return '❌ Cancelled';
-        default: return '🟡 Pending';
+        case 'pending': return 'Pending';
+        case 'confirmed': return 'Confirmed';
+        case 'completed': return 'Completed';
+        case 'cancelled': return 'Cancelled';
+        default: return 'Pending';
     }
 }
 
@@ -1223,7 +1734,7 @@ window.viewReturnDetails = async function(requestId) {
         const returnDate = new Date(request.return_date).toLocaleDateString();
         
         alert(`
-📋 RETURN REQUEST DETAILS
+RETURN REQUEST DETAILS
 
 Request Ref: ${request.request_ref}
 Booking Ref: ${request.booking_ref}
@@ -1231,14 +1742,14 @@ Customer: ${request.customer_name}
 Phone: ${request.customer_phone}
 Email: ${request.customer_email}
 
-📍 Return Details:
+Return Details:
 Date: ${returnDate}
 Time: ${request.return_time}
 Location: ${request.original_hostel}
 
-📦 Items: ${request.items_summary}
+Items: ${request.items_summary}
 
-💰 Payment: ${request.payment_method === 'momo' ? 'Mobile Money' : 'Pay on Delivery'}
+Payment: ${request.payment_method === 'momo' ? 'Mobile Money' : 'Pay on Delivery'}
 Fee: ₵${request.delivery_fee}
 
 Status: ${request.status}

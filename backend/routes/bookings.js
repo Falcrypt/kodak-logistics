@@ -151,6 +151,7 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/stats', authenticateToken, async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
+        const totalResult = await db.getOne('SELECT COUNT(*) as count FROM bookings');
         const todayResult = await db.getOne('SELECT COUNT(*) as count FROM bookings WHERE DATE(booking_date) = $1', [today]);
         const pendingResult = await db.getOne("SELECT COUNT(*) as count FROM bookings WHERE status = 'pending'");
         const confirmedResult = await db.getOne("SELECT COUNT(*) as count FROM bookings WHERE status = 'confirmed'");
@@ -162,6 +163,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         const verifiedPaymentResult = await db.getOne("SELECT SUM(total_amount) as total FROM bookings WHERE payment_status = 'verified'");
         
         res.json({
+            total: totalResult?.count || 0,
             today: todayResult?.count || 0,
             pending: pendingResult?.count || 0,
             confirmed: confirmedResult?.count || 0,

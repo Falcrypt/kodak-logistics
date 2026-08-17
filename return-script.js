@@ -14,7 +14,7 @@ const historySection = document.getElementById('historySection');
 
 // ========== INITIALIZATION ==========
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Return Items Page Loaded');
+    console.log('Return Items Page Loaded');
     
     // Setup mobile menu
     setupMobileMenu();
@@ -194,7 +194,7 @@ function setupCopyButton() {
             try {
                 await navigator.clipboard.writeText(momoNumber);
                 const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
                 setTimeout(() => {
                     copyBtn.innerHTML = originalText;
                 }, 2000);
@@ -215,10 +215,10 @@ async function loadDailyLimit() {
         const limitNotice = document.getElementById('dailyLimitNotice');
         if (limitNotice) {
             if (limit.remaining <= 10) {
-                limitNotice.innerHTML = `⚠️ Only ${limit.remaining} slots remaining today! Book quickly.`;
+                limitNotice.innerHTML = `<i class="fas fa-triangle-exclamation"></i> Only ${limit.remaining} slots remaining today! Book quickly.`;
                 limitNotice.className = 'limit-notice warning';
             } else {
-                limitNotice.innerHTML = `📊 Today's remaining slots: ${limit.remaining}/${limit.limit}`;
+                limitNotice.innerHTML = `<i class="fas fa-chart-simple"></i> Today's remaining slots: ${limit.remaining}/${limit.limit}`;
                 limitNotice.className = 'limit-notice';
             }
         }
@@ -298,7 +298,7 @@ async function submitReturnRequest(event) {
             const successMessageDiv = document.getElementById('successMessageContent');
             if (successMessageDiv) {
                 successMessageDiv.innerHTML = `
-                    <p><strong>Status:</strong> 🟡 Pending Admin Approval</p>
+                    <p><strong>Status:</strong> Pending Admin Approval</p>
                     <p>You will receive an email once admin confirms your return.</p>
                 `;
             }
@@ -351,10 +351,10 @@ async function showReturnHistory() {
             let statusText = req.status;
             
             switch(req.status) {
-                case 'pending': statusClass = 'status-pending'; statusText = '🟡 Pending'; break;
-                case 'confirmed': statusClass = 'status-confirmed'; statusText = '🟢 Confirmed'; break;
-                case 'completed': statusClass = 'status-completed'; statusText = '✅ Completed'; break;
-                case 'cancelled': statusClass = 'status-cancelled'; statusText = '❌ Cancelled'; break;
+                case 'pending': statusClass = 'status-pending'; statusText = 'Pending'; break;
+                case 'confirmed': statusClass = 'status-confirmed'; statusText = 'Confirmed'; break;
+                case 'completed': statusClass = 'status-completed'; statusText = 'Completed'; break;
+                case 'cancelled': statusClass = 'status-cancelled'; statusText = 'Cancelled'; break;
             }
             
             const returnDate = new Date(req.return_date).toLocaleDateString();

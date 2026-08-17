@@ -50,7 +50,8 @@ router.post('/login', loginLimiter, async (req, res) => {
             token: token,
             user: {
                 id: admin.id,
-                username: admin.username
+                username: admin.username,
+                avatar_url: admin.avatar_url || null
             }
         });
         
@@ -61,11 +62,53 @@ router.post('/login', loginLimiter, async (req, res) => {
 });
 
 // GET /api/auth/verify - Verify token is valid
-router.get('/verify', authenticateToken, (req, res) => {
-    res.json({ 
-        valid: true, 
-        user: req.user 
-    });
+router.get('/verify', authenticateToken, async (req, res) => {
+    try {
+        const admin = await db.getOne('SELECT id, username, avatar_url FROM admin_users WHERE id = $1', [req.user.id]);
+        res.json({
+            valid: true,
+            user: admin || req.user
+        });
+    } catch (error) {
+        res.json({ valid: true, user: req.user });
+    }
+});
+
+// PUT /api/auth/avatar - Upload/update the logged-in admin's profile picture
+// Stored directly in Postgres as a data URL (small, resized client-side)
+// rather than on disk, since Render's free-tier filesystem is wiped on
+// every redeploy/restart and would lose any uploaded file.
+router.put('/avatar', authenticateToken, async (req, res) => {
+    try {
+        const { avatar } = req.body;
+
+        if (!avatar || typeof avatar !== 'string' || !avatar.startsWith('data:image/')) {
+            return res.status(400).json({ error: 'A valid image data URL is required' });
+        }
+
+        // ~1.5MB base64 ceiling — client resizes images well below this,
+        // this is just a backstop against abuse.
+        if (avatar.length > 1_500_000) {
+            return res.status(413).json({ error: 'Image is too large' });
+        }
+
+        await db.update('UPDATE admin_users SET avatar_url = $1 WHERE id = $2', [avatar, req.user.id]);
+        res.json({ success: true, avatar_url: avatar });
+    } catch (error) {
+        console.error('❌ Avatar upload error:', error);
+        res.status(500).json({ error: 'Failed to save profile picture' });
+    }
+});
+
+// DELETE /api/auth/avatar - Remove the logged-in admin's profile picture
+router.delete('/avatar', authenticateToken, async (req, res) => {
+    try {
+        await db.update('UPDATE admin_users SET avatar_url = NULL WHERE id = $1', [req.user.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('❌ Avatar delete error:', error);
+        res.status(500).json({ error: 'Failed to remove profile picture' });
+    }
 });
 
 // GET /api/auth/test - Simple test endpoint

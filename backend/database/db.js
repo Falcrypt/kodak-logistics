@@ -254,6 +254,57 @@ async function ensureReturnTables() {
     }
 }
 
+// ========== AUTO-CREATE ADMIN AVATAR COLUMN ==========
+async function ensureAdminAvatarColumn() {
+    try {
+        console.log('🔧 Checking/Adding avatar column to admin_users table...');
+        await query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                    WHERE table_name='admin_users' AND column_name='avatar_url') THEN
+                    ALTER TABLE admin_users ADD COLUMN avatar_url TEXT;
+                    RAISE NOTICE 'Added avatar_url column';
+                END IF;
+            END $$;
+        `);
+        console.log('✅ Admin avatar column verified/added successfully!');
+    } catch (error) {
+        console.log('⚠️ Note: Could not add avatar column:', error.message);
+    }
+}
+
+// Add this function to automatically create the reviews table
+async function ensureReviewsTable() {
+    try {
+        console.log('🔧 Creating reviews table if not exists...');
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS reviews (
+                id SERIAL PRIMARY KEY,
+                booking_id INTEGER REFERENCES bookings(id),
+                booking_ref VARCHAR(20) UNIQUE NOT NULL,
+                customer_name VARCHAR(100) NOT NULL,
+                customer_email VARCHAR(100),
+                rating SMALLINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+                comment TEXT,
+                status VARCHAR(20) DEFAULT 'published',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ reviews table ready');
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_reviews_booking_ref ON reviews(booking_ref);
+            CREATE INDEX IF NOT EXISTS idx_reviews_status ON reviews(status);
+        `);
+        console.log('✅ Reviews table index created');
+
+    } catch (error) {
+        console.error('❌ Error creating reviews table:', error.message);
+    }
+}
+
 // ========== EXPORT ALL FUNCTIONS ==========
 module.exports = {
     testConnection,
@@ -263,6 +314,8 @@ module.exports = {
     update,
     tableExists,
     ensurePaymentColumns,
-    ensureReturnTables  // ADD THIS LINE
+    ensureReturnTables,  // ADD THIS LINE
+    ensureReviewsTable,
+    ensureAdminAvatarColumn
 };
 

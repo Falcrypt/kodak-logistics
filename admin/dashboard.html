@@ -18,13 +18,20 @@
         <h2>KODAK<span>Admin</span></h2>
       </div>
       <nav class="sidebar-nav">
-        <a href="#dashboard" class="active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <span class="nav-group-label">General</span>
+        <a href="#dashboard" class="active" data-section="dashboard"><i class="fas fa-chart-pie"></i> Overview</a>
+
+        <span class="nav-group-label">Operations</span>
         <a href="#bookings" data-section="bookings"><i class="fas fa-calendar-check"></i> Bookings</a>
         <a href="#returns" data-section="returns"><i class="fas fa-undo-alt"></i> Returns</a>
+        <a href="#reviews" data-section="reviews"><i class="fas fa-star"></i> Reviews</a>
         <a href="#customers" data-section="customers"><i class="fas fa-users"></i> Customers</a>
+
+        <span class="nav-group-label">Business</span>
         <a href="#pricing" data-section="pricing"><i class="fas fa-tag"></i> Pricing</a>
         <a href="#settings" data-section="settings"><i class="fas fa-cog"></i> Settings</a>
-        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+
+        <a href="#" id="logoutBtn" style="margin-top: 14px; border-top: 1px solid var(--glass-border); padding-top: 16px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </nav>
     </aside>
     
@@ -34,32 +41,69 @@
         <button id="mobileMenuToggle" class="mobile-menu-toggle">
           <i class="fas fa-bars"></i>
         </button>
-        <h1 id="pageTitle">Dashboard</h1>
-        <div class="admin-user">
+        <h1 id="pageTitle">Overview</h1>
+        <div class="admin-user" id="adminUserMenu">
           <span>Welcome, <span id="adminName"></span></span>
-          <i class="fas fa-user-circle"></i>
+          <button type="button" class="admin-user-trigger" id="adminUserTrigger" aria-label="Account menu">
+            <i class="fas fa-user-circle"></i>
+          </button>
+          <div class="admin-user-dropdown" id="adminUserDropdown">
+            <div class="admin-user-dropdown-header">
+              <button type="button" class="admin-user-avatar-btn" id="adminAvatarBtn" aria-label="Change profile picture">
+                <div class="admin-user-avatar" id="adminAvatarInitials">A</div>
+                <span class="admin-user-avatar-edit"><i class="fas fa-camera"></i></span>
+              </button>
+              <div>
+                <div class="admin-user-dropdown-name" id="adminDropdownName">admin</div>
+                <div class="admin-user-dropdown-role">Administrator</div>
+              </div>
+            </div>
+            <input type="file" id="avatarFileInput" accept="image/png, image/jpeg, image/webp" hidden>
+            <a href="#settings" data-section="settings" data-focus="currentPassword" class="admin-user-dropdown-item"><i class="fas fa-key"></i> Change Password</a>
+            <a href="#settings" data-section="settings" class="admin-user-dropdown-item"><i class="fas fa-cog"></i> Business Settings</a>
+            <button type="button" class="admin-user-dropdown-item" id="removeAvatarBtn" style="display:none;"><i class="fas fa-trash-alt"></i> Remove Profile Picture</button>
+            <div class="admin-user-dropdown-divider"></div>
+            <button type="button" class="admin-user-dropdown-item danger" id="dropdownLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+          </div>
         </div>
       </header>
       
       <!-- Dashboard Section -->
       <section id="dashboard-section" class="content-section active-section">
+        <div class="dashboard-group-label">Key Metrics</div>
         <div class="stats-grid" id="statsGrid"></div>
 
-        <!-- Row for Returns -->
-        <div class="stats-grid" id="returnStats" style="margin-top: 20px;"></div>
-        <div class="chart-container">
+        <div class="dashboard-group-label">Customer Insights</div>
+        <div class="stats-grid" id="smartStatsGrid"></div>
 
+        <div class="dashboard-group-label">Trends</div>
+        <div class="insights-grid">
+          <div class="insight-panel">
+            <h3>Revenue — Last 30 Days</h3>
+            <p class="insight-sub">Confirmed &amp; completed bookings</p>
+            <div class="revenue-chart-wrap" id="revenueChart">
+              <svg viewBox="0 0 600 160" preserveAspectRatio="none"></svg>
+            </div>
+          </div>
+          <div class="insight-panel">
+            <h3>Most Booked Items</h3>
+            <p class="insight-sub">All-time, by quantity</p>
+            <div class="popular-items-list" id="popularItemsList"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-group-label">Return Activity</div>
+        <div class="stats-grid" id="returnStats"></div>
+
+        <div class="dashboard-group-label">Recent Activity</div>
+        <div class="chart-container" style="margin-top: 0;">
           <h3>Recent Bookings</h3>
           <div class="table-responsive">
             <table class="data-table">
               <thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
-              <tbody id="recentBookingsBody"><td><td colspan="6">Loading...</td></tr></tr></tbody>
+              <tbody id="recentBookingsBody"><tr><td colspan="6">Loading...</td></tr></tbody>
             </table>
           </div>
-        </div>
-        <div class="quick-actions">
-          <h3>Today's Pickups</h3>
-          <div id="todayPickups" class="pickup-list"></div>
         </div>
       </section>
       
@@ -76,11 +120,11 @@
               <option value="completed">Completed</option>
             </select>
             <div class="date-filter-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <button id="filterToday" class="btn-filter" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">📅 Today</button>
-              <button id="filterTomorrow" class="btn-filter" style="background: #17a2b8; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">📅 Tomorrow</button>
-              <input type="date" id="customDateFilter" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
-              <button id="applyDateFilter" class="btn-filter" style="background: #ffb347; color: #8b0000; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">Apply Date</button>
-              <button id="clearDateFilter" class="btn-filter" style="background: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">Clear Filter</button>
+              <button id="filterToday" class="btn-filter" style="background: var(--success-soft); color: var(--success); border: none; padding: 9px 15px;"><i class="fas fa-calendar-day"></i> Today</button>
+              <button id="filterTomorrow" class="btn-filter" style="background: var(--info-soft); color: var(--info); border: none; padding: 9px 15px;"><i class="fas fa-calendar-day"></i> Tomorrow</button>
+              <input type="date" id="customDateFilter" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+              <button id="applyDateFilter" class="btn-filter" style="background: var(--gold); color: #16181d; border: none; padding: 9px 15px;">Apply Date</button>
+              <button id="clearDateFilter" class="btn-filter" style="background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid var(--glass-border); padding: 9px 15px;">Clear Filter</button>
             </div>
             <button id="exportBtn" class="btn-export"><i class="fas fa-download"></i> Export</button>
           </div>
@@ -100,7 +144,7 @@
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="allBookingsBody"><tr><td colspan="9">Loading...</td></tr></td></tbody>
+            <tbody id="allBookingsBody"><tr><td colspan="9">Loading...</td></tr></tbody>
           </table>
           <div id="pagination" class="pagination"></div>
         </div>
@@ -108,11 +152,16 @@
       
       <!-- Customers Section -->
       <section id="customers-section" class="content-section">
-        <h2>Customer Database</h2>
+        <div class="section-header">
+          <h2><i class="fas fa-users"></i> Customer Database</h2>
+          <div class="filters">
+            <input type="text" id="customerSearch" placeholder="Search name, phone or email...">
+          </div>
+        </div>
         <div class="table-responsive">
           <table class="data-table">
-            <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Bookings</th><th>Last Booking</th><th>Action</th></tr></thead>
-            <tbody id="customersBody"><td><td colspan="6">Loading...</td></tr></tr></tbody>
+            <thead><tr><th>Customer</th><th>Phone</th><th>Email</th><th>Bookings</th><th>Last Booking</th><th>Actions</th></tr></thead>
+            <tbody id="customersBody"><tr><td colspan="6">Loading...</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -125,8 +174,8 @@
         </div>
         
         <div class="filters" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-          <input type="text" id="returnSearch" placeholder="Search by customer, booking ref..." style="flex: 2; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
-          <select id="returnStatusFilter" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+          <input type="text" id="returnSearch" placeholder="Search by customer, booking ref..." style="flex: 2;">
+          <select id="returnStatusFilter">
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
@@ -134,13 +183,13 @@
             <option value="cancelled">Cancelled</option>
           </select>
           <div class="date-filter-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button id="returnFilterToday" class="btn-filter" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">📅 Today</button>
-            <button id="returnFilterTomorrow" class="btn-filter" style="background: #17a2b8; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">📅 Tomorrow</button>
-            <input type="date" id="returnCustomDateFilter" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
-            <button id="applyReturnDateFilter" class="btn-filter" style="background: #ffb347; color: #8b0000; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">Apply Date</button>
-            <button id="clearReturnDateFilter" class="btn-filter" style="background: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">Clear Filter</button>
+            <button id="returnFilterToday" class="btn-filter" style="background: var(--success-soft); color: var(--success); border: none; padding: 9px 15px;"><i class="fas fa-calendar-day"></i> Today</button>
+            <button id="returnFilterTomorrow" class="btn-filter" style="background: var(--info-soft); color: var(--info); border: none; padding: 9px 15px;"><i class="fas fa-calendar-day"></i> Tomorrow</button>
+            <input type="date" id="returnCustomDateFilter" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+            <button id="applyReturnDateFilter" class="btn-filter" style="background: var(--gold); color: #16181d; border: none; padding: 9px 15px;">Apply Date</button>
+            <button id="clearReturnDateFilter" class="btn-filter" style="background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid var(--glass-border); padding: 9px 15px;">Clear Filter</button>
           </div>
-          <button id="refreshReturns" class="btn-export" style="background: #ffb347; color: #8b0000;">
+          <button id="refreshReturns" class="btn-export" style="background: var(--gold); color: #16181d;">
             <i class="fas fa-sync-alt"></i> Refresh
           </button>
         </div>
@@ -167,18 +216,46 @@
           </table>
         </div>
       </section>
-      
+
+      <!-- Reviews Section -->
+      <section id="reviews-section" class="content-section">
+        <div class="section-header">
+          <h2><i class="fas fa-star"></i> Customer Reviews</h2>
+          <p>What customers say after their booking is confirmed or completed</p>
+        </div>
+
+        <div class="insight-panel reviews-summary" id="reviewsSummary">
+          <div class="reviews-average">
+            <div class="big-number" id="reviewsAvgNumber">–</div>
+            <span class="stars" id="reviewsAvgStars"></span>
+            <small id="reviewsTotalCount">No reviews yet</small>
+          </div>
+          <div id="reviewsBreakdown"></div>
+        </div>
+
+        <div class="filters" style="margin-bottom: 20px;">
+          <input type="text" id="reviewSearch" placeholder="Search by customer or booking ref...">
+          <select id="reviewStatusFilter">
+            <option value="all">All</option>
+            <option value="published">Published</option>
+            <option value="hidden">Hidden</option>
+          </select>
+        </div>
+
+        <div id="reviewsList"></div>
+      </section>
+
       <!-- Pricing Section -->
       <section id="pricing-section" class="content-section">
         <div class="section-header">
-          <h2>💰 Pricing Management</h2>
-          <p>Update your storage prices - changes reflect immediately on the website</p>
+          <h2>Pricing Management</h2>
+          <p>Update your storage prices — changes reflect immediately on the website</p>
         </div>
-        
+
         <div class="pricing-grid-modern">
           <!-- Duffle Bag (Small) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🎽</div>
+            <div class="pricing-icon"><img src="../images/duffle-small.jpg" alt="Duffle Bag Small"></div>
             <div class="pricing-info">
               <h3>Duffle Bag (Small)</h3>
               <p>Sports/travel duffle bag - small size</p>
@@ -191,7 +268,7 @@
 
           <!-- Duffle Bag (Big) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🎒</div>
+            <div class="pricing-icon"><img src="../images/duffle-big.jpg" alt="Duffle Bag Big"></div>
             <div class="pricing-info">
               <h3>Duffle Bag (Big)</h3>
               <p>Large travel duffle bag</p>
@@ -204,7 +281,7 @@
 
           <!-- Jute Bag (Small) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🌾</div>
+            <div class="pricing-icon"><img src="../images/jute-small.jpg" alt="Jute Bag Small"></div>
             <div class="pricing-info">
               <h3>Jute Bag (Small)</h3>
               <p>Eco-friendly woven bag - small</p>
@@ -217,7 +294,7 @@
 
           <!-- Jute Bag (Medium) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🌾</div>
+            <div class="pricing-icon"><img src="../images/jute-medium.jpg" alt="Jute Bag Medium"></div>
             <div class="pricing-info">
               <h3>Jute Bag (Medium)</h3>
               <p>Eco-friendly woven bag - medium</p>
@@ -230,7 +307,7 @@
 
           <!-- Jute Bag (Big) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🌾</div>
+            <div class="pricing-icon"><img src="../images/jute-big.jpg" alt="Jute Bag Big"></div>
             <div class="pricing-info">
               <h3>Jute Bag (Big)</h3>
               <p>Eco-friendly woven bag - large</p>
@@ -243,7 +320,7 @@
 
           <!-- Traveling Bag (Small) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">✈️</div>
+            <div class="pricing-icon"><img src="../images/travel-small.jpg" alt="Traveling Bag Small"></div>
             <div class="pricing-info">
               <h3>Traveling Bag (Small)</h3>
               <p>Small suitcase/travel bag</p>
@@ -256,7 +333,7 @@
 
           <!-- Traveling Bag (Medium) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">✈️</div>
+            <div class="pricing-icon"><img src="../images/travel-medium.jpg" alt="Traveling Bag Medium"></div>
             <div class="pricing-info">
               <h3>Traveling Bag (Medium)</h3>
               <p>Medium suitcase/travel bag</p>
@@ -269,7 +346,7 @@
 
           <!-- Traveling Bag (Big) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">✈️</div>
+            <div class="pricing-icon"><img src="../images/travel-big.jpg" alt="Traveling Bag Big"></div>
             <div class="pricing-info">
               <h3>Traveling Bag (Big)</h3>
               <p>Large suitcase/travel bag</p>
@@ -282,7 +359,7 @@
 
           <!-- Microwave -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🍿</div>
+            <div class="pricing-icon"><img src="../images/microwave.jpg" alt="Microwave"></div>
             <div class="pricing-info">
               <h3>Microwave</h3>
               <p>Kitchen appliance storage</p>
@@ -295,7 +372,7 @@
 
           <!-- Fridge (Table Top) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">❄️</div>
+            <div class="pricing-icon"><img src="../images/fridge-tabletop.jpg" alt="Fridge Table Top"></div>
             <div class="pricing-info">
               <h3>Fridge (Table Top)</h3>
               <p>Standard table top fridge</p>
@@ -308,7 +385,7 @@
 
           <!-- Fridge (Double Door) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">❄️❄️</div>
+            <div class="pricing-icon"><img src="../images/fridge-doubledoor.jpg" alt="Fridge Double Door"></div>
             <div class="pricing-info">
               <h3>Fridge (Double Door)</h3>
               <p>Large double door fridge</p>
@@ -321,7 +398,7 @@
 
           <!-- Fridge (Small) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🧊</div>
+            <div class="pricing-icon"><img src="../images/fridge-small.jpg" alt="Fridge Small"></div>
             <div class="pricing-info">
               <h3>Fridge (Small)</h3>
               <p>Compact mini fridge</p>
@@ -334,7 +411,7 @@
 
           <!-- Gas Cylinder (Small) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🔥</div>
+            <div class="pricing-icon"><img src="../images/gas-small.jpg" alt="Gas Cylinder Small"></div>
             <div class="pricing-info">
               <h3>Gas Cylinder (Small)</h3>
               <p>Small cooking gas cylinder</p>
@@ -347,7 +424,7 @@
 
           <!-- Gas Cylinder (Medium) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🔥</div>
+            <div class="pricing-icon"><img src="../images/gas-medium.jpg" alt="Gas Cylinder Medium"></div>
             <div class="pricing-info">
               <h3>Gas Cylinder (Medium)</h3>
               <p>Medium cooking gas cylinder</p>
@@ -360,7 +437,7 @@
 
           <!-- Gas Cylinder (Big) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🔥</div>
+            <div class="pricing-icon"><img src="../images/gas-big.jpg" alt="Gas Cylinder Big"></div>
             <div class="pricing-info">
               <h3>Gas Cylinder (Big)</h3>
               <p>Large cooking gas cylinder</p>
@@ -373,7 +450,7 @@
 
           <!-- Other Container (Small) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">📦</div>
+            <div class="pricing-icon"><img src="../images/container-small.jpg" alt="Container Small"></div>
             <div class="pricing-info">
               <h3>Other Container (Small)</h3>
               <p>Small plastic container/box</p>
@@ -386,7 +463,7 @@
 
           <!-- Other Container (Big) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">📦</div>
+            <div class="pricing-icon"><img src="../images/container-big.jpg" alt="Container Big"></div>
             <div class="pricing-info">
               <h3>Other Container (Big)</h3>
               <p>Large plastic container/box</p>
@@ -397,16 +474,68 @@
             </div>
           </div>
 
-          <!-- Buckets (Free) -->
+          <!-- Television (Small) -->
           <div class="pricing-card-modern">
-            <div class="pricing-icon">🪣</div>
+            <div class="pricing-icon"><img src="../images/smallscreen.jpg" alt="Television Small"></div>
             <div class="pricing-info">
-              <h3>Buckets</h3>
-              <p>Free when stored with paid items</p>
+              <h3>Television (Small)</h3>
+              <p>Up to 32"</p>
             </div>
             <div class="pricing-input-group">
               <span class="currency">₵</span>
-              <input type="number" id="priceBuckets" min="0" step="0.5" value="0" class="pricing-input" readonly style="background:#f0f0f0;">
+              <input type="number" id="priceTvSmall" min="0" step="0.5" value="39.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- Television (Medium) -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon"><img src="../images/mediumscreen.jpg" alt="Television Medium"></div>
+            <div class="pricing-info">
+              <h3>Television (Medium)</h3>
+              <p>33" – 43"</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceTvMedium" min="0" step="0.5" value="54.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- Television (Large) -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon"><img src="../images/largescreen.jpg" alt="Television Large"></div>
+            <div class="pricing-info">
+              <h3>Television (Large)</h3>
+              <p>44" – 55"</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceTvLarge" min="0" step="0.5" value="69.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- Television (Extra Large) -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon"><img src="../images/tv.jpg" alt="Television Extra Large"></div>
+            <div class="pricing-info">
+              <h3>Television (Extra Large)</h3>
+              <p>56" and above</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceTvXlarge" min="0" step="0.5" value="89.99" class="pricing-input">
+            </div>
+          </div>
+
+          <!-- Buckets -->
+          <div class="pricing-card-modern">
+            <div class="pricing-icon"><img src="../images/buckets.jpg" alt="Buckets"></div>
+            <div class="pricing-info">
+              <h3>Buckets</h3>
+              <p>Set to ₵0 to keep them free with paid items</p>
+            </div>
+            <div class="pricing-input-group">
+              <span class="currency">₵</span>
+              <input type="number" id="priceBuckets" min="0" step="0.5" value="0" class="pricing-input">
             </div>
           </div>
         </div>
@@ -422,7 +551,7 @@
       <!-- Settings Section -->
       <section id="settings-section" class="content-section">
         <div class="section-header">
-          <h2>⚙️ Business Settings</h2>
+          <h2>Business Settings</h2>
           <p>Manage your business contact information and security</p>
         </div>
         
@@ -528,20 +657,20 @@
     Session expiring soon. <button onclick="extendSession()">Stay Logged In</button>
   </div>
 
-  <div id="customerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;">
-    <div style="background: white; border-radius: 20px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 30px; position: relative;">
-      <button onclick="closeCustomerModal()" style="position: absolute; top: 15px; right: 20px; background: #dc3545; color: white; border: none; border-radius: 50%; width: 35px; height: 35px; font-size: 20px; cursor: pointer;">&times;</button>
-      <h2 id="modalCustomerName" style="color: #8b0000; margin-bottom: 10px;">Customer Details</h2>
-      <p id="modalCustomerPhone" style="color: #666; margin-bottom: 20px;"></p>
-      <h3 style="color: #8b0000; margin-bottom: 15px;">Booking History</h3>
+  <div id="customerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 10000; justify-content: center; align-items: center;">
+    <div class="glass" style="max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 30px; position: relative;">
+      <button onclick="closeCustomerModal()" style="position: absolute; top: 15px; right: 20px; background: var(--danger-soft); color: var(--danger); border: none; border-radius: 50%; width: 35px; height: 35px; font-size: 20px; cursor: pointer;">&times;</button>
+      <h2 id="modalCustomerName" style="color: var(--text); margin-bottom: 10px;">Customer Details</h2>
+      <p id="modalCustomerPhone" style="color: var(--text-muted); margin-bottom: 20px;"></p>
+      <h3 style="color: var(--gold); margin-bottom: 15px; font-size: 15px;">Booking History</h3>
       <div id="modalBookingsList" style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse;">
-          <thead><tr style="background: #f5f5f5;"><th style="padding: 10px; border: 1px solid #ddd;">Reference</th><th style="padding: 10px; border: 1px solid #ddd;">Date</th><th style="padding: 10px; border: 1px solid #ddd;">Items</th><th style="padding: 10px; border: 1px solid #ddd;">Total</th><th style="padding: 10px; border: 1px solid #ddd;">Status</th></tr></thead>
+          <thead><tr><th style="padding: 10px; border-bottom: 1px solid var(--glass-border); color: var(--text-faint); text-align: left; font-size: 11px; text-transform: uppercase;">Reference</th><th style="padding: 10px; border-bottom: 1px solid var(--glass-border); color: var(--text-faint); text-align: left; font-size: 11px; text-transform: uppercase;">Date</th><th style="padding: 10px; border-bottom: 1px solid var(--glass-border); color: var(--text-faint); text-align: left; font-size: 11px; text-transform: uppercase;">Items</th><th style="padding: 10px; border-bottom: 1px solid var(--glass-border); color: var(--text-faint); text-align: left; font-size: 11px; text-transform: uppercase;">Total</th><th style="padding: 10px; border-bottom: 1px solid var(--glass-border); color: var(--text-faint); text-align: left; font-size: 11px; text-transform: uppercase;">Status</th></tr></thead>
           <tbody id="modalBookingsTableBody"></tbody>
         </table>
       </div>
       <div style="margin-top: 20px; text-align: center;">
-        <button onclick="closeCustomerModal()" style="background: #6c757d; color: white; border: none; border-radius: 8px; padding: 10px 25px; cursor: pointer;">Close</button>
+        <button onclick="closeCustomerModal()" class="btn-export">Close</button>
       </div>
     </div>
   </div>
