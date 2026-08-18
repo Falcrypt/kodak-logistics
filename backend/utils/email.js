@@ -12,7 +12,24 @@ const transporter = nodemailer.createTransport({
 
 // Helper function to get payment method display text
 function getPaymentMethodDisplay(paymentMethod, paymentStatus, transactionId) {
-    if (paymentMethod === 'momo') {
+    if (paymentMethod === 'paystack') {
+        return `
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Payment Method:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">💳 Paid Online (Paystack)</td>
+            </tr>
+            ${transactionId ? `
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Transaction Reference:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${transactionId}</td>
+            </tr>
+            ` : ''}
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Payment Status:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">✅ Paid and confirmed</td>
+            </tr>
+        `;
+    } else if (paymentMethod === 'momo') {
         let statusMessage = '';
         if (paymentStatus === 'pending_verification') {
             statusMessage = '⏳ Pending Verification - We will verify your payment within 24 hours';
@@ -56,7 +73,14 @@ function getPaymentMethodDisplay(paymentMethod, paymentStatus, transactionId) {
 
 // Helper function to get payment message for customer
 function getPaymentMessage(paymentMethod, paymentStatus) {
-    if (paymentMethod === 'momo') {
+    if (paymentMethod === 'paystack') {
+        return `
+            <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #28a745;">
+                <strong>✅ Payment Received!</strong><br>
+                Your payment went through instantly via Paystack — no verification wait. We will contact you shortly to schedule your pickup.
+            </div>
+        `;
+    } else if (paymentMethod === 'momo') {
         if (paymentStatus === 'pending_verification') {
             return `
                 <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;">
@@ -90,7 +114,8 @@ async function sendAdminNotification(booking) {
     try {
         console.log("📧 Sending admin email...");
         
-        const paymentMethodText = booking.payment_method === 'momo' ? '📱 Mobile Money' : '💵 Pay on Pickup';
+        const paymentMethodText = booking.payment_method === 'paystack' ? '💳 Paid via Paystack'
+            : booking.payment_method === 'momo' ? '📱 Mobile Money' : '💵 Pay on Pickup';
         const paymentStatusText = booking.payment_status || (booking.payment_method === 'momo' ? 'pending_verification' : 'unpaid');
         
         let paymentStatusDisplay = '';

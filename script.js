@@ -536,50 +536,29 @@ function setupGallery() {
 
 // ========== PAYMENT SYSTEM FUNCTIONS ==========
 
-function toggleMomoFields() {
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-    const momoFields = document.getElementById('momoFields');
-    const transactionIdInput = document.getElementById('transactionId');
+// Cached after the first fetch so we don't hit the backend on every toggle.
+let paystackPublicKey = null;
+let paystackConfigChecked = false;
 
-    if (paymentMethod === 'momo') {
-        if (momoFields) momoFields.style.display = 'block';
-        if (transactionIdInput) transactionIdInput.required = true;
-    } else {
-        if (momoFields) momoFields.style.display = 'none';
-        if (transactionIdInput) {
-            transactionIdInput.required = false;
-            transactionIdInput.value = '';
+async function getPaystackPublicKey() {
+    if (paystackConfigChecked) return paystackPublicKey;
+    paystackConfigChecked = true;
+    try {
+        const response = await fetch(`${API_URL}/payments/config`);
+        if (response.ok) {
+            const data = await response.json();
+            paystackPublicKey = data.publicKey || null;
         }
+    } catch (error) {
+        console.log('Paystack config not available:', error.message);
     }
+    return paystackPublicKey;
 }
 
-async function copyMomoNumber() {
-    const momoNumber = '0544705397';
-
-    try {
-        await navigator.clipboard.writeText(momoNumber);
-
-        const copyBtn = document.getElementById('copyMomoBtn');
-        if (copyBtn) {
-            const originalHtml = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-
-            setTimeout(() => {
-                copyBtn.innerHTML = originalHtml;
-            }, 2000);
-        }
-
-        showToastMessage('MoMo number copied!', 'success');
-
-    } catch (err) {
-        const textarea = document.createElement('textarea');
-        textarea.value = momoNumber;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        showToastMessage('Number copied!', 'success');
-    }
+function togglePaymentFields() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const paystackFields = document.getElementById('paystackFields');
+    if (paystackFields) paystackFields.style.display = paymentMethod === 'paystack' ? 'block' : 'none';
 }
 
 function showToastMessage(message, type = 'info') {
@@ -611,7 +590,7 @@ function showToastMessage(message, type = 'info') {
 
 function updateMomoAmountDisplay() {
     const totalElement = document.getElementById('totalPrice');
-    const displayAmountElement = document.getElementById('displayAmount');
+    const displayAmountElement = document.getElementById('paystackDisplayAmount');
 
     if (totalElement && displayAmountElement) {
         const total = totalElement.textContent;
@@ -631,8 +610,7 @@ function autoSaveFormData() {
         date: document.getElementById('date')?.value || '',
         time: document.getElementById('time')?.value || '',
         description: document.getElementById('description')?.value || '',
-        paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value || 'pickup',
-        transactionId: document.getElementById('transactionId')?.value || ''
+        paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value || 'pickup'
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
@@ -666,12 +644,11 @@ function restoreSavedFormData() {
                 if (document.getElementById('date')) document.getElementById('date').value = data.date || '';
                 if (document.getElementById('time')) document.getElementById('time').value = data.time || '';
                 if (document.getElementById('description')) document.getElementById('description').value = data.description || '';
-                if (document.getElementById('transactionId')) document.getElementById('transactionId').value = data.transactionId || '';
 
                 const paymentRadio = document.querySelector(`input[name="paymentMethod"][value="${data.paymentMethod}"]`);
                 if (paymentRadio) {
                     paymentRadio.checked = true;
-                    toggleMomoFields();
+                    togglePaymentFields();
                 }
 
                 calculateTotal();
@@ -689,7 +666,7 @@ function clearSavedFormData() {
 }
 
 function setupAutoSave() {
-    const formInputs = ['name', 'email', 'phone', 'hostel', 'date', 'time', 'description', 'transactionId'];
+    const formInputs = ['name', 'email', 'phone', 'hostel', 'date', 'time', 'description'];
 
     formInputs.forEach(id => {
         const element = document.getElementById(id);
@@ -703,26 +680,66 @@ function setupAutoSave() {
     paymentRadios.forEach(radio => {
         radio.addEventListener('change', () => {
             autoSaveFormData();
-            toggleMomoFields();
+            togglePaymentFields();
         });
     });
 }
 
 // ========== MAIN SUBMIT FUNCTION ==========
+// Shared success handling — same reset regardless of which payment path got us here.
+function handleBookingSuccess(bookingRef, paymentMethod) {
+    clearSavedFormData();
+
+    let successMessage = `Booking confirmed!\nReference: ${bookingRef}\n\n`;
+    if (paymentMethod === 'paystack') {
+        successMessage += `Your payment has been received and confirmed instantly.\n\n`;
+    } else {
+        successMessage += `You will pay when we pick up your items.\n\n`;
+    }
+    successMessage += `Check your email for confirmation.`;
+
+    alert(successMessage);
+
+    document.getElementById('bookingForm').reset();
+    document.querySelectorAll('.item-row').forEach((row, index) => {
+        if (index > 0) row.remove();
+    });
+
+    const firstRow = document.querySelector('.item-row');
+    if (firstRow) {
+        const firstSelect = firstRow.querySelector('.itemSelect');
+        const firstQuantity = firstRow.querySelector('.quantity');
+        const firstTriggerText = firstRow.querySelector('.trigger-text');
+        const firstTriggerImg = firstRow.querySelector('.trigger-image');
+        if (firstSelect) firstSelect.value = '';
+        if (firstQuantity) firstQuantity.value = '';
+        if (firstTriggerText) firstTriggerText.textContent = 'Select item type';
+        if (firstTriggerImg) firstTriggerImg.src = 'images/default-item.png';
+    }
+
+    const pickupRadio = document.querySelector('input[name="paymentMethod"][value="pickup"]');
+    if (pickupRadio) pickupRadio.checked = true;
+    togglePaymentFields();
+
+    calculateTotal();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetSubmitButton() {
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-circle-check"></i> Confirm Booking';
+    }
+}
+
 async function submitBooking(event) {
     if (event) event.preventDefault();
 
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
 
     if (!paymentMethod) {
-        showToastMessage('Please select a payment method (Pay on Pickup or Mobile Money)', 'error');
-        return;
-    }
-
-    const transactionId = document.getElementById('transactionId')?.value;
-
-    if (paymentMethod === 'momo' && !transactionId) {
-        showToastMessage('Please enter your transaction ID after sending the payment', 'error');
+        showToastMessage('Please select a payment method (Pay on Pickup or Pay Now)', 'error');
         return;
     }
 
@@ -777,8 +794,7 @@ async function submitBooking(event) {
         description: document.getElementById('description').value,
         items: items,
         total: computedTotal,
-        payment_method: paymentMethod,
-        transaction_id: paymentMethod === 'momo' ? transactionId : null
+        payment_method: paymentMethod
     };
 
     if (!bookingData.name || !bookingData.email || !bookingData.phone || !bookingData.hostel || !bookingData.date || !bookingData.time) {
@@ -790,6 +806,12 @@ async function submitBooking(event) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = 'Processing...';
 
+    if (paymentMethod === 'paystack') {
+        await submitWithPaystack(bookingData);
+        return;
+    }
+
+    // Pay on pickup — straight through, no payment step
     try {
         const response = await fetch(`${API_URL}/bookings`, {
             method: 'POST',
@@ -800,41 +822,7 @@ async function submitBooking(event) {
         const result = await response.json();
 
         if (response.ok) {
-            clearSavedFormData();
-
-            let successMessage = `Booking confirmed!\nReference: ${result.bookingRef}\n\n`;
-            if (paymentMethod === 'momo') {
-                successMessage += `We've received your payment information. You will receive an email once we verify your payment.\n\n`;
-            } else {
-                successMessage += `You will pay when we pick up your items.\n\n`;
-            }
-            successMessage += `Check your email for confirmation.`;
-
-            alert(successMessage);
-
-            document.getElementById('bookingForm').reset();
-            document.querySelectorAll('.item-row').forEach((row, index) => {
-                if (index > 0) row.remove();
-            });
-
-            const firstRow = document.querySelector('.item-row');
-            if (firstRow) {
-                const firstSelect = firstRow.querySelector('.itemSelect');
-                const firstQuantity = firstRow.querySelector('.quantity');
-                const firstTriggerText = firstRow.querySelector('.trigger-text');
-                const firstTriggerImg = firstRow.querySelector('.trigger-image');
-                if (firstSelect) firstSelect.value = '';
-                if (firstQuantity) firstQuantity.value = '';
-                if (firstTriggerText) firstTriggerText.textContent = 'Select item type';
-                if (firstTriggerImg) firstTriggerImg.src = 'images/default-item.png';
-            }
-
-            const pickupRadio = document.querySelector('input[name="paymentMethod"][value="pickup"]');
-            if (pickupRadio) pickupRadio.checked = true;
-            toggleMomoFields();
-
-            calculateTotal();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            handleBookingSuccess(result.bookingRef, paymentMethod);
         } else {
             showToastMessage(result.error || 'Booking failed. Please try again.', 'error');
         }
@@ -842,24 +830,77 @@ async function submitBooking(event) {
         console.error('Booking error:', error);
         showToastMessage('Network error. Please check your connection.', 'error');
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-circle-check"></i> Confirm Booking';
+        resetSubmitButton();
     }
+}
+
+// Opens Paystack's secure checkout popup, then asks our own backend to
+// verify the payment (never trust the client-side callback alone) before
+// the booking is actually created.
+async function submitWithPaystack(bookingData) {
+    const publicKey = await getPaystackPublicKey();
+
+    if (!publicKey || typeof PaystackPop === 'undefined') {
+        showToastMessage('Online payment is temporarily unavailable — please choose Pay on Pickup instead', 'error');
+        resetSubmitButton();
+        return;
+    }
+
+    const handler = PaystackPop.setup({
+        key: publicKey,
+        email: bookingData.email,
+        amount: Math.round(bookingData.total * 100), // cedis -> pesewas
+        currency: 'GHS',
+        metadata: {
+            name: bookingData.name,
+            phone: bookingData.phone,
+            hostel: bookingData.hostel,
+            date: bookingData.date,
+            time: bookingData.time,
+            description: bookingData.description,
+            items: bookingData.items
+        },
+        callback: function(response) {
+            (async () => {
+                try {
+                    const verifyResponse = await fetch(`${API_URL}/payments/verify-and-book`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reference: response.reference })
+                    });
+                    const result = await verifyResponse.json();
+
+                    if (verifyResponse.ok) {
+                        handleBookingSuccess(result.bookingRef, 'paystack');
+                    } else {
+                        showToastMessage(result.error || 'Payment received, but confirming it failed — contact us with your payment reference: ' + response.reference, 'error');
+                    }
+                } catch (error) {
+                    console.error('Verify-and-book error:', error);
+                    showToastMessage('Payment received, but confirming it failed — contact us with your payment reference: ' + response.reference, 'error');
+                } finally {
+                    resetSubmitButton();
+                }
+            })();
+        },
+        onClose: function() {
+            showToastMessage('Payment cancelled — your booking was not submitted', 'info');
+            resetSubmitButton();
+        }
+    });
+
+    handler.openIframe();
 }
 
 // ========== INITIALIZE PAYMENT SYSTEM ==========
 function initPaymentSystem() {
-    const copyBtn = document.getElementById('copyMomoBtn');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', copyMomoNumber);
-    }
-
     const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
     paymentRadios.forEach(radio => {
-        radio.addEventListener('change', toggleMomoFields);
+        radio.addEventListener('change', togglePaymentFields);
     });
 
-    toggleMomoFields();
+    togglePaymentFields();
+    getPaystackPublicKey();
     setupAutoSave();
     restoreSavedFormData();
 }

@@ -21,6 +21,7 @@ const customersRoutes = require('./routes/customers');
 const returnsRoutes = require('./routes/returns');  // ADD THIS LINE
 const reviewsRoutes = require('./routes/reviews');
 const insightsRoutes = require('./routes/insights');
+const paymentsRoutes = require('./routes/payments');
 
 // ===== STEP 4: CREATE EXPRESS APP =====
 const app = express();
@@ -59,7 +60,13 @@ app.use(cors({
 }));
 
 // 5.4 Parse JSON bodies
-app.use(express.json({ limit: '2mb' })); // raised slightly to fit a resized profile picture
+// The verify callback stashes the raw bytes too — Paystack's webhook
+// signature is an HMAC over the exact raw body, which is gone once
+// express.json() has parsed it into an object.
+app.use(express.json({
+    limit: '2mb', // raised slightly to fit a resized profile picture
+    verify: (req, res, buf) => { req.rawBody = buf; }
+}));
 
 // 5.5 Log all requests
 app.use((req, res, next) => {
@@ -224,6 +231,7 @@ app.use('/api/customers', customersRoutes);
 app.use('/api/returns', returnsRoutes);  // ADD THIS LINE
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/insights', insightsRoutes);
+app.use('/api/payments', paymentsRoutes);
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Route not found' });
@@ -268,6 +276,13 @@ async function startServer() {
         console.log('✅ Admin avatar column check complete');
     } catch (error) {
         console.log('⚠️ Admin avatar column check warning:', error.message);
+    }
+
+    // CHECK PAYSTACK CONFIG
+    if (process.env.PAYSTACK_SECRET_KEY && process.env.PAYSTACK_PUBLIC_KEY) {
+        console.log('✅ Paystack keys detected — online checkout is enabled');
+    } else {
+        console.log('⚠️ PAYSTACK_SECRET_KEY / PAYSTACK_PUBLIC_KEY not set — online checkout will stay disabled until they are added to .env');
     }
 
     app.listen(PORT, () => {

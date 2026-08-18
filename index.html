@@ -206,34 +206,21 @@
                 </label>
 
                 <label class="payment-option">
-                    <input type="radio" name="paymentMethod" value="momo">
+                    <input type="radio" name="paymentMethod" value="paystack">
                     <div class="payment-option-content">
-                        <strong><i class="fas fa-mobile-screen-button"></i> Mobile Money</strong>
-                        <small>Pay now to secure your booking</small>
+                        <strong><i class="fas fa-lock"></i> Pay Now</strong>
+                        <small>Card or Mobile Money — instant confirmation</small>
                     </div>
                 </label>
             </div>
 
-            <div id="momoFields" style="display: none;">
+            <div id="paystackFields" style="display: none;">
                 <div class="momo-panel">
-                    <p><strong><i class="fas fa-paper-plane"></i> Send payment to:</strong></p>
-
-                    <div class="momo-number-row">
-                        <div class="momo-number-code">054 470 5397</div>
-                        <button type="button" id="copyMomoBtn" class="copy-btn"><i class="fas fa-copy"></i> Copy Number</button>
-                    </div>
-
-                    <p><strong>Amount:</strong> <span id="displayAmount" style="font-size: 18px; font-weight: bold; color: #ffb347;">GH₵0</span></p>
-                    <p style="color: #ffb347; font-size: 14px; margin-top: 10px;">
-                        <i class="fas fa-triangle-exclamation"></i> <strong>Important:</strong> Your booking is NOT confirmed until we verify your payment.
-                        After sending money, enter the transaction ID below.
+                    <p><strong><i class="fas fa-shield-halved"></i> Secured by Paystack</strong></p>
+                    <p><strong>Amount:</strong> <span id="paystackDisplayAmount" style="font-size: 18px; font-weight: bold; color: #ffb347;">GH₵0</span></p>
+                    <p style="color: rgba(255,255,255,0.75); font-size: 14px; margin-top: 10px;">
+                        <i class="fas fa-circle-info"></i> You'll be prompted to pay by card or Mobile Money in a secure Paystack window. Your booking confirms the instant your payment succeeds — no waiting for manual verification.
                     </p>
-                </div>
-
-                <div class="form-group" style="margin-top: 1.2rem;">
-                    <label>Transaction ID (from your SMS)</label>
-                    <input type="text" id="transactionId" placeholder="e.g., MTN123456789">
-                    <small style="color: rgba(255,255,255,0.55); display: block; margin-top: 0.4rem;">Enter the transaction ID from your mobile money confirmation message</small>
                 </div>
             </div>
 
@@ -268,6 +255,7 @@
     </div>
   </footer>
 
+  <script src="https://js.paystack.co/v1/inline.js"></script>
   <script src="nav.js"></script>
   <script src="script.js"></script>
 </body>

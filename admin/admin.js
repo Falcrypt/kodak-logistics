@@ -831,7 +831,8 @@ function displayAllBookings(bookings) {
     const paymentStatus = booking.payment_status || 'unpaid';
     const transactionId = booking.transaction_id || '';
     
-    const paymentMethodText = paymentMethod === 'momo' ? 'MoMo' : 'Pickup';
+    const paymentMethodText = paymentMethod === 'paystack' ? 'Paystack' : paymentMethod === 'momo' ? 'MoMo' : 'Pickup';
+    const paymentMethodIcon = paymentMethod === 'paystack' ? 'fa-shield-halved' : paymentMethod === 'momo' ? 'fa-mobile-screen-button' : 'fa-money-bill-wave';
 
     const showVerifyButton = paymentMethod === 'momo' && paymentStatus === 'pending_verification';
 
@@ -851,8 +852,8 @@ function displayAllBookings(bookings) {
         </select>
        </td>
       <td>
-        <span class="item-text">${paymentMethodText}</span> ${getPaymentStatusBadge(paymentStatus)}
-        ${transactionId ? `<br><small style="font-size: 10px;">TX: ${escapeHtml(transactionId)}</small>` : ''}
+        <span class="item-text"><i class="fas ${paymentMethodIcon}"></i> ${paymentMethodText}</span> ${getPaymentStatusBadge(paymentStatus)}
+        ${transactionId ? `<br><small style="font-size: 10px;">Ref: ${escapeHtml(transactionId)}</small>` : ''}
        </td>
       <td>
         ${showVerifyButton ? `<button class="action-btn btn-verify" onclick="verifyPayment(${id}, '${escapeHtml(booking.customer_email)}', '${escapeHtml(ref)}', ${total})"><i class="fas fa-check-circle"></i> Verify</button>` : ''}
