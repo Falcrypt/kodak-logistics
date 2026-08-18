@@ -8,12 +8,17 @@
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 // Accepts a "Name" <email@x.com> string or a bare email address.
+// Brevo matches the sender against its verified-senders list case-sensitively
+// (a real bug we hit: "Kodaklogisticsservices@..." was rejected as unverified
+// even though "kodaklogisticsservices@..." — the actually-verified casing —
+// is the same mailbox) — lowercasing here makes that mismatch impossible.
 function parseSender(from) {
     const match = (from || '').match(/^"?([^"<]*)"?\s*<(.+)>$/);
     if (match) {
-        return { name: match[1].trim() || 'Kodak Logistics', email: match[2].trim() };
+        return { name: match[1].trim() || 'Kodak Logistics', email: match[2].trim().toLowerCase() };
     }
-    return { name: 'Kodak Logistics', email: from || process.env.EMAIL_USER };
+    const email = from || process.env.EMAIL_USER;
+    return { name: 'Kodak Logistics', email: (email || '').toLowerCase() };
 }
 
 // Drop-in replacement for nodemailer's transporter.sendMail(mailOptions) —
