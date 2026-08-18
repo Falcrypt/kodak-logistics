@@ -1,17 +1,54 @@
 // backend/utils/email.js
-const nodemailer = require('nodemailer');
+//
+// Sends via Brevo's HTTP API (port 443) instead of raw SMTP. Render's free
+// tier blocks outbound SMTP ports (25/465/587) entirely as an anti-spam
+// policy — every email send was failing silently until this switch, since
+// the booking itself always succeeded regardless (email is fire-and-forget).
+// HTTPS is never blocked, so this sidesteps the issue for good.
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
-// Create transporter (using Gmail - free)
-// family: 4 forces IPv4 — Render's network can't route to Gmail's SMTP
-// server over IPv6 (ENETUNREACH), which was silently failing every send.
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER || 'Kodaklogisticsservices@gmail.com',
-        pass: process.env.EMAIL_PASS || 'your-app-password'
-    },
-    family: 4
-});
+// Accepts a "Name" <email@x.com> string or a bare email address.
+function parseSender(from) {
+    const match = (from || '').match(/^"?([^"<]*)"?\s*<(.+)>$/);
+    if (match) {
+        return { name: match[1].trim() || 'Kodak Logistics', email: match[2].trim() };
+    }
+    return { name: 'Kodak Logistics', email: from || process.env.EMAIL_USER };
+}
+
+// Drop-in replacement for nodemailer's transporter.sendMail(mailOptions) —
+// every call site below already builds a {from, to, subject, html} object.
+async function sendEmail({ from, to, subject, html }) {
+    if (!process.env.BREVO_API_KEY) {
+        throw new Error('BREVO_API_KEY is not set — cannot send email');
+    }
+
+    const response = await fetch(BREVO_API_URL, {
+        method: 'POST',
+        headers: {
+            'api-key': process.env.BREVO_API_KEY,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            sender: parseSender(from),
+            to: [{ email: to }],
+            subject,
+            htmlContent: html
+        })
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Brevo send failed (${response.status}): ${errorBody}`);
+    }
+
+    return response.json();
+}
+
+// Kept as `transporter.sendMail(...)` shaped calls throughout this file —
+// this alias avoids having to touch every one of the 6 call sites below.
+const transporter = { sendMail: sendEmail };
 
 // Helper function to get payment method display text
 function getPaymentMethodDisplay(paymentMethod, paymentStatus, transactionId) {
