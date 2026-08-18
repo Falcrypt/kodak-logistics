@@ -174,6 +174,27 @@ function updatePriceDisplay() {
   updateSelectOptions();
   updateDropdownPrices();
   updateBucketsTeaser();
+  updateGalleryPriceTags();
+}
+
+// The gallery tiles' "From ₵X" tags were hardcoded text — this keeps them
+// in sync with whatever the admin actually sets, using the cheapest size
+// in each category (same data source as the price modal).
+function updateGalleryPriceTags() {
+  const categories = getCategoryItems();
+  document.querySelectorAll('.gallery-item[data-category]').forEach(item => {
+    const category = item.dataset.category;
+    if (category === 'buckets') return; // handled by updateBucketsTeaser (can be free)
+
+    const entries = categories[category];
+    if (!entries || !entries.length) return;
+
+    const values = entries.map(e => e.price).filter(p => typeof p === 'number' && !isNaN(p));
+    if (!values.length) return;
+
+    const tag = item.querySelector('.price-tag');
+    if (tag) tag.textContent = `From ${Math.min(...values)}`;
+  });
 }
 
 // Buckets can be free or priced by the admin — reflect whichever is set
