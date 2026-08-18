@@ -2,12 +2,15 @@
 const nodemailer = require('nodemailer');
 
 // Create transporter (using Gmail - free)
+// family: 4 forces IPv4 — Render's network can't route to Gmail's SMTP
+// server over IPv6 (ENETUNREACH), which was silently failing every send.
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER || 'Kodaklogisticsservices@gmail.com',
         pass: process.env.EMAIL_PASS || 'your-app-password'
-    }
+    },
+    family: 4
 });
 
 // Helper function to get payment method display text
