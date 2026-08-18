@@ -35,7 +35,7 @@ function resizeImageFile(file, maxSize = 256, quality = 0.85) {
     reader.onerror = () => reject(new Error('Could not read file'));
     reader.onload = () => {
       const img = new Image();
-      img.onerror = () => reject(new Error('Could not read image'));
+      img.onerror = () => reject(new Error('This photo format isn\'t supported by this browser (common with iPhone HEIC photos). Please use a JPEG or PNG — try sharing the photo via WhatsApp/email first, which usually converts it, or take a screenshot of it.'));
       img.onload = () => {
         const side = Math.min(img.width, img.height);
         const sx = (img.width - side) / 2;
