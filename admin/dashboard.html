@@ -111,6 +111,11 @@
       <section id="bookings-section" class="content-section">
         <div class="section-header">
           <h2>All Bookings</h2>
+          <div class="view-tabs" id="bookingsViewTabs">
+            <button type="button" class="view-tab active" data-view="active"><i class="fas fa-bolt"></i> Active</button>
+            <button type="button" class="view-tab" data-view="past"><i class="fas fa-box-archive"></i> Past</button>
+            <button type="button" class="view-tab" data-view="all"><i class="fas fa-layer-group"></i> All</button>
+          </div>
           <div class="filters">
             <input type="text" id="searchBooking" placeholder="Search customer, phone...">
             <select id="statusFilter">

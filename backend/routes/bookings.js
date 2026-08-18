@@ -120,7 +120,34 @@ router.get('/', authenticateToken, async (req, res) => {
             params.push(req.query.date);
             paramCounter++;
         }
-        
+
+        // Active/Past split — separates current bookings from old ones
+        // (e.g. last semester's) using the pickup date itself, so nothing
+        // needs to be manually archived.
+        if (req.query.view === 'active') {
+            whereConditions.push(`DATE(booking_date) >= CURRENT_DATE`);
+        } else if (req.query.view === 'past') {
+            whereConditions.push(`DATE(booking_date) < CURRENT_DATE`);
+        }
+
+        // Filter by when the booking was submitted (not the pickup date) —
+        // backs the "Booked Today/This Week/This Month" dashboard tiles.
+        if (req.query.submitted === 'today') {
+            whereConditions.push(`DATE(created_at) = CURRENT_DATE`);
+        } else if (req.query.submitted === 'week') {
+            whereConditions.push(`created_at >= NOW() - INTERVAL '7 days'`);
+        } else if (req.query.submitted === 'month') {
+            whereConditions.push(`created_at >= NOW() - INTERVAL '30 days'`);
+        }
+
+        // Payment status filter — separate from booking status, backs the
+        // "Pending Payments" dashboard tile.
+        if (req.query.payment_status) {
+            whereConditions.push(`payment_status = $${paramCounter}`);
+            params.push(req.query.payment_status);
+            paramCounter++;
+        }
+
         const whereClause = whereConditions.length > 0
             ? 'WHERE ' + whereConditions.join(' AND ')
             : '';
@@ -161,7 +188,19 @@ router.get('/stats', authenticateToken, async (req, res) => {
         // Payment stats
         const pendingPaymentResult = await db.getOne("SELECT COUNT(*) as count FROM bookings WHERE payment_status = 'pending_verification'");
         const verifiedPaymentResult = await db.getOne("SELECT SUM(total_amount) as total FROM bookings WHERE payment_status = 'verified'");
-        
+
+        // Distinct customers who made a booking in each window — how many
+        // different people booked, not how many bookings came in.
+        const customersTodayResult = await db.getOne(
+            'SELECT COUNT(DISTINCT customer_phone) as count FROM bookings WHERE DATE(created_at) = $1', [today]
+        );
+        const customersWeekResult = await db.getOne(
+            "SELECT COUNT(DISTINCT customer_phone) as count FROM bookings WHERE created_at >= NOW() - INTERVAL '7 days'"
+        );
+        const customersMonthResult = await db.getOne(
+            "SELECT COUNT(DISTINCT customer_phone) as count FROM bookings WHERE created_at >= NOW() - INTERVAL '30 days'"
+        );
+
         res.json({
             total: totalResult?.count || 0,
             today: todayResult?.count || 0,
@@ -170,7 +209,10 @@ router.get('/stats', authenticateToken, async (req, res) => {
             completed: completedResult?.count || 0,
             revenue: revenueResult?.total || 0,
             pending_payments: pendingPaymentResult?.count || 0,
-            verified_revenue: verifiedPaymentResult?.total || 0
+            verified_revenue: verifiedPaymentResult?.total || 0,
+            customers_today: customersTodayResult?.count || 0,
+            customers_this_week: customersWeekResult?.count || 0,
+            customers_this_month: customersMonthResult?.count || 0
         });
     } catch (error) {
         console.error('❌ Get stats error:', error);

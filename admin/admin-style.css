@@ -557,12 +557,14 @@ body {
   display: flex;
   align-items: center;
   gap: 18px;
-  transition: transform 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
   background: var(--glass-hover);
+  border-color: rgba(205, 163, 106, 0.4);
 }
 
 .stat-icon {
@@ -1056,6 +1058,42 @@ body {
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
+}
+
+.view-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  width: fit-content;
+}
+
+.view-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-faint);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-tab:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.view-tab.active {
+  color: #16181d;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  box-shadow: 0 4px 14px rgba(205, 163, 106, 0.35);
 }
 
 .filters input,

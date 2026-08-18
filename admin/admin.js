@@ -104,6 +104,9 @@ function renderItemThumbs(itemsSummary, maxThumbs = 3) {
 // ========== SEARCH & FILTER VARIABLES ==========
 let currentSearchTerm = '';
 let currentStatusFilter = 'all';
+let currentBookingsView = 'active'; // 'active' | 'past' | 'all' — keeps old semesters' bookings out of the way by default
+let currentSubmittedFilter = ''; // '' | 'today' | 'week' | 'month' — when the booking was made, not the pickup date
+let currentPaymentStatusFilter = ''; // '' | 'pending_verification' | 'verified' | 'rejected' | 'unpaid'
 let searchTimeout = null;
 
 // ========== DATE FILTER VARIABLES ==========
@@ -359,7 +362,7 @@ async function loadAllSettings() {
 }
 
 // ========== NAVIGATION SETUP ==========
-function navigateToSection(sectionId) {
+function navigateToSection(sectionId, skipDefaultLoad) {
   document.querySelectorAll('.content-section').forEach(section => {
     section.classList.remove('active-section');
   });
@@ -377,6 +380,10 @@ function navigateToSection(sectionId) {
   if (titleEl) {
     titleEl.textContent = sectionId === 'dashboard' ? 'Overview' : sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
   }
+
+  // skipDefaultLoad lets a caller (e.g. a clicked dashboard stat tile) apply
+  // its own filters instead of having them immediately reset.
+  if (skipDefaultLoad) return;
 
   // Load data based on section
   if (sectionId === 'bookings') {
@@ -594,21 +601,22 @@ async function loadDashboardData() {
     if (!stats) return;
     
     const revenue = typeof stats.revenue === 'number' ? stats.revenue : parseFloat(stats.revenue) || 0;
-    
+    const todayStr = new Date().toISOString().split('T')[0];
+
     const statsGrid = document.getElementById('statsGrid');
     if (statsGrid) {
       statsGrid.innerHTML = `
-        <div class="stat-card"><i class="fas fa-boxes-stacked stat-icon"></i><div class="stat-info"><h3>Total Bookings</h3><p>${stats.total || 0}</p></div></div>
-        <div class="stat-card"><i class="fas fa-calendar-alt stat-icon"></i><div class="stat-info"><h3>Today's Bookings</h3><p>${stats.today || 0}</p></div></div>
-        <div class="stat-card"><i class="fas fa-clock stat-icon"></i><div class="stat-info"><h3>Pending</h3><p>${stats.pending || 0}</p></div></div>
-        <div class="stat-card"><i class="fas fa-check-circle stat-icon"></i><div class="stat-info"><h3>Confirmed</h3><p>${stats.confirmed || 0}</p></div></div>
-        <div class="stat-card"><i class="fas fa-money-bill-wave stat-icon"></i><div class="stat-info"><h3>Revenue (₵)</h3><p>${revenue.toFixed(2)}</p></div></div>
-        <div class="stat-card"><i class="fas fa-spinner stat-icon"></i><div class="stat-info"><h3>Pending Payments</h3><p>${stats.pending_payments || 0}</p></div></div>
+        <div class="stat-card" onclick="goToFilteredBookings({view:'all'})"><i class="fas fa-boxes-stacked stat-icon"></i><div class="stat-info"><h3>Total Bookings</h3><p>${stats.total || 0}</p></div></div>
+        <div class="stat-card" onclick="goToFilteredBookings({date:'${todayStr}', view:'all'})"><i class="fas fa-calendar-alt stat-icon"></i><div class="stat-info"><h3>Today's Bookings</h3><p>${stats.today || 0}</p></div></div>
+        <div class="stat-card" onclick="goToFilteredBookings({status:'pending', view:'all'})"><i class="fas fa-clock stat-icon"></i><div class="stat-info"><h3>Pending</h3><p>${stats.pending || 0}</p></div></div>
+        <div class="stat-card" onclick="goToFilteredBookings({status:'confirmed', view:'all'})"><i class="fas fa-check-circle stat-icon"></i><div class="stat-info"><h3>Confirmed</h3><p>${stats.confirmed || 0}</p></div></div>
+        <div class="stat-card" onclick="goToFilteredBookings({view:'all'})"><i class="fas fa-money-bill-wave stat-icon"></i><div class="stat-info"><h3>Revenue (₵)</h3><p>${revenue.toFixed(2)}</p></div></div>
+        <div class="stat-card" onclick="goToFilteredBookings({paymentStatus:'pending_verification', view:'all'})"><i class="fas fa-spinner stat-icon"></i><div class="stat-info"><h3>Pending Payments</h3><p>${stats.pending_payments || 0}</p></div></div>
       `;
     }
     await loadRecentBookings();
     loadReturnStats();
-    loadSmartStats();
+    loadSmartStats(stats);
     loadRevenueTrend();
     loadPopularItems();
   } catch (error) {
@@ -617,7 +625,7 @@ async function loadDashboardData() {
 }
 
 // ========== SMART INSIGHTS ==========
-async function loadSmartStats() {
+async function loadSmartStats(bookingStats) {
   try {
     const [growth, reviewStats] = await Promise.all([
       apiCall('/insights/customer-growth'),
@@ -630,9 +638,12 @@ async function loadSmartStats() {
     const avgRating = reviewStats?.average_rating ? reviewStats.average_rating.toFixed(1) : '–';
 
     grid.innerHTML = `
-      <div class="stat-card"><i class="fas fa-users stat-icon"></i><div class="stat-info"><h3>Total Customers</h3><p>${growth?.total_customers ?? 0}</p><small>${growth?.new_last_30_days ?? 0} new in last 30 days</small></div></div>
-      <div class="stat-card"><i class="fas fa-repeat stat-icon"></i><div class="stat-info"><h3>Repeat Customers</h3><p>${growth?.repeat_customers ?? 0}</p><small>Booked more than once</small></div></div>
-      <div class="stat-card"><i class="fas fa-star stat-icon"></i><div class="stat-info"><h3>Average Rating</h3><p>${avgRating}</p><small>${reviewStats?.total ?? 0} review${reviewStats?.total === 1 ? '' : 's'}</small></div></div>
+      <div class="stat-card" onclick="goToCustomers()"><i class="fas fa-users stat-icon"></i><div class="stat-info"><h3>Total Customers</h3><p>${growth?.total_customers ?? 0}</p><small>${growth?.new_last_30_days ?? 0} new in last 30 days</small></div></div>
+      <div class="stat-card" onclick="goToCustomers()"><i class="fas fa-repeat stat-icon"></i><div class="stat-info"><h3>Repeat Customers</h3><p>${growth?.repeat_customers ?? 0}</p><small>Booked more than once</small></div></div>
+      <div class="stat-card" onclick="goToReviews()"><i class="fas fa-star stat-icon"></i><div class="stat-info"><h3>Average Rating</h3><p>${avgRating}</p><small>${reviewStats?.total ?? 0} review${reviewStats?.total === 1 ? '' : 's'}</small></div></div>
+      <div class="stat-card" onclick="goToFilteredBookings({submitted:'today', view:'all'})"><i class="fas fa-user-clock stat-icon"></i><div class="stat-info"><h3>Booked Today</h3><p>${bookingStats?.customers_today ?? 0}</p><small>Distinct customers</small></div></div>
+      <div class="stat-card" onclick="goToFilteredBookings({submitted:'week', view:'all'})"><i class="fas fa-calendar-week stat-icon"></i><div class="stat-info"><h3>Booked This Week</h3><p>${bookingStats?.customers_this_week ?? 0}</p><small>Distinct customers</small></div></div>
+      <div class="stat-card" onclick="goToFilteredBookings({submitted:'month', view:'all'})"><i class="fas fa-calendar-days stat-icon"></i><div class="stat-info"><h3>Booked This Month</h3><p>${bookingStats?.customers_this_month ?? 0}</p><small>Distinct customers</small></div></div>
     `;
   } catch (error) {
     console.error('Failed to load smart stats:', error);
@@ -772,10 +783,19 @@ async function loadFilteredBookings() {
         if (currentBookingDateFilter) {
             params.append('date', currentBookingDateFilter);
         }
-        
+        if (currentBookingsView !== 'all') {
+            params.append('view', currentBookingsView);
+        }
+        if (currentSubmittedFilter) {
+            params.append('submitted', currentSubmittedFilter);
+        }
+        if (currentPaymentStatusFilter) {
+            params.append('payment_status', currentPaymentStatusFilter);
+        }
+
         const url = `/bookings${params.toString() ? '?' + params.toString() : ''}`;
         const data = await apiCall(url);
-        
+
         displayAllBookings(data?.bookings || []);
         
     } catch (error) {
@@ -787,14 +807,52 @@ async function loadFilteredBookings() {
 async function loadAllBookings() {
     currentSearchTerm = '';
     currentStatusFilter = 'all';
-    
+    currentSubmittedFilter = '';
+    currentPaymentStatusFilter = '';
+
     const searchInput = document.getElementById('searchBooking');
     const statusFilter = document.getElementById('statusFilter');
-    
+
     if (searchInput) searchInput.value = '';
     if (statusFilter) statusFilter.value = 'all';
-    
+
     await loadFilteredBookings();
+}
+
+// ========== DASHBOARD TILE → FILTERED VIEW (clickable stat cards) ==========
+// Jumps to the Bookings section with a specific filter combination already
+// applied, and keeps the visible controls (status dropdown, view tabs, date
+// box) in sync so the UI doesn't look out of step with what's shown.
+function goToFilteredBookings({ status = 'all', date = '', submitted = '', paymentStatus = '', view = 'all' } = {}) {
+  navigateToSection('bookings', true);
+
+  currentSearchTerm = '';
+  currentStatusFilter = status;
+  currentBookingDateFilter = date;
+  currentSubmittedFilter = submitted;
+  currentPaymentStatusFilter = paymentStatus;
+  currentBookingsView = view;
+
+  const searchInput = document.getElementById('searchBooking');
+  const statusFilterEl = document.getElementById('statusFilter');
+  const customDateInput = document.getElementById('customDateFilter');
+  if (searchInput) searchInput.value = '';
+  if (statusFilterEl) statusFilterEl.value = status;
+  if (customDateInput) customDateInput.value = date;
+
+  document.querySelectorAll('#bookingsViewTabs .view-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.view === view);
+  });
+
+  loadFilteredBookings();
+}
+
+function goToCustomers() {
+  navigateToSection('customers');
+}
+
+function goToReviews() {
+  navigateToSection('reviews');
 }
 
 function getPaymentStatusBadge(paymentStatus) {
@@ -810,11 +868,27 @@ function getPaymentStatusBadge(paymentStatus) {
     }
 }
 
+// A friendlier, context-aware empty state instead of a flat "No bookings
+// found" regardless of which filter combination led there.
+function emptyBookingsMessage() {
+  if (currentSearchTerm) return `No bookings match "${escapeHtml(currentSearchTerm)}"`;
+  if (currentPaymentStatusFilter === 'pending_verification') return 'Nothing awaiting payment verification right now 🎉';
+  if (currentSubmittedFilter === 'today') return 'No bookings submitted today yet';
+  if (currentSubmittedFilter === 'week') return 'No bookings submitted this week yet';
+  if (currentSubmittedFilter === 'month') return 'No bookings submitted this month yet';
+  if (currentStatusFilter === 'pending') return 'Nothing pending right now';
+  if (currentStatusFilter === 'confirmed') return 'No confirmed bookings match this view';
+  if (currentBookingDateFilter) return `No bookings scheduled for ${currentBookingDateFilter}`;
+  if (currentBookingsView === 'active') return 'No active bookings — everything current is picked up. Check the "Past" tab for history.';
+  if (currentBookingsView === 'past') return 'No past bookings yet';
+  return 'No bookings found';
+}
+
 function displayAllBookings(bookings) {
   const tbody = document.getElementById('allBookingsBody');
   if (!tbody) return;
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11">No bookings found</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="11">${emptyBookingsMessage()}</td></tr>`;
     return;
   }
   tbody.innerHTML = bookings.map(booking => {
@@ -1316,6 +1390,19 @@ function setupEventListeners() {
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.addEventListener('click', exportBookings);
   setupSearchListeners();
+}
+
+// ========== BOOKINGS VIEW TABS (Active / Past / All) ==========
+function setupBookingsViewTabs() {
+  const tabs = document.querySelectorAll('#bookingsViewTabs .view-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentBookingsView = tab.dataset.view;
+      loadFilteredBookings();
+    });
+  });
 }
 
 // ========== DATE FILTER FUNCTIONS ==========
@@ -1820,6 +1907,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize date filters (safe to call even if elements don't exist yet)
     setupDateFilters();
+    setupBookingsViewTabs();
     
     if (menuBtn && sidebar) {
         function checkWidth() {
