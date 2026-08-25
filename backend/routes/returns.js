@@ -8,13 +8,6 @@ const router = express.Router();
 
 // ========== HELPER FUNCTIONS ==========
 
-// Generate return reference (e.g., RTR-000001)
-async function generateReturnRef() {
-    const result = await db.query("SELECT COUNT(*) as count FROM return_requests");
-    const count = parseInt(result[0].count) + 1;
-    return `RTR-${String(count).padStart(6, '0')}`;
-}
-
 // Check daily request limit
 async function checkDailyLimit(requestDate) {
     const dateStr = requestDate.split('T')[0];
@@ -208,36 +201,39 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             });
         }
         
-        // Generate reference
-        const request_ref = await generateReturnRef();
-        
         // Set payment status
         let paymentStatus = 'unpaid';
         if (payment_method === 'momo' && transaction_id) {
             paymentStatus = 'pending_verification';
         }
-        
-        // Insert return request
+
+        // Insert first, then derive the reference from the row's own auto-
+        // increment id (same pattern as bookings) — generating it from
+        // COUNT(*) beforehand isn't safe under concurrent requests and
+        // produces a duplicate (and a hard failure) if any row is ever
+        // deleted, since request_ref is UNIQUE.
         const insertSql = `
             INSERT INTO return_requests (
-                request_ref, booking_id, booking_ref, customer_name, customer_email,
+                booking_id, booking_ref, customer_name, customer_email,
                 customer_phone, original_hostel, items_summary, total_items_stored,
                 return_date, return_time, special_instructions, delivery_fee,
                 payment_method, transaction_id, payment_status, status
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
             RETURNING id
         `;
-        
+
         const params = [
-            request_ref, booking_id, booking_ref, customer_name, customer_email,
+            booking_id, booking_ref, customer_name, customer_email,
             customer_phone, original_hostel, items_summary, total_items_stored,
             return_date, return_time, special_instructions || '', 30.00,
             payment_method || 'delivery', transaction_id || null, paymentStatus, 'pending'
         ];
-        
+
         const result = await db.query(insertSql, params);
         const returnId = result[0].id;
-        
+        const request_ref = `RTR-${String(returnId).padStart(6, '0')}`;
+        await db.update('UPDATE return_requests SET request_ref = $1 WHERE id = $2', [request_ref, returnId]);
+
         // Increment daily counter
         await incrementDailyCounter(return_date);
         

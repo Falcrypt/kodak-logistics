@@ -9,17 +9,35 @@ const router = express.Router();
 router.post('/', publicWriteLimiter, async (req, res) => {
     try {
         console.log("📥 RECEIVED BOOKING DATA:", req.body);
-        const { 
-            name, email, phone, hostel, date, time, description, items, total,
-            payment_method, transaction_id 
+        const {
+            name, email, phone, hostel, date, time, description, items,
+            payment_method, transaction_id
         } = req.body;
-        
+
         if (!name || !email || !phone || !hostel || !date || !time || !items || items.length === 0) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
-        
+
         const itemsSummary = items.map(item => `${item.quantity}x ${item.type}`).join(', ');
-        
+
+        // Recompute the total from the live prices server-side — never trust
+        // whatever total the client sent, since a stale page, a client bug,
+        // or a tampered request could otherwise save the wrong amount with
+        // nobody noticing (the Paystack path is already safe this way,
+        // since it derives the total from Paystack's own verified amount).
+        const priceRows = await db.query(
+            "SELECT setting_key, setting_value FROM settings WHERE setting_key LIKE 'price_%'"
+        );
+        const priceMap = {};
+        priceRows.forEach(row => {
+            priceMap[row.setting_key.replace('price_', '')] = parseFloat(row.setting_value) || 0;
+        });
+        const total = items.reduce((sum, item) => {
+            const qty = parseInt(item.quantity) || 0;
+            const price = priceMap[item.type] || 0;
+            return sum + price * qty;
+        }, 0);
+
         // Set payment status based on method
         let paymentStatus = 'unpaid';
         if (payment_method === 'momo') {
@@ -103,7 +121,7 @@ router.get('/', authenticateToken, async (req, res) => {
         let paramCounter = 1;
         
         if (search) {
-            whereConditions.push(`(customer_name LIKE $${paramCounter} OR customer_phone LIKE $${paramCounter+1} OR hostel_name LIKE $${paramCounter+2} OR booking_ref LIKE $${paramCounter+3})`);
+            whereConditions.push(`(customer_name ILIKE $${paramCounter} OR customer_phone ILIKE $${paramCounter+1} OR hostel_name ILIKE $${paramCounter+2} OR booking_ref ILIKE $${paramCounter+3})`);
             const searchTerm = `%${search}%`;
             params.push(searchTerm, searchTerm, searchTerm, searchTerm);
             paramCounter += 4;
