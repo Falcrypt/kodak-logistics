@@ -687,14 +687,20 @@ function setupAutoSave() {
 
 // ========== MAIN SUBMIT FUNCTION ==========
 // Shared success handling — same reset regardless of which payment path got us here.
-function handleBookingSuccess(bookingRef, paymentMethod) {
+function handleBookingSuccess(bookingRef, paymentMethod, total) {
     clearSavedFormData();
+
+    const amountText = typeof total === 'number' ? `GH₵${total.toFixed(2)}` : null;
 
     let successMessage = `Booking confirmed!\nReference: ${bookingRef}\n\n`;
     if (paymentMethod === 'paystack') {
-        successMessage += `Your payment has been received and confirmed instantly.\n\n`;
+        successMessage += amountText
+            ? `Your payment of ${amountText} has been received and confirmed instantly.\n\n`
+            : `Your payment has been received and confirmed instantly.\n\n`;
     } else {
-        successMessage += `You will pay when we pick up your items.\n\n`;
+        successMessage += amountText
+            ? `Total: ${amountText} — you will pay this when we pick up your items.\n\n`
+            : `You will pay when we pick up your items.\n\n`;
     }
     successMessage += `Check your email for confirmation.`;
 
@@ -822,7 +828,7 @@ async function submitBooking(event) {
         const result = await response.json();
 
         if (response.ok) {
-            handleBookingSuccess(result.bookingRef, paymentMethod);
+            handleBookingSuccess(result.bookingRef, paymentMethod, bookingData.total);
         } else {
             showToastMessage(result.error || 'Booking failed. Please try again.', 'error');
         }
@@ -871,7 +877,7 @@ async function submitWithPaystack(bookingData) {
                     const result = await verifyResponse.json();
 
                     if (verifyResponse.ok) {
-                        handleBookingSuccess(result.bookingRef, 'paystack');
+                        handleBookingSuccess(result.bookingRef, 'paystack', bookingData.total);
                     } else {
                         showToastMessage(result.error || 'Payment received, but confirming it failed — contact us with your payment reference: ' + response.reference, 'error');
                     }
