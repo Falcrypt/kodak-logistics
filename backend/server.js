@@ -41,14 +41,18 @@ const allowedOrigins = [
     'http://127.0.0.1:5500',
     'http://localhost:5500',
     'https://falcrypt.github.io',
-    'https://kodak-logistics.netlify.app',
-    'https://*.onrender.com'
+    'https://kodak-logistics.netlify.app'
 ];
+
+// Matches exactly one subdomain of onrender.com, e.g. https://kodak-logistics-api.onrender.com —
+// anchored with ^/$ so it can't be satisfied by a substring anywhere in the
+// origin (the previous check accepted anything containing "onrender.com").
+const RENDER_SUBDOMAIN = /^https:\/\/[a-z0-9-]+\.onrender\.com$/;
 
 app.use(cors({
     origin: function(origin, callback) {
         if (!origin) return callback(null, true);
-        if (allowedOrigins.some(allowed => origin === allowed || (allowed.includes('*') && origin.includes('onrender.com')))) {
+        if (allowedOrigins.includes(origin) || RENDER_SUBDOMAIN.test(origin)) {
             callback(null, true);
         } else {
             console.log('❌ CORS blocked for origin:', origin);
@@ -297,6 +301,10 @@ async function startServer() {
 
 process.on('uncaughtException', (err) => {
     console.error('❌ Uncaught Exception:', err);
+    // Node's own docs: the process is in an undefined state after this and
+    // must not keep handling requests. Exiting lets Render restart it clean
+    // instead of it silently limping along and failing requests in weird ways.
+    process.exit(1);
 });
 
 process.on('unhandledRejection', (err) => {

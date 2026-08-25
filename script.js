@@ -329,6 +329,7 @@ function initCustomDropdowns() {
 
         wrapper.classList.remove('open');
         calculateTotal();
+        autoSaveFormData();
       });
     });
   });
@@ -357,6 +358,7 @@ function setupQtyStepper(row) {
     input.value = current > 1 ? current - 1 : '';
     clearInvalid();
     calculateTotal();
+    autoSaveFormData();
   });
 
   plusBtn.addEventListener('click', () => {
@@ -364,11 +366,13 @@ function setupQtyStepper(row) {
     input.value = val;
     clearInvalid();
     calculateTotal();
+    autoSaveFormData();
   });
 
   input.addEventListener('input', () => {
     clearInvalid();
     calculateTotal();
+    autoSaveFormData();
   });
 }
 
@@ -379,6 +383,7 @@ function setupRemoveButton(row) {
     if (document.querySelectorAll('.item-row').length > 1) {
       row.remove();
       calculateTotal();
+      autoSaveFormData();
     }
   });
 }
@@ -387,6 +392,7 @@ function itemRowTemplate() {
   return `
     <select class="itemSelect" style="display: none;">
       <option value="">Select item type</option>
+      ${Object.keys(ITEM_LABELS).map(key => `<option value="${key}">${ITEM_LABELS[key]}</option>`).join('')}
     </select>
 
     <div class="custom-select-wrapper">
@@ -602,6 +608,14 @@ function updateMomoAmountDisplay() {
 const STORAGE_KEY = 'kodak_booking_form';
 
 function autoSaveFormData() {
+    // Save each item row's selection too — previously only the contact
+    // fields were saved, so "come back and finish" silently lost every
+    // item the customer had already picked.
+    const items = Array.from(document.querySelectorAll('.item-row')).map(row => ({
+        type: row.querySelector('.itemSelect')?.value || '',
+        quantity: row.querySelector('.quantity')?.value || ''
+    })).filter(item => item.type || item.quantity);
+
     const formData = {
         name: document.getElementById('name')?.value || '',
         email: document.getElementById('email')?.value || '',
@@ -610,7 +624,8 @@ function autoSaveFormData() {
         date: document.getElementById('date')?.value || '',
         time: document.getElementById('time')?.value || '',
         description: document.getElementById('description')?.value || '',
-        paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value || 'pickup'
+        paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value || 'pickup',
+        items
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
@@ -626,6 +641,41 @@ function autoSaveFormData() {
             }, 2000);
         }, 2000);
     }
+}
+
+// Rebuilds item rows from saved {type, quantity} pairs, adding rows as
+// needed (via the same "Add Another Item" flow so all its listeners get
+// wired up) and syncing each custom dropdown's visible trigger to match.
+function restoreSavedItems(items) {
+    if (!Array.isArray(items) || items.length === 0) return;
+
+    const addBtn = document.getElementById('addItem');
+    while (document.querySelectorAll('.item-row').length < items.length && addBtn) {
+        addBtn.click();
+    }
+
+    const rows = document.querySelectorAll('.item-row');
+    items.forEach((item, i) => {
+        const row = rows[i];
+        if (!row) return;
+
+        const qtyInput = row.querySelector('.quantity');
+        if (qtyInput && item.quantity) qtyInput.value = item.quantity;
+
+        if (!item.type) return;
+        const select = row.querySelector('.itemSelect');
+        if (select) select.value = item.type;
+
+        const wrapper = row.querySelector('.custom-select-wrapper');
+        const option = wrapper?.querySelector(`.custom-option[data-value="${item.type}"]`);
+        if (option) {
+            const trigger = wrapper.querySelector('.custom-select-trigger');
+            const triggerImg = trigger?.querySelector('.trigger-image');
+            const triggerText = trigger?.querySelector('.trigger-text');
+            if (triggerImg) triggerImg.src = option.getAttribute('data-img');
+            if (triggerText) triggerText.textContent = option.querySelector('.option-name').textContent;
+        }
+    });
 }
 
 function restoreSavedFormData() {
@@ -651,6 +701,7 @@ function restoreSavedFormData() {
                     togglePaymentFields();
                 }
 
+                restoreSavedItems(data.items);
                 calculateTotal();
                 return true;
             }

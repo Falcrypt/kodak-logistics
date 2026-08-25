@@ -128,8 +128,11 @@ router.post('/verify-booking', publicWriteLimiter, async (req, res) => {
             });
         }
         
-        // Calculate total items count
-        const itemCount = (booking.items_summary.match(/x/g) || []).length;
+        // Calculate total items count (number of item-type entries in the
+        // summary, e.g. "2x jute_big, 1x tv_xlarge" -> 2). Counting literal
+        // "x" characters overcounted whenever an item type itself contains
+        // an "x", like tv_xlarge.
+        const itemCount = booking.items_summary.split(',').filter(s => s.trim()).length;
         
         res.json({
             success: true,

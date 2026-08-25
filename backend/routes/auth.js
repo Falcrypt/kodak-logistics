@@ -34,7 +34,9 @@ router.post('/login', loginLimiter, async (req, res) => {
         
         if (!validPassword) {
             console.log("❌ Invalid password for user:", username);
-            return res.status(401).json({ error: 'Invalid password' });
+            // Same message as the unknown-username case above — otherwise the
+            // two responses tell an attacker whether a given username exists.
+            return res.status(401).json({ error: 'Invalid username or password' });
         }
         
         const token = jwt.sign(
