@@ -5,6 +5,7 @@
 // policy — every email send was failing silently until this switch, since
 // the booking itself always succeeded regardless (email is fire-and-forget).
 // HTTPS is never blocked, so this sidesteps the issue for good.
+const { formatLocation } = require('./location');
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 // Accepts a "Name" <email@x.com> string or a bare email address.
@@ -195,7 +196,7 @@ async function sendAdminNotification(booking) {
                 <p><strong>Name:</strong> ${escapeHtml(booking.customer_name)}</p>
                 <p><strong>Phone:</strong> ${escapeHtml(booking.customer_phone)}</p>
                 <p><strong>Email:</strong> ${escapeHtml(booking.customer_email)}</p>
-                <p><strong>Hostel:</strong> ${escapeHtml(booking.hostel_name)}</p>
+                <p><strong>Hostel:</strong> ${escapeHtml(formatLocation(booking.hostel_name, booking.room_number, booking.floor))}</p>
 
                 <h3>Booking Details:</h3>
                 <p><strong>Pickup Date:</strong> ${booking.booking_date} at ${booking.booking_time}</p>
@@ -257,7 +258,7 @@ async function sendCustomerConfirmation(booking) {
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd;"><strong>Hostel:</strong></td>
-                            <td style="padding: 8px; border: 1px solid #ddd;">${escapeHtml(booking.hostel_name)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${escapeHtml(formatLocation(booking.hostel_name, booking.room_number, booking.floor))}</td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd;"><strong>Items:</strong></td>
@@ -392,7 +393,7 @@ async function sendReturnRequestConfirmation(returnRequest) {
                         <p><strong>Original Booking:</strong> ${escapeHtml(returnRequest.booking_ref)}</p>
                         <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
                         <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
-                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.delivery_location || returnRequest.original_hostel)}</p>
+                        <p><strong>Delivery Location:</strong> ${escapeHtml(formatLocation(returnRequest.delivery_location || returnRequest.original_hostel, returnRequest.delivery_room_number, returnRequest.delivery_floor))}</p>
                         <p><strong>Items to Return:</strong> ${escapeHtml(returnRequest.items_summary)}</p>
                         <p><strong>Delivery Fee:</strong> ₵30.00</p>
                         <p><strong>Payment:</strong> ${statusMessage}</p>
@@ -457,7 +458,7 @@ async function sendReturnRequestNotification(returnRequest) {
                         <p><strong>Request Reference:</strong> ${escapeHtml(returnRequest.request_ref)}</p>
                         <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
                         <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
-                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.delivery_location || returnRequest.original_hostel)}</p>
+                        <p><strong>Delivery Location:</strong> ${escapeHtml(formatLocation(returnRequest.delivery_location || returnRequest.original_hostel, returnRequest.delivery_room_number, returnRequest.delivery_floor))}</p>
                         <p><strong>Items:</strong> ${escapeHtml(returnRequest.items_summary)}</p>
                         <p><strong>Delivery Fee:</strong> ₵30.00</p>
                         <p><strong>Payment Method:</strong> ${returnRequest.payment_method === 'momo' ? 'Mobile Money (Pending Verification)' : 'Pay on Delivery'}</p>
@@ -504,7 +505,7 @@ async function sendReturnStatusUpdateEmail(returnRequest) {
                 statusMessage = 'Your return request has been approved!';
                 nextSteps = `
                     <li>We will deliver your items on ${returnDateFormatted} at ${returnRequest.return_time}</li>
-                    <li>Please be available at ${escapeHtml(returnRequest.delivery_location || returnRequest.original_hostel)} during the delivery time</li>
+                    <li>Please be available at ${escapeHtml(formatLocation(returnRequest.delivery_location || returnRequest.original_hostel, returnRequest.delivery_room_number, returnRequest.delivery_floor))} during the delivery time</li>
                     <li>Have your payment ready (₵30 delivery fee)</li>
                 `;
                 break;
@@ -552,7 +553,7 @@ async function sendReturnStatusUpdateEmail(returnRequest) {
                         <p><strong>Original Booking:</strong> ${escapeHtml(returnRequest.booking_ref)}</p>
                         <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
                         <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
-                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.delivery_location || returnRequest.original_hostel)}</p>
+                        <p><strong>Delivery Location:</strong> ${escapeHtml(formatLocation(returnRequest.delivery_location || returnRequest.original_hostel, returnRequest.delivery_room_number, returnRequest.delivery_floor))}</p>
                         <p><strong>Items:</strong> ${escapeHtml(returnRequest.items_summary)}</p>
                         <p><strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${returnRequest.status.toUpperCase()}</span></p>
                     </div>

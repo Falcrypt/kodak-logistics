@@ -621,6 +621,8 @@ function autoSaveFormData() {
         email: document.getElementById('email')?.value || '',
         phone: document.getElementById('phone')?.value || '',
         hostel: document.getElementById('hostel')?.value || '',
+        room_number: document.getElementById('roomNumber')?.value || '',
+        floor: document.getElementById('floor')?.value || '',
         date: document.getElementById('date')?.value || '',
         time: document.getElementById('time')?.value || '',
         description: document.getElementById('description')?.value || '',
@@ -691,6 +693,8 @@ function restoreSavedFormData() {
                 if (document.getElementById('email')) document.getElementById('email').value = data.email || '';
                 if (document.getElementById('phone')) document.getElementById('phone').value = data.phone || '';
                 if (document.getElementById('hostel')) document.getElementById('hostel').value = data.hostel || '';
+                document.getElementById('roomNumber').value = data.room_number || '';
+                document.getElementById('floor').value = data.floor || '';
                 if (document.getElementById('date')) document.getElementById('date').value = data.date || '';
                 if (document.getElementById('time')) document.getElementById('time').value = data.time || '';
                 if (document.getElementById('description')) document.getElementById('description').value = data.description || '';
@@ -717,7 +721,7 @@ function clearSavedFormData() {
 }
 
 function setupAutoSave() {
-    const formInputs = ['name', 'email', 'phone', 'hostel', 'date', 'time', 'description'];
+    const formInputs = ['name', 'email', 'phone', 'hostel', 'roomNumber', 'floor', 'date', 'time', 'description'];
 
     formInputs.forEach(id => {
         const element = document.getElementById(id);
@@ -846,6 +850,8 @@ async function submitBooking(event) {
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
         hostel: document.getElementById('hostel').value,
+        room_number: document.getElementById('roomNumber').value.trim(),
+        floor: document.getElementById('floor').value.trim(),
         date: document.getElementById('date').value,
         time: document.getElementById('time').value,
         description: document.getElementById('description').value,
@@ -912,6 +918,8 @@ async function submitWithPaystack(bookingData) {
             name: bookingData.name,
             phone: bookingData.phone,
             hostel: bookingData.hostel,
+            room_number: bookingData.room_number,
+            floor: bookingData.floor,
             date: bookingData.date,
             time: bookingData.time,
             description: bookingData.description,

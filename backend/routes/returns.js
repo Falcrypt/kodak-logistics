@@ -1,5 +1,6 @@
 // backend/routes/returns.js
 const express = require('express');
+const { locationDetails } = require('../utils/location');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
 const { publicWriteLimiter } = require('../middleware/rateLimiters');
@@ -69,7 +70,7 @@ router.post('/verify-booking', publicWriteLimiter, async (req, res) => {
         // Find the booking
         const booking = await db.getOne(
             `SELECT id, booking_ref, customer_name, customer_email, customer_phone,
-                    hostel_name, items_summary, created_at, status
+                    hostel_name, room_number, floor, items_summary, created_at, status
              FROM bookings
              WHERE booking_ref = $1`,
             [booking_ref.toUpperCase()]
@@ -143,6 +144,8 @@ router.post('/verify-booking', publicWriteLimiter, async (req, res) => {
                 customer_email: booking.customer_email,
                 customer_phone: booking.customer_phone,
                 hostel_name: booking.hostel_name,
+                room_number: booking.room_number,
+                floor: booking.floor,
                 items_summary: booking.items_summary,
                 total_items: itemCount || 1,
                 storage_date: booking.created_at
@@ -160,7 +163,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
     try {
         const {
             booking_id, booking_ref, customer_name, customer_email, customer_phone,
-            original_hostel, delivery_location, items_summary, total_items_stored,
+            original_hostel, delivery_location, delivery_room_number, delivery_floor, items_summary, total_items_stored,
             return_date, return_time, special_instructions,
             payment_method, transaction_id
         } = req.body;
@@ -176,6 +179,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             return res.status(400).json({ error: 'Please enter a delivery destination (maximum 500 characters)' });
         }
         const deliveryLocation = destination.trim();
+        const location = locationDetails(delivery_room_number, delivery_floor);
 
         // Check daily limit
         const dailyLimit = await checkDailyLimit(return_date);
@@ -227,8 +231,8 @@ router.post('/', publicWriteLimiter, async (req, res) => {
                 booking_id, booking_ref, customer_name, customer_email,
                 customer_phone, original_hostel, items_summary, total_items_stored,
                 return_date, return_time, special_instructions, delivery_fee,
-                payment_method, transaction_id, payment_status, status, delivery_location
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+                payment_method, transaction_id, payment_status, status, delivery_location, delivery_room_number, delivery_floor
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
             RETURNING id
         `;
 
@@ -236,7 +240,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             booking_id, booking_ref, customer_name, customer_email,
             customer_phone, original_hostel, items_summary, total_items_stored,
             return_date, return_time, special_instructions || '', 30.00,
-            payment_method || 'delivery', transaction_id || null, paymentStatus, 'pending', deliveryLocation
+            payment_method || 'delivery', transaction_id || null, paymentStatus, 'pending', deliveryLocation, location.room_number, location.floor
         ];
 
         const result = await db.query(insertSql, params);
@@ -257,6 +261,8 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             customer_phone: customer_phone,
             original_hostel: original_hostel,
             delivery_location: deliveryLocation,
+            delivery_room_number: location.room_number,
+            delivery_floor: location.floor,
             items_summary: items_summary,
             return_date: return_date,
             return_time: return_time,
@@ -279,7 +285,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
         
     } catch (error) {
         console.error('Create return request error:', error);
-        res.status(500).json({ error: 'Failed to create return request' });
+        res.status(error.status || 500).json({ error: error.status === 400 ? error.message : 'Failed to create return request' });
     }
 });
 
@@ -289,7 +295,7 @@ router.get('/customer/:email', async (req, res) => {
         const { email } = req.params;
         
         const requests = await db.query(
-            `SELECT id, request_ref, booking_ref, items_summary, return_date, return_time,
+            `SELECT id, request_ref, booking_ref, original_hostel, delivery_location, delivery_room_number, delivery_floor, items_summary, return_date, return_time,
                     delivery_fee, payment_method, payment_status, status, created_at, completed_at
              FROM return_requests 
              WHERE customer_email = $1 

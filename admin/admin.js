@@ -754,7 +754,7 @@ function displayRecentBookings(bookings) {
 
     return `<tr>
       <td>${escapeHtml(date)}</td>
-      <td>${escapeHtml(name)}</td>
+      <td>${escapeHtml(name)}<br><small>${escapeHtml([booking.hostel_name || booking.hostel || '', booking.room_number ? `Room ${booking.room_number}` : '', booking.floor].filter(Boolean).join(', '))}</small></td>
       <td>${renderItemThumbs(items)}</td>
       <td>₵${escapeHtml(total)}</td>
       <td>${paymentBadge}</td>
@@ -913,7 +913,7 @@ function displayAllBookings(bookings) {
     return `<tr>
       <td>${escapeHtml(id)}</td>
       <td>${escapeHtml(ref)}</td>
-      <td>${escapeHtml(name)}</td>
+      <td>${escapeHtml(name)}<br><small>${escapeHtml([booking.hostel_name || booking.hostel || '', booking.room_number ? `Room ${booking.room_number}` : '', booking.floor].filter(Boolean).join(', '))}</small></td>
       <td>${escapeHtml(phone)}</td>
       <td>${escapeHtml(date)}</td>
       <td>${renderItemThumbs(items)}</td>
@@ -1362,10 +1362,10 @@ async function exportBookings() {
     const data = await apiCall('/bookings/export');
     if (!data) return;
     
-    const headers = ['Reference', 'Date', 'Name', 'Phone', 'Hostel', 'Items', 'Total', 'Status', 'Payment Method', 'Payment Status', 'Transaction ID'];
+    const headers = ['Reference', 'Date', 'Name', 'Phone', 'Hostel', 'Room Number', 'Floor', 'Items', 'Total', 'Status', 'Payment Method', 'Payment Status', 'Transaction ID'];
     const rows = data.map(b => [
       b.booking_ref || '', b.booking_date || '', b.customer_name || '',
-      b.customer_phone || '', b.hostel_name || '',
+      b.customer_phone || '', b.hostel_name || '', b.room_number || '', b.floor || '',
       b.items_summary || '', b.total_amount || '0', b.status || '',
       b.payment_method || 'pickup', b.payment_status || 'unpaid', b.transaction_id || ''
     ]);
@@ -1834,6 +1834,8 @@ Return Details:
 Date: ${returnDate}
 Time: ${request.return_time}
 Delivery Location: ${request.delivery_location || request.original_hostel}
+Room Number: ${request.delivery_room_number || 'Not provided'}
+Floor: ${request.delivery_floor || 'Not provided'}
 Original Pickup: ${request.original_hostel}
 
 Items: ${request.items_summary}

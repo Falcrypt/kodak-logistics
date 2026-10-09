@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const location = document.getElementById('deliveryLocation');
         location.readOnly = this.value === 'original';
         location.value = location.readOnly ? (verifiedBooking?.hostel_name || '') : '';
+        document.getElementById('deliveryRoomNumber').value = location.readOnly ? (verifiedBooking?.room_number || '') : '';
+        document.getElementById('deliveryFloor').value = location.readOnly ? (verifiedBooking?.floor || '') : '';
         if (!location.readOnly) location.focus();
     });
     
@@ -106,6 +108,8 @@ async function verifyBooking() {
             document.getElementById('returnCustomerEmail').value = verifiedBooking.customer_email;
             document.getElementById('returnCustomerPhone').value = verifiedBooking.customer_phone;
             document.getElementById('returnHostel').value = verifiedBooking.hostel_name;
+            document.getElementById('deliveryRoomNumber').value = verifiedBooking.room_number || '';
+            document.getElementById('deliveryFloor').value = verifiedBooking.floor || '';
             document.getElementById('destinationChoice').value = 'original';
             document.getElementById('deliveryLocation').value = verifiedBooking.hostel_name || '';
             document.getElementById('deliveryLocation').readOnly = true;
@@ -261,6 +265,8 @@ async function submitReturnRequest(event) {
         customer_phone: document.getElementById('returnCustomerPhone').value,
         original_hostel: document.getElementById('returnHostel').value,
         delivery_location: deliveryLocation,
+        delivery_room_number: document.getElementById('deliveryRoomNumber').value.trim(),
+        delivery_floor: document.getElementById('deliveryFloor').value.trim(),
         items_summary: document.getElementById('itemsSummary').value,
         total_items_stored: parseInt(document.getElementById('totalItems').value),
         return_date: returnDate,

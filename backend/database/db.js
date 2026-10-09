@@ -225,7 +225,7 @@ async function ensureReturnTables() {
         `);
         console.log('✅ return_requests table ready');
         
-        await query('ALTER TABLE return_requests ADD COLUMN IF NOT EXISTS delivery_location TEXT');
+        await query('ALTER TABLE return_requests ADD COLUMN IF NOT EXISTS delivery_location TEXT, ADD COLUMN IF NOT EXISTS delivery_room_number VARCHAR(50), ADD COLUMN IF NOT EXISTS delivery_floor VARCHAR(50)');
 
         // Create return_daily_counter table
         await query(`

@@ -1,4 +1,5 @@
 const express = require('express');
+const { locationDetails } = require('../utils/location');
 const db = require('../database/db');
 const { authenticateToken } = require('../middleware/auth');
 const { publicWriteLimiter } = require('../middleware/rateLimiters');
@@ -10,7 +11,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
     try {
         console.log("📥 RECEIVED BOOKING DATA:", req.body);
         const {
-            name, email, phone, hostel, date, time, description, items,
+            name, email, phone, hostel, room_number, floor, date, time, description, items,
             payment_method, transaction_id
         } = req.body;
 
@@ -18,6 +19,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
+        const location = locationDetails(room_number, floor);
         const itemsSummary = items.map(item => `${item.quantity}x ${item.type}`).join(', ');
 
         // Recompute the total from the live prices server-side — never trust
@@ -50,15 +52,15 @@ router.post('/', publicWriteLimiter, async (req, res) => {
         const sql = `INSERT INTO bookings 
             (customer_name, customer_email, customer_phone, hostel_name, 
              booking_date, booking_time, items, items_summary, total_amount, status, description,
-             payment_method, transaction_id, payment_status) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`;
+             payment_method, transaction_id, payment_status, room_number, floor)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`;
         
         const params = [ 
             name, email, phone, hostel, date, time,
             JSON.stringify(items), itemsSummary, total, 'pending', description || '',
             payment_method || 'pickup',
             transaction_id || null,
-            paymentStatus
+            paymentStatus, location.room_number, location.floor
         ];
         
         // ✅ db.insert already adds RETURNING id, so we just get the ID back
@@ -75,6 +77,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             customer_email: email,
             customer_phone: phone,
             hostel_name: hostel,
+            ...location,
             booking_date: date,
             booking_time: time,
             items_summary: itemsSummary,
@@ -98,7 +101,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
         
     } catch (error) {
         console.error('❌ Create booking error:', error);
-        res.status(500).json({ error: 'Failed to create booking: ' + error.message });
+        res.status(error.status || 500).json({ error: 'Failed to create booking: ' + error.message });
     }
 });
 

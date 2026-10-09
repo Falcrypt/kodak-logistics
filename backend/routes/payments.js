@@ -1,5 +1,6 @@
 // backend/routes/payments.js - Paystack checkout: verify-on-callback + webhook safety net
 const express = require('express');
+const { locationDetails } = require('../utils/location');
 const crypto = require('crypto');
 const db = require('../database/db');
 const { publicWriteLimiter } = require('../middleware/rateLimiters');
@@ -35,6 +36,7 @@ async function createBookingFromPaystack(txn) {
     if (existing) return existing;
 
     const meta = txn.metadata || {};
+    const location = locationDetails(meta.room_number, meta.floor);
     const items = meta.items || [];
     const itemsSummary = items.map(item => `${item.quantity}x ${item.type}`).join(', ');
     const total = txn.amount / 100; // pesewas -> cedis
@@ -42,13 +44,13 @@ async function createBookingFromPaystack(txn) {
     const sql = `INSERT INTO bookings
         (customer_name, customer_email, customer_phone, hostel_name,
          booking_date, booking_time, items, items_summary, total_amount, status, description,
-         payment_method, transaction_id, payment_status, payment_verified_at, payment_verified_by)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), $15)`;
+         payment_method, transaction_id, payment_status, payment_verified_at, payment_verified_by, room_number, floor)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), $15, $16, $17)`;
 
     const params = [
         meta.name, txn.customer?.email || meta.email, meta.phone, meta.hostel,
         meta.date, meta.time, JSON.stringify(items), itemsSummary, total, 'confirmed',
-        meta.description || '', 'paystack', txn.reference, 'verified', 'Paystack (auto)'
+        meta.description || '', 'paystack', txn.reference, 'verified', 'Paystack (auto)', location.room_number, location.floor
     ];
 
     const insertId = await db.insert(sql, params);
@@ -58,6 +60,7 @@ async function createBookingFromPaystack(txn) {
     const booking = {
         id: insertId, booking_ref: bookingRef, customer_name: meta.name,
         customer_email: txn.customer?.email || meta.email, customer_phone: meta.phone,
+        ...location,
         hostel_name: meta.hostel, booking_date: meta.date, booking_time: meta.time,
         items_summary: itemsSummary, total_amount: total, status: 'confirmed',
         payment_method: 'paystack', transaction_id: txn.reference, payment_status: 'verified'
@@ -91,7 +94,7 @@ router.post('/verify-and-book', publicWriteLimiter, async (req, res) => {
         });
     } catch (error) {
         console.error('❌ Verify-and-book error:', error);
-        res.status(500).json({ error: 'Failed to confirm payment: ' + error.message });
+        res.status(error.status || 500).json({ error: 'Failed to confirm payment: ' + error.message });
     }
 });
 

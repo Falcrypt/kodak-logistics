@@ -127,6 +127,8 @@ async function setupDatabase() {
         `);
         console.log('✅ settings table ready');
         
+        await db.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS room_number VARCHAR(50), ADD COLUMN IF NOT EXISTS floor VARCHAR(50)');
+
         // ===== ALL NEW SPECIFIC ITEMS (No more generic items) =====
         const defaultSettings = [
             // Contact settings
