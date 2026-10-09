@@ -392,7 +392,7 @@ async function sendReturnRequestConfirmation(returnRequest) {
                         <p><strong>Original Booking:</strong> ${escapeHtml(returnRequest.booking_ref)}</p>
                         <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
                         <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
-                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.original_hostel)}</p>
+                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.delivery_location || returnRequest.original_hostel)}</p>
                         <p><strong>Items to Return:</strong> ${escapeHtml(returnRequest.items_summary)}</p>
                         <p><strong>Delivery Fee:</strong> ₵30.00</p>
                         <p><strong>Payment:</strong> ${statusMessage}</p>
@@ -457,7 +457,7 @@ async function sendReturnRequestNotification(returnRequest) {
                         <p><strong>Request Reference:</strong> ${escapeHtml(returnRequest.request_ref)}</p>
                         <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
                         <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
-                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.original_hostel)}</p>
+                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.delivery_location || returnRequest.original_hostel)}</p>
                         <p><strong>Items:</strong> ${escapeHtml(returnRequest.items_summary)}</p>
                         <p><strong>Delivery Fee:</strong> ₵30.00</p>
                         <p><strong>Payment Method:</strong> ${returnRequest.payment_method === 'momo' ? 'Mobile Money (Pending Verification)' : 'Pay on Delivery'}</p>
@@ -504,7 +504,7 @@ async function sendReturnStatusUpdateEmail(returnRequest) {
                 statusMessage = 'Your return request has been approved!';
                 nextSteps = `
                     <li>We will deliver your items on ${returnDateFormatted} at ${returnRequest.return_time}</li>
-                    <li>Please be available at ${returnRequest.original_hostel} during the delivery time</li>
+                    <li>Please be available at ${escapeHtml(returnRequest.delivery_location || returnRequest.original_hostel)} during the delivery time</li>
                     <li>Have your payment ready (₵30 delivery fee)</li>
                 `;
                 break;
@@ -552,7 +552,7 @@ async function sendReturnStatusUpdateEmail(returnRequest) {
                         <p><strong>Original Booking:</strong> ${escapeHtml(returnRequest.booking_ref)}</p>
                         <p><strong>Return Date:</strong> ${returnDateFormatted}</p>
                         <p><strong>Return Time:</strong> ${returnRequest.return_time}</p>
-                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.original_hostel)}</p>
+                        <p><strong>Delivery Location:</strong> ${escapeHtml(returnRequest.delivery_location || returnRequest.original_hostel)}</p>
                         <p><strong>Items:</strong> ${escapeHtml(returnRequest.items_summary)}</p>
                         <p><strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${returnRequest.status.toUpperCase()}</span></p>
                     </div>

@@ -160,7 +160,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
     try {
         const {
             booking_id, booking_ref, customer_name, customer_email, customer_phone,
-            original_hostel, items_summary, total_items_stored,
+            original_hostel, delivery_location, items_summary, total_items_stored,
             return_date, return_time, special_instructions,
             payment_method, transaction_id
         } = req.body;
@@ -170,6 +170,13 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
         
+        // Older clients can continue using their original pickup location.
+        const destination = delivery_location === undefined ? original_hostel : delivery_location;
+        if (typeof destination !== 'string' || !destination.trim() || destination.trim().length > 500) {
+            return res.status(400).json({ error: 'Please enter a delivery destination (maximum 500 characters)' });
+        }
+        const deliveryLocation = destination.trim();
+
         // Check daily limit
         const dailyLimit = await checkDailyLimit(return_date);
         if (dailyLimit.remaining <= 0) {
@@ -220,8 +227,8 @@ router.post('/', publicWriteLimiter, async (req, res) => {
                 booking_id, booking_ref, customer_name, customer_email,
                 customer_phone, original_hostel, items_summary, total_items_stored,
                 return_date, return_time, special_instructions, delivery_fee,
-                payment_method, transaction_id, payment_status, status
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                payment_method, transaction_id, payment_status, status, delivery_location
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
             RETURNING id
         `;
 
@@ -229,7 +236,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             booking_id, booking_ref, customer_name, customer_email,
             customer_phone, original_hostel, items_summary, total_items_stored,
             return_date, return_time, special_instructions || '', 30.00,
-            payment_method || 'delivery', transaction_id || null, paymentStatus, 'pending'
+            payment_method || 'delivery', transaction_id || null, paymentStatus, 'pending', deliveryLocation
         ];
 
         const result = await db.query(insertSql, params);
@@ -249,6 +256,7 @@ router.post('/', publicWriteLimiter, async (req, res) => {
             customer_email: customer_email,
             customer_phone: customer_phone,
             original_hostel: original_hostel,
+            delivery_location: deliveryLocation,
             items_summary: items_summary,
             return_date: return_date,
             return_time: return_time,

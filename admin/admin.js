@@ -1833,7 +1833,8 @@ Email: ${request.customer_email}
 Return Details:
 Date: ${returnDate}
 Time: ${request.return_time}
-Location: ${request.original_hostel}
+Delivery Location: ${request.delivery_location || request.original_hostel}
+Original Pickup: ${request.original_hostel}
 
 Items: ${request.items_summary}
 

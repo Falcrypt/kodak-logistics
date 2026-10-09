@@ -30,6 +30,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup payment method toggles
     setupPaymentMethodToggle();
+    document.getElementById('destinationChoice').addEventListener('change', function() {
+        const location = document.getElementById('deliveryLocation');
+        location.readOnly = this.value === 'original';
+        location.value = location.readOnly ? (verifiedBooking?.hostel_name || '') : '';
+        if (!location.readOnly) location.focus();
+    });
     
     // Setup copy button for MoMo number
     setupCopyButton();
@@ -100,6 +106,10 @@ async function verifyBooking() {
             document.getElementById('returnCustomerEmail').value = verifiedBooking.customer_email;
             document.getElementById('returnCustomerPhone').value = verifiedBooking.customer_phone;
             document.getElementById('returnHostel').value = verifiedBooking.hostel_name;
+            document.getElementById('destinationChoice').value = 'original';
+            document.getElementById('deliveryLocation').value = verifiedBooking.hostel_name || '';
+            document.getElementById('deliveryLocation').readOnly = true;
+            document.getElementById('originalLocationText').textContent = 'Original pickup: ' + (verifiedBooking.hostel_name || 'Not recorded');
             document.getElementById('bookingId').value = verifiedBooking.id;
             document.getElementById('bookingRefHidden').value = verifiedBooking.booking_ref;
             document.getElementById('itemsSummary').value = verifiedBooking.items_summary;
@@ -236,6 +246,13 @@ async function submitReturnRequest(event) {
         return;
     }
     
+    const deliveryLocation = document.getElementById('deliveryLocation').value.trim();
+    if (!deliveryLocation) {
+        showToast('Please enter your delivery destination', 'error');
+        document.getElementById('deliveryLocation').focus();
+        return;
+    }
+
     const requestData = {
         booking_id: parseInt(document.getElementById('bookingId').value),
         booking_ref: document.getElementById('bookingRefHidden').value,
@@ -243,6 +260,7 @@ async function submitReturnRequest(event) {
         customer_email: document.getElementById('returnCustomerEmail').value,
         customer_phone: document.getElementById('returnCustomerPhone').value,
         original_hostel: document.getElementById('returnHostel').value,
+        delivery_location: deliveryLocation,
         items_summary: document.getElementById('itemsSummary').value,
         total_items_stored: parseInt(document.getElementById('totalItems').value),
         return_date: returnDate,

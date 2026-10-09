@@ -136,6 +136,20 @@
                 <input type="hidden" id="itemsSummary">
                 <input type="hidden" id="totalItems">
 
+                <div class="form-group">
+                    <label for="destinationChoice">Delivery Destination *</label>
+                    <select id="destinationChoice" required>
+                        <option value="original">Original pickup location</option>
+                        <option value="new">A new hostel or location</option>
+                    </select>
+                    <small id="originalLocationText"></small>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryLocation">Delivery Address / Hostel *</label>
+                    <input type="text" id="deliveryLocation" maxlength="500" required readonly placeholder="Enter hostel, area, room number and nearby landmark">
+                    <small>Include enough detail for our team to find you.</small>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Return Date *</label>
