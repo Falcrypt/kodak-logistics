@@ -28,7 +28,7 @@ const paymentsRoutes = require('./routes/payments');
 const app = express();
 
 // Account for Render's ingress without trusting arbitrary forwarded IPs.
-configureProxy(app);
+configureProxy(app, process.env);
 
 // ===== STEP 5: MIDDLEWARE =====
 
