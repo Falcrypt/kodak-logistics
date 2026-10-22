@@ -8,6 +8,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const { configureProxy } = require('./middleware/proxy');
 const db = require('./database/db');
 
 // ===== IMPORT THE FUNCTIONS FROM db.js =====
@@ -25,6 +26,9 @@ const paymentsRoutes = require('./routes/payments');
 
 // ===== STEP 4: CREATE EXPRESS APP =====
 const app = express();
+
+// Account for Render's ingress without trusting arbitrary forwarded IPs.
+configureProxy(app);
 
 // ===== STEP 5: MIDDLEWARE =====
 
@@ -259,6 +263,7 @@ const PORT = process.env.PORT || 3000;
 async function startServer() {
     console.log('🚀 Starting Kodak Logistics server...');
     
+    console.log(`Runtime: Node.js ${process.version}; trusted proxy hops: ${app.get('trust proxy')}`);
     const dbConnected = await db.testConnection();
     if (!dbConnected) {
         console.error('❌ Cannot start server without database');
